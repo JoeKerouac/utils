@@ -4,7 +4,7 @@ import com.joe.utils.common.BeanUtils;
 import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.parse.xml.converter.XmlTypeConverterUtil;
-import com.joe.utils.type.JavaTypeUtil;
+import com.joe.utils.type.ReflectUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -236,7 +236,7 @@ public class XmlParser {
             }
 
             //判断是否是简单类型或者集合类型
-            if (JavaTypeUtil.isSimple(descriptor.getRealType())) {
+            if (ReflectUtil.isSimple(descriptor.getRealType())) {
                 //是简单类型或者集合类型
                 if (Map.class.isAssignableFrom(descriptor.getRealType())) {
                     logger.warn("xml解析器不能处理map类型，该类型将被忽略");

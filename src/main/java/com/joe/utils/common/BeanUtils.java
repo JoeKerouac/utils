@@ -1,7 +1,7 @@
 package com.joe.utils.common;
 
 import com.joe.utils.collection.LRUCacheMap;
-import com.joe.utils.type.JavaTypeUtil;
+import com.joe.utils.type.ReflectUtil;
 import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,6 @@ import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -259,31 +258,6 @@ public class BeanUtils {
             cache.put(clazz, descriptors);
             return descriptors;
         }
-
-    }
-
-    /**
-     * 判断字段是否是final
-     *
-     * @param field 要判断的字段
-     * @return 返回true表示字段是final类型
-     */
-    public static boolean isFinal(Field field) {
-        // getModifiers获取出来的各个修饰符的值（多个修饰符时需要相加）：
-        // public: 1 0
-        // private: 2 1
-        // protected: 4 2
-        // static: 8 3
-        // final: 16 4
-        // synchronized: 32 5
-        // volatile: 64 6
-        // transient: 128 7
-        // native: 256 8
-        // interface: 512 9
-        // abstract: 1024 10
-        // strictfp: 2048 11
-        int modifier = field.getModifiers();
-        return Modifier.isFinal(modifier);
     }
 
     /**
@@ -345,7 +319,7 @@ public class BeanUtils {
 
         CustomPropertyDescriptor customPropertyDescriptor = null;
         try {
-            if (isFinal(field)) {
+            if (ReflectUtil.isFinal(field)) {
                 logger.debug("字段{}是final类型，尝试为该字段创建说明", name);
                 customPropertyDescriptor = tryBuildFinal(field, clazz);
             } else {
@@ -401,15 +375,8 @@ public class BeanUtils {
         if (descriptor == null) {
             return null;
         }
-        Class<?> typeClass = field.getType();
-        String typeName = typeClass.getName();
-        //判断是否是基本数据类型
-        if (JavaTypeUtil.isGeneralType(typeClass)) {
-            logger.debug("类型[{}]是基本数据类型", typeClass);
-            typeClass = JavaTypeUtil.getGeneralTypeByName(typeName);
-        }
         return new CustomPropertyDescriptor(descriptor.getName(), descriptor.getReadMethod(),
-                descriptor.getWriteMethod(), clazz, field, typeClass);
+                descriptor.getWriteMethod(), clazz, field);
     }
 
     private final static class FieldCache {
@@ -461,17 +428,17 @@ public class BeanUtils {
         private final Class<?> clazz;
         // 字段
         private final Field field;
-        //字段的类型（如果是基本类型如int、byte之类的那么使用自定义的封装类型来和Integer、Byte等区分）
+        //字段的类型
         private Class<?> type;
 
         public CustomPropertyDescriptor(String name, Method readMethod, Method writeMethod, Class<?> clazz,
-                                        Field field, Class<?> type) {
+                                        Field field) {
             this.name = name;
             this.readMethod = readMethod;
             this.writeMethod = writeMethod;
             this.clazz = clazz;
             this.field = field;
-            this.type = type;
+            this.type = field.getType();
             if (readMethod != null)
                 readMethod.setAccessible(true);
             if (writeMethod != null)
@@ -483,8 +450,8 @@ public class BeanUtils {
          *
          * @return 返回true表示该字段是八大基本类型
          */
-        public boolean isBasic() {
-            return JavaTypeUtil.isInternalBasicType(type);
+        public boolean isGeneralType() {
+            return ReflectUtil.isGeneralType(type);
         }
 
         /**
@@ -492,8 +459,8 @@ public class BeanUtils {
          *
          * @return 返回true表示该字段是八大基本类型的封装类型
          */
-        public boolean isBasicObject() {
-            return JavaTypeUtil.isBasicObject(type);
+        public boolean isBasic() {
+            return ReflectUtil.isBasic(type);
         }
 
         /**
@@ -502,7 +469,7 @@ public class BeanUtils {
          * @return 字段的真实类型
          */
         public Class<?> getRealType() {
-            return field.getType();
+            return type;
         }
 
         /**
@@ -511,7 +478,7 @@ public class BeanUtils {
          * @return 字段的类型名，如果字段是基本类型那么将会返回int、long等而不是java.util.String这种格式的类型名
          */
         public String getTypeName() {
-            return field.getType().getName();
+            return type.getName();
         }
 
         /**

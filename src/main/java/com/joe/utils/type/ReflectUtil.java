@@ -2,8 +2,6 @@ package com.joe.utils.type;
 
 import com.joe.utils.common.BeanUtils;
 import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
-import com.joe.utils.type.basic.*;
-import jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +18,8 @@ import java.util.regex.Pattern;
  *
  * @author joe
  */
-public class JavaTypeUtil {
-    private static final Logger logger = LoggerFactory.getLogger(JavaTypeUtil.class);
+public class ReflectUtil {
+    private static final Logger logger = LoggerFactory.getLogger(ReflectUtil.class);
     private static final Pattern superPattern = Pattern.compile("(.*) super.*");
     private static final Pattern extendsPattern = Pattern.compile("(.*) extends.*");
 
@@ -69,37 +67,62 @@ public class JavaTypeUtil {
     }
 
     /**
+     * 判断字段是否是final的
+     *
+     * @param field 字段
+     * @return 返回true表示是final
+     */
+    public static boolean isFinal(Field field) {
+        int modifier = field.getModifiers();
+        return isFinal(modifier);
+    }
+
+    /**
+     * 判断方法、构造器是否是final
+     *
+     * @param executable 方法、构造器对象
+     * @return 返回true表示是final
+     */
+    public static boolean isFinal(Executable executable) {
+        int modifier = executable.getModifiers();
+        return isFinal(modifier);
+    }
+
+    /**
+     * 判断字段是否是public
+     *
+     * @param field 字段
+     * @return 返回true表示是public
+     */
+    public static boolean isPublic(Field field) {
+        int modifier = field.getModifiers();
+        return isPublic(modifier);
+    }
+
+    /**
+     * 判断方法、构造器是否是public
+     *
+     * @param executable 方法、构造器对象
+     * @return 返回true表示是public
+     */
+    public static boolean isPublic(Executable executable) {
+        int modifier = executable.getModifiers();
+        return isPublic(modifier);
+    }
+
+    /**
      * 根据java系统类型得出自定义类型
      *
      * @param type java反射取得的类型
      * @return 自定义java类型说明
      */
     public static JavaType createJavaType(Type type) {
+        if (type instanceof JavaType) {
+            return (JavaType) type;
+        }
         String typeName = type.getTypeName();
-        JavaType javaType = null;
-
-        Class<?> generalType = null;
-        if (typeName.endsWith("[]")) {
-            // 类型是系统数组类型（格式：String[]）
-            logger.debug("系统类型为：{}，转换为相应的Array类型", typeName);
-            if (isGeneralArrayType(typeName)) {
-                generalType = getGeneralTypeByName(typeName.replaceAll("\\[\\]", ""));
-                logger.debug("{}是基本类型，对应的包装类型为：{}", typeName, generalType);
-            } else {
-                typeName = typeName.replaceAll("\\[\\]", "");
-            }
-            logger.debug("数组类型为：{}", typeName);
-            ArrayType arrayType = new ArrayType();
-            try {
-                generalType = generalType == null ? Class.forName(typeName) : generalType;
-                arrayType.setBaseType(generalType);
-                arrayType.setName(typeName);
-                javaType = arrayType;
-            } catch (Exception e) {
-                logger.error("反射获取类型{}错误", typeName, e);
-                throw new RuntimeException(e);
-            }
-        } else if (type instanceof WildcardType) {
+        JavaType javaType;
+        if (type instanceof WildcardType) {
             // 该类型是不确定的泛型，即泛型为 ?
             logger.debug("类型{}是不确定的泛型", typeName);
             WildcardType wildcardTypeImpl = (WildcardType) type;
@@ -142,17 +165,9 @@ public class JavaTypeUtil {
             // 该类型是普通类型（没有泛型，本身也不是泛型参数）
             javaType = new BaseType();
             BaseType baseType = (BaseType) javaType;
-            Class<?> clazz = null;
-
-            try {
-                if (isGeneralType(typeName)) {
-                    clazz = getGeneralTypeByName(typeName);
-                }
-                baseType.setType(clazz == null ? Class.forName(typeName) : clazz);
-            } catch (Exception e) {
-                logger.error("反射获取类型{}错误", typeName, e);
-            }
-            baseType.setName(((Class) type).getSimpleName());
+            Class<?> clazz = (Class) type;
+            baseType.setType(clazz);
+            baseType.setName(clazz.getSimpleName());
         } else {
             throw new IllegalArgumentException("type[" + type + "]类型未知");
         }
@@ -231,7 +246,7 @@ public class JavaTypeUtil {
      * @return 如果是基本类型则返回<code>true</code>
      * @throws NullPointerException 当传入Class对象为null时抛出该异常
      */
-    public static boolean isBasicObject(Class<?> clazz) throws NullPointerException {
+    public static boolean isBasic(Class<?> clazz) throws NullPointerException {
         if (clazz == null) {
             throw new NullPointerException("Class不能为null");
         } else if (Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz) || Byte.class
@@ -275,23 +290,7 @@ public class JavaTypeUtil {
         if (clazz == null) {
             throw new NullPointerException("Class不能为null");
         }
-        String name = clazz.getName();
-        return isGeneralType(name);
-    }
-
-    /**
-     * 判断指定类型名是否是8大基本类型
-     *
-     * @param name 类型名（通常通过{@link Class#getName()}得到）
-     * @return 如果是基本类型则返回<code>true</code>
-     */
-    public static boolean isGeneralType(String name) {
-        if ("byte".equals(name) || "short".equals(name) || "int".equals(name) || "long".equals(name)
-                || "double".equals(name) || "float".equals(name) || "boolean".equals(name) || "char".equals(name)) {
-            return true;
-        } else {
-            return false;
-        }
+        return clazz.isPrimitive();
     }
 
     /**
@@ -326,71 +325,6 @@ public class JavaTypeUtil {
     }
 
     /**
-     * 根据基本类型的Class对象获取对应的类型（基本类型：byte、short、int、long、double、float、boolean、char）
-     *
-     * @param clazz 对应的原生Java  Class对象
-     * @return 对应的自定义类型
-     * @throws NullPointerException 当传入Class对象为空时抛出该异常
-     */
-    public static Class<?> getGeneralTypeByName(Class<?> clazz) throws NullPointerException {
-        if (clazz == null) {
-            throw new NullPointerException("Class不能为null");
-        }
-        String name = clazz.getName();
-        return getGeneralTypeByName(name);
-    }
-
-    /**
-     * 根据基本类型的名称获取对应的类型（名称应为：byte、short、int、long、double、float、boolean、char其中之一）
-     *
-     * @param name 反射获取到的基本类型名称
-     * @return 对应的自定义类型
-     */
-    public static Class<?> getGeneralTypeByName(String name) {
-        switch (name) {
-            case "byte":
-                return ByteType.class;
-            case "short":
-                return ShortType.class;
-            case "int":
-                return IntType.class;
-            case "long":
-                return LongType.class;
-            case "double":
-                return DoubleType.class;
-            case "float":
-                return FloatType.class;
-            case "boolean":
-                return BooleanType.class;
-            case "char":
-                return CharacterType.class;
-            default:
-                logger.warn("{}不是基本类型", name);
-                return null;
-        }
-    }
-
-    /**
-     * 判断类型是否是内置基本类型
-     *
-     * @param clazz 类型的Class对象
-     * @return 返回true表示类型是内置基本类型
-     * @throws NullPointerException 当传入Class对象为空时抛出该异常
-     */
-    public static boolean isInternalBasicType(Class<?> clazz) throws NullPointerException {
-        if (clazz == null) {
-            throw new NullPointerException("Class不能为null");
-        }
-        if (clazz.equals(ByteType.class) || clazz.equals(ShortType.class) || clazz.equals(IntType.class) || clazz
-                .equals(LongType.class) || clazz.equals(DoubleType.class) || clazz.equals(FloatType.class) || clazz
-                .equals(BooleanType.class) || clazz.equals(CharType.class)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
      * 处理泛型名称
      *
      * @param fullName 泛型全名
@@ -410,5 +344,25 @@ public class JavaTypeUtil {
             }
         }
         return name;
+    }
+
+    /**
+     * 判断修饰符是否是final
+     *
+     * @param modifier 修饰符
+     * @return 返回true表示是final类型
+     */
+    private static boolean isFinal(int modifier) {
+        return Modifier.isFinal(modifier);
+    }
+
+    /**
+     * 判断修饰符是否是public
+     *
+     * @param modifier 修饰符
+     * @return 返回true表示是public
+     */
+    private static boolean isPublic(int modifier) {
+        return Modifier.isPublic(modifier);
     }
 }

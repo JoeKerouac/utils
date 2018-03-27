@@ -1,16 +1,13 @@
 package com.joe.utils.parse.xml.converter;
 
 import com.joe.utils.common.BeanUtils;
-import com.joe.utils.parse.SerializeException;
 import com.joe.utils.parse.xml.XmlNode;
-import com.joe.utils.parse.xml.XmlParser;
 import com.joe.utils.parse.xml.XmlTypeConvert;
 import com.joe.utils.type.basic.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,7 +92,7 @@ public class XmlTypeConverterUtil {
      */
     public static XmlTypeConvert resolve(BeanUtils.CustomPropertyDescriptor filed) {
         XmlTypeConvert convert;
-        if (filed.isBasic() || filed.isBasicObject()) {
+        if (filed.isGeneralType() || filed.isBasic()) {
             convert = XmlTypeConverterUtil.converters.get(filed.getTypeName());
         } else if (String.class.equals(filed.getType())) {
             convert = DEFAULT_CONVERTER;

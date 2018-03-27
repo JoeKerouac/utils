@@ -3,7 +3,7 @@ package com.joe.utils.parse.xml.converter;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.parse.xml.XmlParser;
 import com.joe.utils.parse.xml.XmlTypeConvert;
-import com.joe.utils.type.JavaTypeUtil;
+import com.joe.utils.type.ReflectUtil;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +21,14 @@ public interface XmlConverter<T> extends XmlTypeConvert<T> {
     @Override
     default T read(Element element, String attrName) {
         String data = StringUtils.isEmpty(attrName) ? element.asXML() : element.attributeValue(attrName);
-        if (String.class.equals(resolve())) {
+        Class<T> clazz = resolve();
+        if (String.class.equals(clazz)) {
             logger.info("xml转换器确定的字段类型为String，转到String转换器");
             return (T) data;
-        } else if (JavaTypeUtil.isBasicObject(resolve()) || JavaTypeUtil.isInternalBasicType(resolve())) {
-            logger.info("xml转换器确定的字段类型为" + resolve().getName() + "，转到基本类型转换器");
-            return (T) XmlTypeConverterUtil.converters.get(resolve().getName()).read(element, attrName);
+        } else if (ReflectUtil.isBasic(clazz) || ReflectUtil.isGeneralType(clazz)) {
+            logger.info("xml转换器确定的字段类型为" + clazz.getName() + "，转到基本类型转换器");
+            return (T) XmlTypeConverterUtil.converters.get(clazz.getName()).read(element, attrName);
         }
-        return PARSER.parse(data, resolve());
+        return PARSER.parse(data, clazz);
     }
 }
