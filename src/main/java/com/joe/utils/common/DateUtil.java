@@ -122,6 +122,17 @@ public class DateUtil {
     }
 
     /**
+     * 获取指定格式的当前日期的字符串，指定时区
+     *
+     * @param format 日期格式
+     * @param zoneId 时区ID，例如GMT
+     * @return 指定格式的当前日期的字符串
+     */
+    public static String getFormatDate(String format, String zoneId) {
+        return getFormatDate(format, new Date(), zoneId);
+    }
+
+    /**
      * 获取指定日期的指定格式的字符串
      *
      * @param format 日期格式
@@ -129,8 +140,20 @@ public class DateUtil {
      * @return 指定日期的指定格式的字符串
      */
     public static String getFormatDate(String format, Date date) {
+        return getFormatDate(format, date, ZoneId.systemDefault().getId());
+    }
+
+    /**
+     * 获取指定日期的指定格式的字符串，指定时区
+     *
+     * @param format 日期格式
+     * @param date   指定日期
+     * @param zoneId 时区ID，例如GMT
+     * @return 指定日期的指定格式的字符串
+     */
+    public static String getFormatDate(String format, Date date, String zoneId) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format);
-        return dateTimeFormatter.format(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+        return dateTimeFormatter.format(date.toInstant().atZone(ZoneId.of(zoneId)).toLocalDateTime());
     }
 
     /**
