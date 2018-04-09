@@ -3,7 +3,6 @@ package com.joe.utils.parse.xml.converter;
 import com.joe.utils.common.BeanUtils;
 import com.joe.utils.parse.xml.XmlNode;
 import com.joe.utils.parse.xml.XmlTypeConvert;
-import com.joe.utils.type.basic.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,15 +41,6 @@ public class XmlTypeConverterUtil {
         converters.put(Float.class.getName(), new FloatConverter());
         converters.put(Boolean.class.getName(), new BooleanConverter());
         converters.put(Character.class.getName(), new CharConverter());
-
-        converters.put(ByteType.class.getName(), new ByteConverter());
-        converters.put(ShortType.class.getName(), new ShortConverter());
-        converters.put(IntType.class.getName(), new IntConverter());
-        converters.put(LongType.class.getName(), new LongConverter());
-        converters.put(DoubleType.class.getName(), new DoubleConverter());
-        converters.put(FloatType.class.getName(), new FloatConverter());
-        converters.put(BooleanType.class.getName(), new BooleanConverter());
-        converters.put(CharType.class.getName(), new CharConverter());
     }
 
     /**
