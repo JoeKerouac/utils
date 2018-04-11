@@ -33,6 +33,22 @@ public class Tree<T> {
     }
 
     /**
+     * 更新节点数据
+     *
+     * @param name 节点名
+     * @param data 要更新的数据
+     * @return 节点原来的数据
+     */
+    public T updateData(String name, T data) {
+        Node<T> node = root.getNode(name);
+        T old = null;
+        if (node != null) {
+            old = node.setData(data);
+        }
+        return old;
+    }
+
+    /**
      * 判断指定路径是否存在
      *
      * @param name 路径名
@@ -163,8 +179,10 @@ public class Tree<T> {
          *
          * @param data 要更新的数据
          */
-        public void setData(T data) {
+        public T setData(T data) {
+            T old = this.data;
             this.data = data;
+            return old;
         }
 
         /**
