@@ -18,6 +18,28 @@ public class StringUtils {
     private static Pattern numberPattern = Pattern.compile("-?[0-9]{1,}\\.?[0-9]{1,}");
 
     /**
+     * 删除字符串的前/后缀
+     *
+     * @param str 字符串
+     * @param arg 要删除的前/后缀
+     * @return 删除后的结果，例如当str是001234000、arg是0时，结果为1234
+     */
+    public static String trim(String str, String arg) {
+        if (str == null || arg == null) {
+            throw new NullPointerException("str or arg must not be null");
+        }
+
+        while (str.startsWith(arg)) {
+            str.substring(arg.length());
+        }
+
+        while (str.endsWith(arg)) {
+            str.substring(0, str.length() - arg.length());
+        }
+        return str;
+    }
+
+    /**
      * 解析form格式的参数，例如abc=123&amp;sdjk=234n这种格式的数据
      *
      * @param data 要解析的数据
