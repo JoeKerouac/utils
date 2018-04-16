@@ -7,7 +7,7 @@
     <name>utils</name>
     <packaging>jar</packaging>
     <description>常用工具类</description>
-    <url>https://github.com/935237604/utils</url>
+    <url>https://github.com/JoeKerouac/utils</url>
 
     <licenses>
         <license>
@@ -15,6 +15,12 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
+
+    <scm>
+        <connection>scm:git@github.com:JoeKerouac/utils.git</connection>
+        <developerConnection>scm:git@github.com:JoeKerouac/utils.git</developerConnection>
+        <url>https://github.com/JoeKerouac/utils</url>
+    </scm>
 
     <developers>
         <developer>
