@@ -170,7 +170,7 @@ public class XmlParser {
      * @return 解析结果
      */
     public String toXml(Object source) {
-        return toXml(source, DEFAULT_ROOT, false);
+        return toXml(source, null, false);
     }
 
     /**
