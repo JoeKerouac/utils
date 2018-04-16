@@ -30,11 +30,11 @@ public class StringUtils {
         }
 
         while (str.startsWith(arg)) {
-            str.substring(arg.length());
+            str = str.substring(arg.length());
         }
 
         while (str.endsWith(arg)) {
-            str.substring(0, str.length() - arg.length());
+            str = str.substring(0, str.length() - arg.length());
         }
         return str;
     }
