@@ -18,11 +18,12 @@ import java.util.stream.Collectors;
  * XML解析（反向解析为java对象时不区分大小写），该解析器由于大量使用反射，所以在第一次解析
  * 某个类型的对象时效率较低，解析过一次系统会自动添加缓存，速度将会大幅提升（测试中提升了25倍）
  *
- * @author Administrator
+ * @author JoeKerouac
  */
 public class XmlParser {
     private static final Logger logger = LoggerFactory.getLogger(XmlParser.class);
     private static final XmlParser xmlParser = new XmlParser();
+    private static final String DEFAULT_ROOT = "root";
 
     public static XmlParser getInstance() {
         return xmlParser;
@@ -163,10 +164,20 @@ public class XmlParser {
     }
 
     /**
-     * 将Object解析为xml，字段值为null的将不包含在xml中，暂时只能解析基本类型（可以正确解析list、map）
+     * 将Object解析为xml，根节点为root，字段值为null的将不包含在xml中，暂时只能解析基本类型（可以正确解析list、map）
+     *
+     * @param source bean
+     * @return 解析结果
+     */
+    public String toXml(Object source) {
+        return toXml(source, DEFAULT_ROOT, false);
+    }
+
+    /**
+     * 将Object解析为xml，暂时只能解析基本类型（可以正确解析list、map）
      *
      * @param source   bean
-     * @param rootName 根节点名称
+     * @param rootName 根节点名称，如果为null则会尝试使用默认值
      * @param hasNull  是否包含null元素（true：包含）
      * @return 解析结果
      */
@@ -175,6 +186,16 @@ public class XmlParser {
             logger.warn("传入的source为null，返回null");
             return null;
         }
+
+        if (rootName == null) {
+            XmlNode xmlNode = source.getClass().getDeclaredAnnotation(XmlNode.class);
+            rootName = xmlNode == null ? rootName : xmlNode.name();
+        }
+
+        if (rootName == null) {
+            rootName = DEFAULT_ROOT;
+        }
+
         Long start = System.currentTimeMillis();
         Element root = DocumentHelper.createElement(rootName);
         buildDocument(root, source, source.getClass(), !hasNull);

@@ -18,7 +18,7 @@ import java.util.List;
  * @author joe
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Documented
 public @interface XmlNode {
     /**
