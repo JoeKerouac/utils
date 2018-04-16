@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.935237604</groupId>
     <artifactId>utils</artifactId>
-    <version>1.7</version>
+    <version>1.8</version>
     <name>utils</name>
     <packaging>jar</packaging>
     <description>常用工具类</description>
