@@ -7,7 +7,6 @@ import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -113,7 +112,7 @@ public class RedisClusterManagerFactory {
     private static RedisSingleServerConfig buildRedisConfig(String host, int port, String password) throws
             MalformedURLException {
         RedisSingleServerConfig config = new RedisSingleServerConfig();
-        config.setAddress(new URL(host + ":" + port));
+        config.setAddress(host + ":" + port);
         config.setPassword(password);
         return config;
     }
@@ -125,12 +124,13 @@ public class RedisClusterManagerFactory {
      * @return 构建的RedissonClient
      */
     private static RedissonClient buildRedissonClient(RedisBaseConfig redisBaseConfig) {
-        Config config = null;
+        Config config = new Config();
 
         if (redisBaseConfig instanceof RedisSingleServerConfig) {
             RedisSingleServerConfig redisSingleServerConfig = (RedisSingleServerConfig) redisBaseConfig;
             SingleServerConfig singleServerConfig = config.useSingleServer();
-            BeanUtils.copy(redisSingleServerConfig, singleServerConfig);
+            BeanUtils.copy(singleServerConfig, redisSingleServerConfig);
+            singleServerConfig.setAddress(redisSingleServerConfig.getAddress());
         } else {
             throw new IllegalArgumentException("位置的配置类型：" + redisBaseConfig.getClass());
         }

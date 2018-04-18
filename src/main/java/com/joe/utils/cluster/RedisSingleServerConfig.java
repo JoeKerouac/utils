@@ -2,8 +2,6 @@ package com.joe.utils.cluster;
 
 import lombok.Data;
 
-import java.net.URL;
-
 /**
  *
  * @author joe
@@ -12,10 +10,10 @@ import java.net.URL;
 @Data
 public class RedisSingleServerConfig extends RedisBaseConfig {
     /**
-     * Redis server address
+     * Redis server address，format：host:port
      *
      */
-    private URL address;
+    private String address;
 
     /**
      * Minimum idle subscription connection amount
