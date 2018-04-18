@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @version 2018.04.18 10:41
  */
 @Data
-abstract class RedisBaseConfig implements Serializable {
+public abstract class RedisBaseConfig implements Serializable {
     /**
      * If pooled connection not used for a <code>timeout</code> time
      * and current connections amount bigger than minimum idle connections pool size,
