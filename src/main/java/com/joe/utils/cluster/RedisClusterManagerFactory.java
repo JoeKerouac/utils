@@ -57,7 +57,7 @@ public class RedisClusterManagerFactory {
         if (!cache.containsKey(redisBaseConfig)) {
             synchronized (lock) {
                 if (!cache.containsKey(redisBaseConfig)) {
-                    cache.put(redisBaseConfig, new RedisClusterManager(buildRedissonClient(redisBaseConfig)));
+                    cache.put(redisBaseConfig, newInstance(redisBaseConfig));
                 }
             }
         }
@@ -109,7 +109,7 @@ public class RedisClusterManagerFactory {
      * @return redis 单机配置文件
      * @throws MalformedURLException MalformedURLException
      */
-    private static RedisSingleServerConfig buildRedisConfig(String host, int port, String password) throws
+    public static RedisSingleServerConfig buildRedisConfig(String host, int port, String password) throws
             MalformedURLException {
         RedisSingleServerConfig config = new RedisSingleServerConfig();
         config.setAddress(host + ":" + port);

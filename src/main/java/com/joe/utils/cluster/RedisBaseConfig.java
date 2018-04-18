@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Data
 public abstract class RedisBaseConfig implements Serializable {
     /**
-     * If pooled connection not used for a <code>timeout</code> time
+     * If pooled connection not used for a timeout time
      * and current connections amount bigger than minimum idle connections pool size,
      * then it will closed and removed from pool.
      * Value in milliseconds.
@@ -21,7 +21,7 @@ public abstract class RedisBaseConfig implements Serializable {
     private int idleConnectionTimeout = 10000;
 
     /**
-     * Ping timeout used in <code>Node.ping</code> and <code>Node.pingAll<code> operation.
+     * Ping timeout used in Node.ping and Node.pingAll operation.
      * Value in milliseconds.
      */
     private int pingTimeout = 1000;
@@ -56,7 +56,7 @@ public abstract class RedisBaseConfig implements Serializable {
     /**
      * Redis server will be excluded from the list of available nodes
      * when sequential unsuccessful execution attempts of any Redis command
-     * reaches <code>failedAttempts</code>.
+     * reaches failedAttempts.
      */
     private int failedAttempts = 3;
 
