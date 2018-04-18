@@ -130,6 +130,7 @@ public class RedisClusterManagerFactory {
             RedisSingleServerConfig redisSingleServerConfig = (RedisSingleServerConfig) redisBaseConfig;
             SingleServerConfig singleServerConfig = config.useSingleServer();
             BeanUtils.copy(singleServerConfig, redisSingleServerConfig);
+            //该字段write方法和get方法类型不一致，需要手动处理
             singleServerConfig.setAddress(redisSingleServerConfig.getAddress());
         } else {
             throw new IllegalArgumentException("位置的配置类型：" + redisBaseConfig.getClass());
