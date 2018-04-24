@@ -3,6 +3,7 @@ package com.joe.utils.cluster;
 import org.redisson.api.RedissonClient;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -37,5 +38,10 @@ public class RedisClusterManager implements ClusterManager {
     @Override
     public <K, V> ConcurrentMap<K, V> getConcurrentMap(String name) {
         return redissonClient.getMap(name);
+    }
+
+    @Override
+    public <K> Set<K> getSet(String name) {
+        return redissonClient.getSet(name);
     }
 }

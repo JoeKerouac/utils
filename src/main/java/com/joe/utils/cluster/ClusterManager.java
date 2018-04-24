@@ -2,6 +2,7 @@ package com.joe.utils.cluster;
 
 import java.net.MalformedURLException;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -50,6 +51,15 @@ public interface ClusterManager {
      * @return 指定名字对应的Map
      */
     <K, V> ConcurrentMap<K, V> getConcurrentMap(String name);
+
+    /**
+     * 获取一个分布式Set
+     *
+     * @param name Set的名字
+     * @param <K>  Set中数据类型
+     * @return Set
+     */
+    <K> Set<K> getSet(String name);
 
     /**
      * 获取redis实现的分布式管理器
