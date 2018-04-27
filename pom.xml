@@ -165,6 +165,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- redis支持（支持分布式锁和分布式数据结构），暂时未用 -->
         <dependency>
