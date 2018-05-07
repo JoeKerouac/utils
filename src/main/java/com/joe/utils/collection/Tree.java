@@ -2,6 +2,9 @@ package com.joe.utils.collection;
 
 import com.joe.utils.common.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,6 +33,27 @@ public class Tree<T> {
     public T getData(String name) {
         Node<T> node = root.getNode(name);
         return node == null ? null : node.getData();
+    }
+
+    /**
+     * 获取指定路径下的所有直系子节点的数据
+     *
+     * @param name 路径名
+     * @return 指定路径下的所有直系子节点的数据
+     */
+    public List<T> getAllData(String name) {
+        Node<T> node = root.getNode(name);
+        if (node == null) {
+            return Collections.emptyList();
+        } else {
+            Map<String, Node<T>> nodeList = node.getChilds();
+            if (nodeList.isEmpty()) {
+                return Collections.emptyList();
+            }
+            List<T> datas = new ArrayList<>(nodeList.size());
+            node.getChilds().values().forEach(n -> datas.add(n.getData()));
+            return datas;
+        }
     }
 
     /**
