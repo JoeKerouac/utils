@@ -41,7 +41,7 @@ public class Tree<T> {
      * @param name 路径名
      * @return 指定路径下的所有直系子节点的数据
      */
-    public List<T> getAllData(String name) {
+    public List<T> getAllChildData(String name) {
         Node<T> node = root.getNode(name);
         if (node == null) {
             return Collections.emptyList();
