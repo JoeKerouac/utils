@@ -126,7 +126,7 @@
         <annotation.version>1.2</annotation.version>
         <ws.version>2.1</ws.version>
         <cglib.version>3.2.5</cglib.version>
-        <net.version>1.4</net.version>
+        <net.version>1.5</net.version>
     </properties>
 
     <dependencies>
