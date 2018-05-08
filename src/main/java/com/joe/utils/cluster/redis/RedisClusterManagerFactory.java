@@ -1,4 +1,4 @@
-package com.joe.utils.cluster;
+package com.joe.utils.cluster.redis;
 
 import com.joe.utils.common.BeanUtils;
 import org.redisson.Redisson;
@@ -6,7 +6,6 @@ import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,9 +27,8 @@ public class RedisClusterManagerFactory {
      * @param host redis的主机地址，例如192.168.1.100
      * @param port redis的端口，例如8080
      * @return redis实现的分布式锁管理器
-     * @throws MalformedURLException MalformedURLException
      */
-    public static RedisClusterManager getInstance(String host, int port) throws MalformedURLException {
+    public static RedisClusterManager getInstance(String host, int port) {
         return getInstance(host, port, null);
     }
 
@@ -41,9 +39,8 @@ public class RedisClusterManagerFactory {
      * @param port     redis的端口，例如8080
      * @param password 密码
      * @return redis实现的分布式锁管理器
-     * @throws MalformedURLException MalformedURLException
      */
-    public static RedisClusterManager getInstance(String host, int port, String password) throws MalformedURLException {
+    public static RedisClusterManager getInstance(String host, int port, String password) {
         return getInstance(buildRedisConfig(host, port, password));
     }
 
@@ -71,9 +68,8 @@ public class RedisClusterManagerFactory {
      * @param host redis的主机地址，例如192.168.1.100
      * @param port redis的端口，例如8080
      * @return redis实现的分布式锁管理器
-     * @throws MalformedURLException MalformedURLException
      */
-    public static RedisClusterManager newInstance(String host, int port) throws MalformedURLException {
+    public static RedisClusterManager newInstance(String host, int port) {
         return newInstance(host, port, null);
     }
 
@@ -84,9 +80,8 @@ public class RedisClusterManagerFactory {
      * @param port     redis的端口，例如8080
      * @param password 密码
      * @return redis实现的分布式锁管理器
-     * @throws MalformedURLException MalformedURLException
      */
-    public static RedisClusterManager newInstance(String host, int port, String password) throws MalformedURLException {
+    public static RedisClusterManager newInstance(String host, int port, String password) {
         return newInstance(buildRedisConfig(host, port, password));
     }
 
@@ -107,10 +102,8 @@ public class RedisClusterManagerFactory {
      * @param port     redis port
      * @param password redis password
      * @return redis 单机配置文件
-     * @throws MalformedURLException MalformedURLException
      */
-    public static RedisSingleServerConfig buildRedisConfig(String host, int port, String password) throws
-            MalformedURLException {
+    public static RedisSingleServerConfig buildRedisConfig(String host, int port, String password) {
         RedisSingleServerConfig config = new RedisSingleServerConfig();
         config.setAddress(host + ":" + port);
         config.setPassword(password);

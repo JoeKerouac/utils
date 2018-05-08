@@ -1,5 +1,9 @@
 package com.joe.utils.cluster;
 
+import com.joe.utils.cluster.redis.RedisBaseConfig;
+import com.joe.utils.cluster.redis.RedisClusterManager;
+import com.joe.utils.cluster.redis.RedisClusterManagerFactory;
+
 import java.net.MalformedURLException;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +64,15 @@ public interface ClusterManager {
      * @return Set
      */
     <K> Set<K> getSet(String name);
+
+    /**
+     * 获取topic
+     *
+     * @param name topic name
+     * @param <M>  topic中message的类型
+     * @return 对应的topic
+     */
+    <M> Topic<M> getTopic(String name);
 
     /**
      * 获取redis实现的分布式管理器

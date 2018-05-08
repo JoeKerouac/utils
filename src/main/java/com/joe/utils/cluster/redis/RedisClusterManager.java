@@ -1,5 +1,8 @@
-package com.joe.utils.cluster;
+package com.joe.utils.cluster.redis;
 
+import com.joe.utils.cluster.ClusterManager;
+import com.joe.utils.cluster.Topic;
+import com.joe.utils.cluster.redis.RedisTopic;
 import org.redisson.api.RedissonClient;
 
 import java.util.Map;
@@ -43,5 +46,10 @@ public class RedisClusterManager implements ClusterManager {
     @Override
     public <K> Set<K> getSet(String name) {
         return redissonClient.getSet(name);
+    }
+
+    @Override
+    public <M> Topic<M> getTopic(String name) {
+        return new RedisTopic<>(redissonClient.getTopic(name));
     }
 }

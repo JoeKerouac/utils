@@ -1,4 +1,4 @@
-package com.joe.utils.cluster;
+package com.joe.utils.cluster.redis;
 
 import lombok.Data;
 
