@@ -96,7 +96,7 @@ public class XmlParser {
         Element root = document.getRootElement();
         for (CustomPropertyDescriptor descript : propertyDescriptor) {
             XmlNode xmlNode = descript.getAnnotation(XmlNode.class);
-            final String fieldName = descript.getName().toLowerCase();
+            final String fieldName = descript.getName();
             //节点名
             String nodeName = null;
             //属性名
@@ -397,9 +397,7 @@ public class XmlParser {
         }
 
         //将数据转换为用户指定数据
-        List<?> list = elements.stream().map(d -> {
-            return convert.read(d, attrName);
-        }).collect(Collectors.toList());
+        List<?> list = elements.stream().map(d -> convert.read(d, attrName)).collect(Collectors.toList());
 
         if (!trySetValue(list, pojo, field, collectionClass) && !collectionClass.equals(field.getType())) {
             //使用注解标记的类型赋值失败并且注解的集合类型与实际字段类型不符时尝试使用字段实际类型赋值

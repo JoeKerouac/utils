@@ -84,4 +84,10 @@ public @interface XmlNode {
      * @return 字段对应的集合类型，如果不指定那么将会采用默认值
      */
     Class<? extends Collection> arrayType() default List.class;
+
+    /**
+     * 如果节点为集合类型
+     * @return
+     */
+    String arrayRoot() default "NODE";
 }

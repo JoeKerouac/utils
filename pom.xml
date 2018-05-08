@@ -123,10 +123,7 @@
         <yaml.version>2.8.7</yaml.version>
         <jackson.version>2.8.5</jackson.version>
         <dom4j.version>1.6.1</dom4j.version>
-        <annotation.version>1.2</annotation.version>
-        <ws.version>2.1</ws.version>
-        <cglib.version>3.2.5</cglib.version>
-        <net.version>1.5</net.version>
+        <junit.version>4.12</junit.version>
     </properties>
 
     <dependencies>
@@ -197,30 +194,12 @@
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-        <!--java 注解包，在xml包中使用，用于注解自定义注解-->
+        <!--test-->
         <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>${annotation.version}</version>
-        </dependency>
-        <!--下面三个cglib、JSR311、网络请求包都是ResourceFactory需要使用的-->
-        <!--JSR311规范，REST的API-->
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>${ws.version}</version>
-        </dependency>
-        <!--CGLIB依赖包，生成测试类使用-->
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>${cglib.version}</version>
-        </dependency>
-        <!--网络请求工具-->
-        <dependency>
-            <groupId>com.github.935237604</groupId>
-            <artifactId>net</artifactId>
-            <version>${net.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
