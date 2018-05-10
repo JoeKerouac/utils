@@ -75,6 +75,11 @@ public interface ClusterManager {
     <M> Topic<M> getTopic(String name);
 
     /**
+     * 关闭分布式管理器
+     */
+    void shutdown();
+
+    /**
      * 获取redis实现的分布式管理器
      *
      * @param host redis的主机地址，例如192.168.1.100

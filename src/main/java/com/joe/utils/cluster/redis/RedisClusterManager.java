@@ -52,4 +52,16 @@ public class RedisClusterManager implements ClusterManager {
     public <M> Topic<M> getTopic(String name) {
         return new RedisTopic<>(redissonClient.getTopic(name));
     }
+
+    @Override
+    public void shutdown() {
+        redissonClient.shutdown();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        //不应该依赖该方法进行shutdown！！！
+        super.finalize();
+        redissonClient.shutdown();
+    }
 }
