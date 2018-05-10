@@ -15,7 +15,7 @@ public class IDCard {
     /**
      * 地区表
      */
-    private static Map<String, String> AREA = new TreeMap<String, String>((o1, o2) -> {
+    private static Map<String, String> AREA = new TreeMap<>((o1, o2) -> {
         Integer i1 = Integer.parseInt(o1);
         Integer i2 = Integer.parseInt(o2);
         return i1 - i2;
@@ -67,7 +67,6 @@ public class IDCard {
                 break;
             } else {
                 i++;
-                continue;
             }
         }
         card += borthday;
@@ -111,8 +110,8 @@ public class IDCard {
         }
         int mod = sum % 11;
         int calcLast = DIVISOR[mod];
-        char last = '1';
-        if (idCardByte[17] == (char) 'x' || idCardByte[17] == (char) 'X') {
+        char last;
+        if (idCardByte[17] == 'x' || idCardByte[17] == 'X') {
             last = 'X';
         } else {
             last = (char) idCardByte[17];
@@ -143,9 +142,9 @@ public class IDCard {
      */
     public static String getArea(String idCard) {
         // 用户所属省份
-        String province = null;
+        String province;
         // 用户所属地区
-        String area = null;
+        String area;
         if (AREA.get(idCard.substring(0, 6)) == null) {
             logger.warn("地区不存在或者地区已不在最新行政区划代码中");
         }
@@ -154,7 +153,6 @@ public class IDCard {
         if (idCard.substring(0, 6).equals("710000") || idCard.substring(0, 6).equals("810000")
                 || idCard.substring(0, 6).equals("820000")) {
             // 台湾省和特别行政区
-            province = "台湾省和特别行政区";
             area = AREA.get(idCard.substring(0, 6) + "0000");
         } else {
             // 查询用户所属省份
@@ -194,7 +192,7 @@ public class IDCard {
      * @return 用户年龄
      */
     public static int getAge(String idCard) {
-        int age = -1;
+        int age;
         // 计算用户年龄
         int year = Integer.parseInt(idCard.substring(6, 10));
         int month_day = Integer.parseInt(idCard.substring(10, 14));

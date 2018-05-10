@@ -1,12 +1,14 @@
 package com.joe.utils.cluster.redis;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  *
  * @author joe
  * @version 2018.04.18 11:01
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class RedisSingleServerConfig extends RedisBaseConfig {
     /**

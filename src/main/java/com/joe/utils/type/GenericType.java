@@ -1,6 +1,7 @@
 package com.joe.utils.type;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 泛型
@@ -8,6 +9,7 @@ import lombok.Data;
  *
  * @author joe
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class GenericType extends JavaType {
     /*

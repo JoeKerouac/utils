@@ -20,6 +20,10 @@ public class PatternUtils {
      * 手机号正则
      */
     private static final Pattern PHONE_PATTERN = Pattern.compile("^1[3|4|5|7|8]\\d{9}$");
+    /**
+     * 匹配数字正则
+     */
+    private static Pattern NUMBER_PARTER = Pattern.compile("-?[0-9]+\\.?[0-9]+");
 
     /**
      * 判断字符串是否是IP格式的字符串
@@ -29,6 +33,17 @@ public class PatternUtils {
      */
     public static boolean isIp(String data) {
         return check(data, IP_PATTERN);
+    }
+
+    /**
+     * 判断字符串参数是否是数字
+     *
+     * @param arg 数字参数
+     * @return 如果参数是数字则返回<code>true</code>
+     */
+    public static boolean isNumber(String arg) {
+        Matcher matcher = NUMBER_PARTER.matcher(arg);
+        return matcher.matches();
     }
 
     /**

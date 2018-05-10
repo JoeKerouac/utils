@@ -67,7 +67,8 @@ public class XmlParser {
      * @param <T>   POJO的实际类型
      * @return 解析结果
      */
-    public <T extends Object> T parse(String xml, Class<T> clazz) {
+    @SuppressWarnings("unchecked")
+    public <T> T parse(String xml, Class<T> clazz) {
         if (xml == null || clazz == null || xml.isEmpty()) {
             return null;
         }
@@ -189,7 +190,7 @@ public class XmlParser {
 
         if (rootName == null) {
             XmlNode xmlNode = source.getClass().getDeclaredAnnotation(XmlNode.class);
-            rootName = xmlNode == null ? rootName : xmlNode.name();
+            rootName = xmlNode == null ? null : xmlNode.name();
         }
 
         if (rootName == null) {
@@ -211,6 +212,7 @@ public class XmlParser {
      * @param pojo       pojo
      * @param ignoreNull 是否忽略空元素
      */
+    @SuppressWarnings("unchecked")
     private void buildDocument(Element parent, Object pojo, Class<?> clazz, boolean ignoreNull) {
         CustomPropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(clazz == null ? pojo
                 .getClass() : clazz);
@@ -232,7 +234,7 @@ public class XmlParser {
             String attrName = (xmlNode == null || StringUtils.isEmpty(xmlNode.attributeName())) ? descriptor.getName() :
                     xmlNode.attributeName();
             //是否是cdata
-            boolean isCDATA = xmlNode == null ? false : xmlNode.isCDATA();
+            boolean isCDATA = xmlNode != null && xmlNode.isCDATA();
 
             //判断字段对应的是否是属性
             if (xmlNode != null && xmlNode.isAttribute()) {
@@ -261,7 +263,6 @@ public class XmlParser {
                 //是简单类型或者集合类型
                 if (Map.class.isAssignableFrom(descriptor.getRealType())) {
                     logger.warn("xml解析器不能处理map类型，该类型将被忽略");
-                    continue;
                 } else if (Collection.class.isAssignableFrom(descriptor.getRealType())) {
                     //集合类型
                     //判断字段值是否为null
@@ -383,6 +384,7 @@ public class XmlParser {
      * @param pojo     pojo
      * @param field    字段说明
      */
+    @SuppressWarnings("unchecked")
     private void setValue(List<Element> elements, String attrName, Object pojo, CustomPropertyDescriptor field) {
         XmlNode attrXmlNode = field.getAnnotation(XmlNode.class);
         logger.debug("要赋值的fieldName为{}", field.getName());
@@ -399,9 +401,9 @@ public class XmlParser {
         //将数据转换为用户指定数据
         List<?> list = elements.stream().map(d -> convert.read(d, attrName)).collect(Collectors.toList());
 
-        if (!trySetValue(list, pojo, field, collectionClass) && !collectionClass.equals(field.getType())) {
+        if (trySetValue(list, pojo, field, collectionClass) && !collectionClass.equals(field.getType())) {
             //使用注解标记的类型赋值失败并且注解的集合类型与实际字段类型不符时尝试使用字段实际类型赋值
-            if (!trySetValue(list, pojo, field, (Class<? extends Collection>) field.getType())) {
+            if (trySetValue(list, pojo, field, (Class<? extends Collection>) field.getType())) {
                 logger.warn("无法为字段[{}]赋值", field.getName());
             }
         }
@@ -417,6 +419,7 @@ public class XmlParser {
      * @param clazz 集合的Class对象
      * @return 返回true表示赋值成功，返回false表示赋值失败
      */
+    @SuppressWarnings("unchecked")
     private boolean trySetValue(List<?> datas, Object pojo, CustomPropertyDescriptor field, Class<? extends
             Collection> clazz) {
         logger.debug("要赋值的fieldName为{}", field.getName());
@@ -424,14 +427,14 @@ public class XmlParser {
         Collection collection = tryBuildCollection(clazz);
         if (collection == null) {
             logger.warn("无法为class[{}]构建实例", clazz);
-            return false;
+            return true;
         }
         collection.addAll(datas);
         try {
-            return BeanUtils.setProperty(pojo, field.getName(), collection);
+            return !BeanUtils.setProperty(pojo, field.getName(), collection);
         } catch (Exception e) {
             logger.debug("字段[{}]赋值失败，使用的集合类为[{}]", field.getName(), clazz, e);
-            return false;
+            return true;
         }
     }
 

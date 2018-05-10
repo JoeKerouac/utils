@@ -16,6 +16,7 @@ public abstract class AbstractXmlTypeConvert<T> implements XmlTypeConvert<T> {
     private Class<T> type;
     protected static final Logger logger = LoggerFactory.getLogger(AbstractXmlTypeConvert.class);
 
+    @SuppressWarnings("unchecked")
     public AbstractXmlTypeConvert() {
         Type genericSuperclass = getClass().getGenericSuperclass();
         // 只检查一层Repository泛型参数，不检查父类
@@ -23,7 +24,6 @@ public abstract class AbstractXmlTypeConvert<T> implements XmlTypeConvert<T> {
             ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
             Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
             type = (Class<T>) actualTypeArguments[0];
-            return;
         } else {
             logger.warn("请检查[{}]类的泛型", this.getClass());
         }

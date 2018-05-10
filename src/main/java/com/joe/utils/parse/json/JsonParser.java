@@ -1,6 +1,6 @@
 package com.joe.utils.parse.json;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.MapType;
@@ -11,16 +11,25 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * json解析工具（高并发下String toJson(Object obj, boolean ignoreNull)存在问题）
+ * json解析工具
  *
  * @author joe
  */
 public class JsonParser {
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper MAPPER_IGNORE_NULL;
+    private static final ObjectMapper MAPPER;
     private static final Logger logger = LoggerFactory.getLogger(JsonParser.class);
     private static JsonParser jsonParser;
 
     private JsonParser() {
+    }
+
+    static {
+        MAPPER = new ObjectMapper();
+        MAPPER_IGNORE_NULL = new ObjectMapper();
+
+        MAPPER.setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        MAPPER_IGNORE_NULL.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     public static JsonParser getInstance() {
@@ -61,10 +70,11 @@ public class JsonParser {
             return (String) obj;
         }
         try {
+            ObjectMapper mapper;
             if (ignoreNull) {
-                mapper.setSerializationInclusion(Include.NON_NULL);
+                mapper = MAPPER_IGNORE_NULL;
             } else {
-                mapper.setSerializationInclusion(Include.ALWAYS);
+                mapper = MAPPER;
             }
             return mapper.writeValueAsString(obj);
         } catch (Exception e) {
@@ -91,7 +101,7 @@ public class JsonParser {
             } else if (type.equals(String.class)) {
                 return (T) content;
             }
-            return mapper.readValue(content, type);
+            return MAPPER.readValue(content, type);
         } catch (Exception e) {
             logger.error("json解析失败，失败原因：", e);
             return null;
@@ -115,7 +125,7 @@ public class JsonParser {
             } else if (type.equals(String.class)) {
                 return (T) new String(content);
             }
-            return mapper.readValue(content, type);
+            return MAPPER.readValue(content, type);
         } catch (Exception e) {
             logger.error("json解析失败，失败原因：", e);
             return null;
@@ -134,12 +144,11 @@ public class JsonParser {
      * @param <V>       map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(String content,
-                                                   @SuppressWarnings("rawtypes") Class<? extends Map> mapType,
-                                                   Class<K> keyType, Class<V> valueType) {
+    public <T extends Map<K, V>, K, V> T readAsMap(String content, Class<? extends Map<K, V>> mapType, Class<K>
+            keyType, Class<V> valueType) {
         try {
-            MapType type = mapper.getTypeFactory().constructMapType(mapType, keyType, valueType);
-            return mapper.readValue(content, type);
+            MapType type = MAPPER.getTypeFactory().constructMapType(mapType, keyType, valueType);
+            return MAPPER.readValue(content, type);
         } catch (Exception e) {
             logger.error("json解析失败，失败原因：", e);
             return null;
@@ -158,12 +167,26 @@ public class JsonParser {
      * @param <V>       map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content,
-                                                   @SuppressWarnings("rawtypes") Class<? extends Map> mapType,
-                                                   Class<K> keyType, Class<V> valueType) {
+    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content, Class<? extends Map<K, V>> mapType, Class<K>
+            keyType, Class<V> valueType) {
+        return readAsMap(new String(content), mapType, keyType, valueType);
+    }
+
+    /**
+     * 将json读取为collection类型的数据
+     *
+     * @param content        json数据
+     * @param collectionType collection类型
+     * @param elementsType   collection泛型
+     * @param <T>            list的实际类型
+     * @param <V>            list的泛型
+     * @return 解析结果
+     */
+    public <T extends Collection<V>, V> T readAsCollection(String content, Class<? extends Collection>
+            collectionType, Class<V> elementsType) {
         try {
-            MapType type = mapper.getTypeFactory().constructMapType(mapType, keyType, valueType);
-            return mapper.readValue(content, type);
+            CollectionLikeType type = MAPPER.getTypeFactory().constructCollectionLikeType(collectionType, elementsType);
+            return MAPPER.readValue(content, type);
         } catch (Exception e) {
             logger.error("json解析失败，失败原因：", e);
             return null;
@@ -180,37 +203,8 @@ public class JsonParser {
      * @param <V>            list的泛型
      * @return 解析结果
      */
-    public <T extends Collection<V>, V> T readAsCollection(String content,
-                                                           @SuppressWarnings("rawtypes") Class<? extends Collection>
-                                                                   collectionType, Class<V> elementsType) {
-        try {
-            CollectionLikeType type = mapper.getTypeFactory().constructCollectionLikeType(collectionType, elementsType);
-            return mapper.readValue(content, type);
-        } catch (Exception e) {
-            logger.error("json解析失败，失败原因：", e);
-            return null;
-        }
-    }
-
-    /**
-     * 将json读取为collection类型的数据
-     *
-     * @param content        json数据
-     * @param collectionType collection类型
-     * @param elementsType   collection泛型
-     * @param <T>            list的实际类型
-     * @param <V>            list的泛型
-     * @return 解析结果
-     */
-    public <T extends Collection<V>, V> T readAsCollection(byte[] content,
-                                                           @SuppressWarnings("rawtypes") Class<? extends Collection>
-                                                                   collectionType, Class<V> elementsType) {
-        try {
-            CollectionLikeType type = mapper.getTypeFactory().constructCollectionLikeType(collectionType, elementsType);
-            return mapper.readValue(content, type);
-        } catch (Exception e) {
-            logger.error("json解析失败，失败原因：", e);
-            return null;
-        }
+    public <T extends Collection<V>, V> T readAsCollection(byte[] content, Class<? extends Collection<V>>
+            collectionType, Class<V> elementsType) {
+        return readAsCollection(new String(content), collectionType, elementsType);
     }
 }

@@ -13,7 +13,6 @@ import org.dom4j.Element;
 public class StringConverter extends AbstractXmlTypeConvert<String> {
     @Override
     public String read(Element element, String attrName) {
-        String data = StringUtils.isEmpty(attrName) ? element.getText() : element.attributeValue(attrName);
-        return data;
+        return StringUtils.isEmpty(attrName) ? element.getText() : element.attributeValue(attrName);
     }
 }

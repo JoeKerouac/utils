@@ -26,19 +26,15 @@ public class ConsoleUtil {
 
 			if (console != null) {
 				System.out.println("Console对象存在，使用Console对象");
-				reader = () -> {
-					return console.readLine();
-				};
+				reader = console::readLine;
 			} else {
 				System.out.println("Console对象不存在，使用Reader");
 				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-				reader = () -> {
-					return bufferedReader.readLine();
-				};
+				reader = bufferedReader::readLine;
 			}
 			work(reader, consumer);
 		} catch (Exception e) {
-			System.err.println(e);
+			e.printStackTrace();
 			System.err.println("系统异常，即将退出");
 			System.exit(1);
 		}

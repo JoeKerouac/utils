@@ -18,6 +18,7 @@ public interface XmlConverter<T> extends XmlTypeConvert<T> {
     Logger logger = LoggerFactory.getLogger(XmlConverter.class);
     XmlParser PARSER = XmlParser.getInstance();
 
+    @SuppressWarnings("unchecked")
     @Override
     default T read(Element element, String attrName) {
         String data = StringUtils.isEmpty(attrName) ? element.asXML() : element.attributeValue(attrName);

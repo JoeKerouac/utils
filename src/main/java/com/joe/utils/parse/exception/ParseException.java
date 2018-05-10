@@ -3,7 +3,7 @@ package com.joe.utils.parse.exception;
 /**
  * 解析异常
  *
- * @author:joe
+ * @author joe
  */
 public class ParseException extends RuntimeException {
     public ParseException() {

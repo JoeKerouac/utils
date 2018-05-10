@@ -32,8 +32,7 @@ public class Manager {
 		int nowLoadedClassCount = classLoadingMXBean.getLoadedClassCount();
 		long totalLoadedClassCount = classLoadingMXBean.getTotalLoadedClassCount();
 		long unloadedClassCount = classLoadingMXBean.getUnloadedClassCount();
-		ClassLoadInfo info = new ClassLoadInfo(nowLoadedClassCount, totalLoadedClassCount, unloadedClassCount);
-		return info;
+		return new ClassLoadInfo(nowLoadedClassCount, totalLoadedClassCount, unloadedClassCount);
 	}
 
 	/**
@@ -46,8 +45,7 @@ public class Manager {
 		double freeMemory = (double) runtime.freeMemory() / (1024 * 1024);
 		double maxMemory = (double) runtime.maxMemory() / (1024 * 1024);
 		double totalMemory = (double) runtime.totalMemory() / (1024 * 1024);
-		JVMMemoryInfo info = new JVMMemoryInfo(freeMemory, maxMemory, totalMemory);
-		return info;
+		return new JVMMemoryInfo(freeMemory, maxMemory, totalMemory);
 	}
 
 	/**
@@ -56,9 +54,9 @@ public class Manager {
 	 * @return 各个内存区的使用情况
 	 */
 	public static List<MemoryInfo> getMemoryInfo() {
-		Map<String, MemoryUsage> map = new TreeMap<String, MemoryUsage>();
+		Map<String, MemoryUsage> map = new TreeMap<>();
 		List<MemoryPoolMXBean> memoryPoolMXBeanList = ManagementFactory.getMemoryPoolMXBeans();
-		List<MemoryInfo> memoryInfoList = new ArrayList<MemoryInfo>();
+		List<MemoryInfo> memoryInfoList = new ArrayList<>();
 		for (MemoryPoolMXBean bean : memoryPoolMXBeanList) {
 			String name = bean.getName();
 			MemoryUsage memoryUsage = bean.getUsage();

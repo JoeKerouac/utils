@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class RedisClusterManagerFactory {
     // 管理redis连接
-    private static Map<RedisBaseConfig, RedisClusterManager> cache = new HashMap<>();
+    private static final Map<RedisBaseConfig, RedisClusterManager> CACHE = new HashMap<>();
     private static final Object lock = new Object();
 
 
@@ -51,15 +51,15 @@ public class RedisClusterManagerFactory {
      * @return 分布式管理器
      */
     public static RedisClusterManager getInstance(RedisBaseConfig redisBaseConfig) {
-        if (!cache.containsKey(redisBaseConfig)) {
+        if (!CACHE.containsKey(redisBaseConfig)) {
             synchronized (lock) {
-                if (!cache.containsKey(redisBaseConfig)) {
-                    cache.put(redisBaseConfig, newInstance(redisBaseConfig));
+                if (!CACHE.containsKey(redisBaseConfig)) {
+                    CACHE.put(redisBaseConfig, newInstance(redisBaseConfig));
                 }
             }
         }
 
-        return cache.get(redisBaseConfig);
+        return CACHE.get(redisBaseConfig);
     }
 
     /**
@@ -129,7 +129,6 @@ public class RedisClusterManagerFactory {
             throw new IllegalArgumentException("位置的配置类型：" + redisBaseConfig.getClass());
         }
 
-        RedissonClient client = Redisson.create(config);
-        return client;
+        return Redisson.create(config);
     }
 }

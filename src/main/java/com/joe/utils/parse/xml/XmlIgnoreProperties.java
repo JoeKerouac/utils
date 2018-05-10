@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * XML忽略未知元素配置
  *
- * @author:joe
+ * @author joe
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})

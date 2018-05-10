@@ -94,13 +94,11 @@ public class XmlTypeConverterUtil {
                 convert = DEFAULT_CONVERTER;
             } else {
                 //用户指定了xmlnode注解但是没有指定converter，使用general字段确定集合中的数据类型
-                XmlConverter c = xmlnode::general;
-                convert = c;
+                convert = (XmlConverter) xmlnode::general;
             }
         } else {
             //字段不是基本类型，假设是pojo，使用xml转换器
-            XmlConverter c = filed::getType;
-            convert = c;
+            convert = (XmlConverter) filed::getType;
         }
         return convert;
     }

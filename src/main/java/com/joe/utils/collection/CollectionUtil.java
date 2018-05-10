@@ -143,8 +143,7 @@ public final class CollectionUtil {
     public static <T> void remove(List<T> list, List<Integer> removes) {
         // 不是ArrayList的先转换为ArrayList
         if (!(list instanceof ArrayList)) {
-            List<T> newList = new ArrayList<T>(list);
-            list = newList;
+            list = new ArrayList<>(list);
         }
         int flag = 0;
         // 删除

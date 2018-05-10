@@ -221,21 +221,17 @@ public class ReflectUtil {
      * @throws NullPointerException 当传入Class对象为null时抛出该异常
      */
     public static boolean isSimple(Class<?> clazz) throws NullPointerException {
-        if (clazz == null) {
+        if (clazz == null)
             throw new NullPointerException("Class不能为null");
-        } else if (Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
-                || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-                || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
-                || Enum.class.isAssignableFrom(clazz) || boolean.class.isAssignableFrom(clazz) || char.class
-                .isAssignableFrom(clazz) || byte.class.isAssignableFrom(clazz) || short.class.isAssignableFrom(clazz)
-                || int.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz) || double.class
-                .isAssignableFrom(clazz) || float.class.isAssignableFrom(clazz)) {
-            // 该Class为基本类型
-            return true;
-        } else {
-            // 该Class为自定义类型
-            return false;
-        }
+        else
+            return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
+                    || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
+                    || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
+                    || Enum.class.isAssignableFrom(clazz) || boolean.class.isAssignableFrom(clazz) || char.class
+                    .isAssignableFrom(clazz) || byte.class.isAssignableFrom(clazz) || short.class.isAssignableFrom
+                    (clazz)
+                    || int.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz) || double.class
+                    .isAssignableFrom(clazz) || float.class.isAssignableFrom(clazz);
     }
 
     /**
@@ -247,18 +243,13 @@ public class ReflectUtil {
      * @throws NullPointerException 当传入Class对象为null时抛出该异常
      */
     public static boolean isBasic(Class<?> clazz) throws NullPointerException {
-        if (clazz == null) {
+        if (clazz == null)
             throw new NullPointerException("Class不能为null");
-        } else if (Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz) || Byte.class
-                .isAssignableFrom(clazz) || Short.class.isAssignableFrom(clazz) || Integer.class.isAssignableFrom
-                (clazz) || Long.class.isAssignableFrom(clazz) || Double.class.isAssignableFrom(clazz) || Float.class
-                .isAssignableFrom(clazz)) {
-            // 该Class为基本类型
-            return true;
-        } else {
-            // 该Class为自定义类型
-            return false;
-        }
+        else
+            return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz) || Byte.class
+                    .isAssignableFrom(clazz) || Short.class.isAssignableFrom(clazz) || Integer.class.isAssignableFrom
+                    (clazz) || Long.class.isAssignableFrom(clazz) || Double.class.isAssignableFrom(clazz) || Float.class
+                    .isAssignableFrom(clazz);
     }
 
     /**
@@ -315,13 +306,9 @@ public class ReflectUtil {
      * @return 如果是基本类型则返回<code>true</code>
      */
     public static boolean isGeneralArrayType(String name) {
-        if ("byte[]".equals(name) || "short[]".equals(name) || "int[]".equals(name) || "long[]".equals(name)
+        return "byte[]".equals(name) || "short[]".equals(name) || "int[]".equals(name) || "long[]".equals(name)
                 || "double[]".equals(name) || "float[]".equals(name) || "boolean[]".equals(name)
-                || "char[]".equals(name)) {
-            return true;
-        } else {
-            return false;
-        }
+                || "char[]".equals(name);
     }
 
     /**

@@ -30,8 +30,7 @@ public class Tools {
             }
             chars[i] = (char) num;
         }
-        String nonceStr = new String(chars);
-        return nonceStr;
+        return new String(chars);
     }
 
     /**
@@ -48,7 +47,6 @@ public class Tools {
         for (int i = 0; i < length; i++) {
             chars[i] = (char) ((Math.random() * 10) + 48);
         }
-        String nonceStr = new String(chars);
-        return nonceStr;
+        return new String(chars);
     }
 }

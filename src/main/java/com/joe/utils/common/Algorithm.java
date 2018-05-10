@@ -41,7 +41,7 @@ public class Algorithm {
      */
     private static <T> List<T> lcs(List<T> arg0, List<T> arg1, Comparator<T> comparator, int i, int j) {
         if (arg0.size() == i || arg1.size() == j) {
-            return new ArrayList<T>(Math.min(arg0.size(), arg1.size()));
+            return new ArrayList<>(Math.min(arg0.size(), arg1.size()));
         }
 
         if (comparator.compare(arg0.get(i), arg1.get(j)) == 0) {
@@ -84,7 +84,7 @@ public class Algorithm {
      */
     private static <T extends Comparable<T>> List<T> lcs(List<T> arg0, List<T> arg1, int i, int j) {
         if (arg0.size() == i || arg1.size() == j) {
-            return new ArrayList<T>(Math.min(arg0.size(), arg1.size()));
+            return new ArrayList<>(Math.min(arg0.size(), arg1.size()));
         }
 
         if (arg0.get(i) != null && arg1.get(j) != null && arg0.get(i).compareTo(arg1.get(j)) == 0) {

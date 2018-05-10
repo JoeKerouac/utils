@@ -11,7 +11,7 @@ import java.util.List;
  * @version 2018.05.08 11:40
  */
 public class RedisTopic<M> implements Topic<M> {
-    private RTopic<M> topic;
+    private final RTopic<M> topic;
     public RedisTopic(RTopic<M> topic) {
         this.topic = topic;
     }

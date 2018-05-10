@@ -13,7 +13,7 @@ import com.joe.utils.collection.LRUCacheMap;
  *
  */
 public class LockService {
-	private static final Map<String, Lock> container = new LRUCacheMap<String, Lock>();
+	private static final Map<String, Lock> container = new LRUCacheMap<>();
 
 	/**
 	 * 根据锁名字获取指定锁，如果不存在则创建
@@ -26,11 +26,7 @@ public class LockService {
 		Lock lock = container.get(key);
 		if (lock == null) {
 			synchronized (container) {
-				lock = container.get(key);
-				if (lock == null) {
-					lock = new ReentrantLock();
-					container.put(key, lock);
-				}
+				lock = container.computeIfAbsent(key, k -> new ReentrantLock());
 			}
 		}
 		return lock;

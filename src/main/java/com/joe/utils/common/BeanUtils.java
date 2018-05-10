@@ -178,10 +178,8 @@ public class BeanUtils {
 
                 if (propertyDescriptor.getWriteMethod() == null) {
                     logger.debug("目标{}中不存在字段[{}]的write方法", targetClassName, field.getName());
-                    continue;
                 } else if (descriptor.getReadMethod() == null) {
                     logger.debug("源{}中不存在字段[{}]的read方法", sourceName, field.getName());
-                    continue;
                 } else {
                     // 调用反射复制
                     propertyDescriptor.getWriteMethod().invoke(dest, descriptor.getReadMethod().invoke(source));
@@ -189,7 +187,6 @@ public class BeanUtils {
                 }
             } catch (Exception e) {
                 logger.warn("copy中复制{}时发生错误，忽略该字段", name, e);
-                continue;
             }
         }
         return dest;
@@ -208,14 +205,13 @@ public class BeanUtils {
         if (sourceList == null || sourceList.isEmpty()) {
             return Collections.emptyList();
         }
-        List<E> list = new ArrayList<E>(sourceList.size());
+        List<E> list = new ArrayList<>(sourceList.size());
 
         if (!(sourceList instanceof ArrayList)) {
-            sourceList = new ArrayList<S>(sourceList);
+            sourceList = new ArrayList<>(sourceList);
         }
 
-        for (int i = 0; i < sourceList.size(); i++) {
-            S source = sourceList.get(i);
+        for (S source : sourceList) {
             E e = copy(source, targetClass);
             if (e != null) {
                 list.add(e);
@@ -252,9 +248,7 @@ public class BeanUtils {
         }
 
         int j = 0;
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
-
+        for (Field field : fields) {
             CustomPropertyDescriptor descriptor = buildDescriptor(field, clazz);
             if (descriptor != null) {
                 descriptors[j++] = descriptor;
@@ -280,7 +274,7 @@ public class BeanUtils {
      * @param clazz 指定类
      * @return 指定类的所有字段
      */
-    public final static Field[] getAllFields(Class<?> clazz) {
+    public static Field[] getAllFields(Class<?> clazz) {
         Field[] result = fieldCache.get(clazz);
         if (result != null) {
             return result;
@@ -304,7 +298,7 @@ public class BeanUtils {
      * @param name  字段名
      * @return 根据字段名获取到的指定类的指定字段，不存在时返回null
      */
-    public final static Field getField(Class<?> clazz, String name) {
+    public static Field getField(Class<?> clazz, String name) {
         Field[] fields = getAllFields(clazz);
         for (Field field : fields) {
             if (field.getName().equals(name)) {
@@ -356,7 +350,7 @@ public class BeanUtils {
                 writeMethod = getMethod("set" + methodName, clazz, readMethod.getReturnType());
             }
 
-            if (writeMethod == null || readMethod == null) {
+            if (writeMethod == null) {
                 logger.warn("说明构建失败，忽略{}字段", field.getName(), e);
             } else {
                 logger.info("自定义构建PropertyDescriptor成功");
@@ -364,6 +358,7 @@ public class BeanUtils {
                     customPropertyDescriptor = convert(field, new PropertyDescriptor(name, readMethod, writeMethod),
                             clazz);
                 } catch (IntrospectionException e1) {
+                    logger.info("构建失败，忽略字段[{}]", field.getName(), e1);
                 }
             }
         }
@@ -381,10 +376,11 @@ public class BeanUtils {
      * @return 方法名对应的方法，如果获取不到返回null
      */
     private static Method getMethod(String methodName, Class<?> clazz, Class<?>... args) {
-        Method method = null;
+        Method method;
         try {
             method = clazz.getMethod(methodName, args);
         } catch (NoSuchMethodException e1) {
+            method = null;
         }
         return method;
     }

@@ -1,12 +1,11 @@
 package com.joe.utils.common;
 
+import com.joe.utils.pattern.PatternUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 字符串的常用操作
@@ -15,8 +14,6 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class StringUtils {
-    private static Pattern numberPattern = Pattern.compile("-?[0-9]{1,}\\.?[0-9]{1,}");
-
     /**
      * 删除字符串的前/后缀
      *
@@ -75,14 +72,43 @@ public class StringUtils {
     }
 
     /**
+     * 判断参数列表是否有空值
+     *
+     * @param args 参数列表
+     * @return 如果参数列表有任意一个值为空则返回true，否则返回false
+     */
+    public static boolean isEmptyAny(String... args) {
+        for (String arg : args) {
+            if (isEmpty(arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断参数列表是否全为空
+     *
+     * @param args 参数列表
+     * @return 如果参数列表全为空则返回true，否则有任意一个值不为空就返回false
+     */
+    public static boolean isEmptyAll(String... args) {
+        for (String arg : args) {
+            if (!isEmpty(arg)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * 判断字符串参数是否是数字
      *
      * @param arg 数字参数
      * @return 如果参数是数字则返回<code>true</code>
      */
     public static boolean isNumber(String arg) {
-        Matcher matcher = numberPattern.matcher(arg);
-        return matcher.matches();
+        return PatternUtils.isNumber(arg);
     }
 
     /**
@@ -116,7 +142,7 @@ public class StringUtils {
      * @param arg0 字符串1
      * @param arg1 字符串2
      * @param i    字符串1的当前位置指针
-     * @param arg1 字符串2的当前位置指针
+     * @param j    字符串2的当前位置指针
      * @return 两个字符串的最大公共子序列的长度
      */
     private static long lcs(String arg0, String arg1, int i, int j) {

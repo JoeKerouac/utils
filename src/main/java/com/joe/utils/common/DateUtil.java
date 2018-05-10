@@ -205,7 +205,7 @@ public class DateUtil {
     }
 
     public enum DateUnit {
-        YEAR, MONTH, DAY, HOUR, MINUTE, SECOND;
+        YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
     }
 
     static class DateUtilException extends RuntimeException {
@@ -232,7 +232,7 @@ public class DateUtil {
      * 创建相应的ChronoUnit
      *
      * @param dateUnit 单位
-     * @return
+     * @return ChronoUnit
      */
     private static ChronoUnit create(DateUnit dateUnit) {
         switch (dateUnit) {

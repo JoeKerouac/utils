@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Tree<T> {
     private static final String ROOT = "root";
-    private Node<T> root;
+    private final Node<T> root;
 
     public Tree() {
         this.root = new Node<>(ROOT, null);
@@ -107,7 +107,7 @@ public class Tree<T> {
      * @param name      节点名
      * @param recursion 是否递归删除，true表示递归删除，如果传入false并且要删除的节点下有子节点则会抛出异常
      */
-    public void delete(String name, boolean recursion) {
+    private void delete(String name, boolean recursion) {
         root.delete(name, recursion);
     }
 
@@ -140,7 +140,7 @@ public class Tree<T> {
         /**
          * 子节点
          */
-        private Map<String, Node<T>> childs;
+        private final Map<String, Node<T>> childs;
 
         Node(String name, String prex, T data, Node<T> parent) {
             this.name = name;
@@ -164,7 +164,7 @@ public class Tree<T> {
         /**
          * 将自己从树上删除（如果该节点有子节点也将一并删除）
          */
-        public void deleteSelf() {
+        void deleteSelf() {
             if (isRoot()) {
                 throw new IllegalStateException("root node can't be delete self");
             }
@@ -176,7 +176,7 @@ public class Tree<T> {
          *
          * @return 节点的完全限定名（节点的完全路径，包含父级路径）
          */
-        public String getFullName() {
+        String getFullName() {
             return prex + name;
         }
 
@@ -185,7 +185,7 @@ public class Tree<T> {
          *
          * @return 本节点名（不包含父级节点名）
          */
-        public String getName() {
+        String getName() {
             return name;
         }
 
@@ -194,7 +194,7 @@ public class Tree<T> {
          *
          * @return 节点数据
          */
-        public T getData() {
+        T getData() {
             return data;
         }
 
@@ -203,7 +203,7 @@ public class Tree<T> {
          *
          * @param data 要更新的数据
          */
-        public T setData(T data) {
+        T setData(T data) {
             T old = this.data;
             this.data = data;
             return old;
@@ -214,7 +214,7 @@ public class Tree<T> {
          *
          * @return 返回true表示当前节点是根节点
          */
-        public boolean isRoot() {
+        boolean isRoot() {
             return parent == null;
         }
 
@@ -225,7 +225,7 @@ public class Tree<T> {
          * @param data 节点数据
          * @return 添加上的节点
          */
-        public Node<T> addChild(String name, T data) {
+        Node<T> addChild(String name, T data) {
             if (name == null || name.isEmpty()) {
                 throw new NullPointerException("node name must not be null or empty");
             }
@@ -257,7 +257,7 @@ public class Tree<T> {
          *
          * @return 返回true表示有子节点
          */
-        public boolean hasChilds() {
+        boolean hasChilds() {
             return !childs.isEmpty();
         }
 
@@ -275,7 +275,7 @@ public class Tree<T> {
          *
          * @return 所有子节点
          */
-        public Map<String, Node<T>> getChilds() {
+        Map<String, Node<T>> getChilds() {
             return childs;
         }
 
@@ -285,7 +285,7 @@ public class Tree<T> {
          * @param name 子节点名
          * @return 要获取的子节点，不存在时返回null
          */
-        public Node<T> getNode(String name) {
+        Node<T> getNode(String name) {
             if (name == null || name.isEmpty()) {
                 throw new NullPointerException("node name must not be null or empty");
             }

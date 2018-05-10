@@ -28,8 +28,6 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     private ClassScanner() {
     }
 
-    ;
-
     public static ClassScanner getInstance() {
         if (classScanner == null) {
             synchronized (lock) {
@@ -75,12 +73,10 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
             return Collections.emptyList();
         }
 
-        if (args != null) {
-            for (Object arg : args) {
-                if (!(arg instanceof String)) {
-                    logger.debug("参数类型为：{}", args.getClass());
-                    throw new ScannerException("参数类型为：" + args.getClass());
-                }
+        for (Object arg : args) {
+            if (!(arg instanceof String)) {
+                logger.debug("参数类型为：{}", args.getClass());
+                throw new ScannerException("参数类型为：" + args.getClass());
             }
         }
 
@@ -107,11 +103,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
         logger.debug("开始扫描包{}下的所有类的集合", pack);
         // 第一个class类的集合
         List<Class<?>> classes = new ArrayList<>();
-        // 是否循环迭代
-        boolean recursive = true;
-        String packageName = pack;
         // 获取包的名字 并进行替换
-        String packageDirName = packageName.replace('.', '/');
+        String packageDirName = pack.replace('.', '/');
         // 定义一个枚举的集合 并进行循环来处理这个目录下的things
         Enumeration<URL> dirs;
         try {
@@ -133,10 +126,10 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                     // 获取包的物理路径
                     String filePath = URLDecoder.decode(url.getFile(), Charset.defaultCharset().name());
                     // 以文件的方式扫描整个包下的文件 并添加到集合中
-                    classes.addAll(findAndAddClassesInPackageByFile(packageName, filePath, recursive));
+                    classes.addAll(findAndAddClassesInPackageByFile(pack, filePath, true));
                 } else if ("jar".equals(protocol)) {
                     JarFile jar = ((JarURLConnection) url.openConnection()).getJarFile();
-                    classes.addAll(findAndAddClassesInPackageByFile(jar, packageDirName, packageName, recursive));
+                    classes.addAll(findAndAddClassesInPackageByFile(jar, packageDirName, pack, true));
                 }
             } catch (Throwable e) {
                 logger.debug("扫描{}时出错", pack, e);
@@ -145,9 +138,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
 
         if (!filters.isEmpty()) {
             logger.debug("扫描完毕，扫描出来的Class集合为：{}，发现过滤器，使用过滤器过滤", classes);
-            classes = classes.stream().filter(clazz -> {
-                return filter(clazz, filters);
-            }).collect(Collectors.toList());
+            classes = classes.stream().filter(clazz -> filter(clazz, filters)).collect(Collectors.toList());
             logger.debug("过滤后的Class为：{}", classes);
         }
 
@@ -233,7 +224,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     private boolean filter(Class<?> clazz, List<ClassFilter> filters) {
         boolean flag = true;
         for (ClassFilter filter : filters) {
-            if (!filter.filter(clazz)) {
+            if (filter.filter(clazz)) {
                 flag = false;
                 break;
             }
@@ -261,9 +252,12 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
             return Collections.emptySet();
         }
         // 如果存在 就获取包下的所有文件 包括目录
-        File[] dirfiles = dir.listFiles(file -> {
-            return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
-        });
+        File[] dirfiles = dir.listFiles(file -> (recursive && file.isDirectory()) || (file.getName().endsWith("" +
+                ".class")));
+
+        if (dirfiles == null || dirfiles.length == 0) {
+            return Collections.emptySet();
+        }
 
         // 循环所有文件
         for (File file : dirfiles) {
