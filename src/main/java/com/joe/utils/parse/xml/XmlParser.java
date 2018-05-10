@@ -275,6 +275,7 @@ public class XmlParser {
                         });
                     }
                 } else {
+                    //基本类型
                     Element node = parent.element(nodeName);
                     if (node == null) {
                         //搜索不到，创建一个
@@ -291,6 +292,7 @@ public class XmlParser {
                     }
                 }
             } else {
+                //对象类型
                 Element node = DocumentHelper.createElement(nodeName);
                 parent.add(node);
 

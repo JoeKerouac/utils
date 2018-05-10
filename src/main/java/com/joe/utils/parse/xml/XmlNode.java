@@ -84,11 +84,4 @@ public @interface XmlNode {
      * @return 字段对应的集合类型，如果不指定那么将会采用默认值
      */
     Class<? extends Collection> arrayType() default List.class;
-
-    /**
-     * 如果节点为集合类型，那么返回该节点集合中每个单项的根节点名
-     *
-     * @return 该节点集合中每个单项的根节点名，使用该名字为集合中的每个数据创建一个节点，用于区分不同节点
-     */
-    String arrayRoot() default "NODE";
 }
