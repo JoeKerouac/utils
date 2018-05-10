@@ -144,7 +144,7 @@ public class JsonParser {
      * @param <V>       map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(String content, Class<? extends Map<K, V>> mapType, Class<K>
+    public <T extends Map<K, V>, K, V> T readAsMap(String content, Class<? extends Map> mapType, Class<K>
             keyType, Class<V> valueType) {
         try {
             MapType type = MAPPER.getTypeFactory().constructMapType(mapType, keyType, valueType);
@@ -167,7 +167,7 @@ public class JsonParser {
      * @param <V>       map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content, Class<? extends Map<K, V>> mapType, Class<K>
+    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content, Class<? extends Map> mapType, Class<K>
             keyType, Class<V> valueType) {
         return readAsMap(new String(content), mapType, keyType, valueType);
     }
@@ -203,7 +203,7 @@ public class JsonParser {
      * @param <V>            list的泛型
      * @return 解析结果
      */
-    public <T extends Collection<V>, V> T readAsCollection(byte[] content, Class<? extends Collection<V>>
+    public <T extends Collection<V>, V> T readAsCollection(byte[] content, Class<? extends Collection>
             collectionType, Class<V> elementsType) {
         return readAsCollection(new String(content), collectionType, elementsType);
     }
