@@ -38,13 +38,6 @@ public class XmlParserTest {
         Assert.assertEquals(user , u1);
     }
 
-    @Test
-    public void test() {
-        String xml = "<USER><NAME>qiao</NAME><age>0</age><userSet><NAME>joe</NAME><age>0</age></userSet></USER>";
-        User user = PARSER.parse(xml, User.class);
-        System.out.println(user);
-    }
-
     private User build() {
         User user = new User();
         user.setName("joe");
@@ -73,9 +66,12 @@ public class XmlParserTest {
         @XmlNode(ignore = true)
         private String other = "abc";
         private int age;
+        /**
+         * 集合类型必须加general字段
+         */
         @XmlNode(general = User.class)
         private List<User> users;
-        @XmlNode(arrayType = HashSet.class , general = User.class)
+        @XmlNode(general = User.class)
         private Set<User> userSet;
     }
 }
