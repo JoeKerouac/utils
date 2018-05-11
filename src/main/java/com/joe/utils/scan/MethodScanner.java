@@ -47,7 +47,7 @@ public class MethodScanner implements Scanner<Method, MethodFilter> {
                 for (Method method : methods) {
                     boolean flag = true;
                     for (MethodFilter filter : filters) {
-                        if (filter.filter(method)) {
+                        if (!filter.filter(method)) {
                             flag = false;
                             break;
                         }
