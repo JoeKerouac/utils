@@ -15,15 +15,36 @@ import java.util.function.BiFunction;
 public final class CollectionUtil {
 
     /**
-     * 对ByteBuffer扩容
+     * 对ByteBuffer扩容（扩容后position为buffer.capacity()，mark为-1，limit为新buffer的capacity）
      *
      * @param buffer 原ByteBuffer
      * @param size   要增加的大小
      * @return 扩容后的ByteBuffer，扩容后的capacity等于原buffer的capacity + size
      */
     public static ByteBuffer grow(ByteBuffer buffer, int size) {
-        if (size <= 0) {
-            throw new IllegalArgumentException("扩容大小必须大于0");
+        return grow(buffer, 0, buffer.capacity(), size);
+    }
+
+    /**
+     * 对ByteBuffer扩容（扩容后position为从原缓冲区复制的数据的长度，即len参数，mark为-1，limit为新buffer的capacity）
+     *
+     * @param buffer 原ByteBuffer
+     * @param size   要增加的大小
+     * @param offset 要复制原缓冲区数据的起始位置
+     * @param len    要复制的数据的长度
+     * @return 扩容后的ByteBuffer，扩容后的capacity等于原buffer的capacity + size，扩容后的数据等于原来缓冲区offset开始长度为len的数据
+     */
+    public static ByteBuffer grow(ByteBuffer buffer, int offset, int len, int size) {
+        if ((size | offset | len) <= 0) {
+            throw new IllegalArgumentException("参数错误");
+        }
+
+        if (offset >= buffer.capacity()) {
+            throw new ArrayIndexOutOfBoundsException("offset必须小于原缓冲区的capacity");
+        }
+
+        if (offset + len > buffer.capacity()) {
+            len = buffer.capacity() - offset;
         }
 
         if (buffer.capacity() == Integer.MAX_VALUE) {
@@ -34,37 +55,25 @@ public final class CollectionUtil {
         int newSize = buffer.capacity() + size;
         newSize = newSize <= 0 ? Integer.MAX_VALUE : newSize;
 
-        //获取position、limit和mark数据
-        int position = buffer.position();
-        int limit = buffer.limit();
-        int mark = -1;
-        try {
-            //获取标记
-            mark = buffer.reset().position();
-        } catch (InvalidMarkException e) {
-            //当原buffer没有mark时会抛出该异常，忽略该异常
-        }
-
         //申请新ByteBuffer，类型和原来的一致，原来是direct就还申请direct类型的，原来是heap就还申请heap类型的
         ByteBuffer newBuffer;
         byte[] data;
         if (buffer.isDirect()) {
             newBuffer = ByteBuffer.allocateDirect(newSize);
             //从0开始copy，将整个数据copy过去；注：Direct类型的ByteBuffer不能使用array获得
-            buffer.position(0);
-            data = new byte[buffer.capacity()];
+            data = new byte[len];
+            buffer.position(offset);
             buffer.get(data);
+            newBuffer.put(data);
         } else {
             newBuffer = ByteBuffer.allocate(newSize);
             //获取数据
             data = buffer.array();
+            //恢复数据
+            newBuffer.put(data, offset, len);
         }
-        //恢复数据
-        newBuffer.put(data);
-        if (mark >= 0) {
-            newBuffer.position(mark).mark();
-        }
-        newBuffer.position(position).limit(limit);
+
+        newBuffer.position(len);
         return newBuffer;
     }
 
