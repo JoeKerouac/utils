@@ -2,6 +2,8 @@ package com.joe.utils.collection;
 
 import com.joe.utils.common.MathUtils;
 
+import java.nio.ByteBuffer;
+import java.nio.InvalidMarkException;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -11,6 +13,41 @@ import java.util.function.BiFunction;
  * @author joe
  */
 public final class CollectionUtil {
+
+    /**
+     * 对ByteBuffer扩容
+     *
+     * @param buffer 原ByteBuffer
+     * @param size   要增加的大小
+     * @return 扩容后的ByteBuffer
+     */
+    public static ByteBuffer grow(ByteBuffer buffer, int size) {
+        if (size <= 0) {
+            throw new IllegalArgumentException("扩容大小必须大于0");
+        }
+
+        ByteBuffer newBuffer;
+        if (buffer.isDirect()) {
+            newBuffer = ByteBuffer.allocateDirect(buffer.capacity() + size);
+        } else {
+            newBuffer = ByteBuffer.allocate(buffer.capacity() + size);
+        }
+        //放入数据
+        newBuffer.put(buffer.array());
+        try {
+            //重置mark数据
+            int mark = buffer.reset().position();
+            newBuffer.position(mark).mark();
+        } catch (InvalidMarkException e) {
+            //当原buffer没有mark时会抛出该异常，忽略该异常
+        }
+        //重置position数据
+        newBuffer.position(buffer.position());
+        //重置limit数据
+        newBuffer.limit(buffer.limit());
+        return newBuffer;
+    }
+
     /**
      * 将多个数组内连接
      *
