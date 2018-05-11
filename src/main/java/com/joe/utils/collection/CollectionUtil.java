@@ -19,32 +19,44 @@ public final class CollectionUtil {
      *
      * @param buffer 原ByteBuffer
      * @param size   要增加的大小
-     * @return 扩容后的ByteBuffer
+     * @return 扩容后的ByteBuffer，扩容后的capacity等于原buffer的capacity + size
      */
     public static ByteBuffer grow(ByteBuffer buffer, int size) {
         if (size <= 0) {
             throw new IllegalArgumentException("扩容大小必须大于0");
         }
 
-        ByteBuffer newBuffer;
-        if (buffer.isDirect()) {
-            newBuffer = ByteBuffer.allocateDirect(buffer.capacity() + size);
-        } else {
-            newBuffer = ByteBuffer.allocate(buffer.capacity() + size);
-        }
-        //放入数据
-        newBuffer.put(buffer.array());
+        //获取position、limit和mark数据
+        int position = buffer.position();
+        int limit = buffer.limit();
+        int mark = -1;
         try {
-            //重置mark数据
-            int mark = buffer.reset().position();
-            newBuffer.position(mark).mark();
+            //获取标记
+            mark = buffer.reset().position();
         } catch (InvalidMarkException e) {
             //当原buffer没有mark时会抛出该异常，忽略该异常
         }
-        //重置position数据
-        newBuffer.position(buffer.position());
-        //重置limit数据
-        newBuffer.limit(buffer.limit());
+
+        //申请新ByteBuffer，类型和原来的一致，原来是direct就还申请direct类型的，原来是heap就还申请heap类型的
+        ByteBuffer newBuffer;
+        byte[] data;
+        if (buffer.isDirect()) {
+            newBuffer = ByteBuffer.allocateDirect(buffer.capacity() + size);
+            //从0开始copy，将整个数据copy过去；注：Direct类型的ByteBuffer不能使用array获得
+            buffer.position(0);
+            data = new byte[buffer.capacity()];
+            buffer.get(data);
+        } else {
+            newBuffer = ByteBuffer.allocate(buffer.capacity() + size);
+            //获取数据
+            data = buffer.array();
+        }
+        //恢复数据
+        newBuffer.put(data);
+        if (mark >= 0) {
+            newBuffer.position(mark).mark();
+        }
+        newBuffer.position(position).limit(limit);
         return newBuffer;
     }
 
