@@ -26,6 +26,14 @@ public final class CollectionUtil {
             throw new IllegalArgumentException("扩容大小必须大于0");
         }
 
+        if (buffer.capacity() == Integer.MAX_VALUE) {
+            throw new OutOfMemoryError("当前缓冲区已经达到最大，无法继续扩容");
+        }
+
+        //确定扩容后的大小
+        int newSize = buffer.capacity() + size;
+        newSize = newSize <= 0 ? Integer.MAX_VALUE : newSize;
+
         //获取position、limit和mark数据
         int position = buffer.position();
         int limit = buffer.limit();
@@ -41,13 +49,13 @@ public final class CollectionUtil {
         ByteBuffer newBuffer;
         byte[] data;
         if (buffer.isDirect()) {
-            newBuffer = ByteBuffer.allocateDirect(buffer.capacity() + size);
+            newBuffer = ByteBuffer.allocateDirect(newSize);
             //从0开始copy，将整个数据copy过去；注：Direct类型的ByteBuffer不能使用array获得
             buffer.position(0);
             data = new byte[buffer.capacity()];
             buffer.get(data);
         } else {
-            newBuffer = ByteBuffer.allocate(buffer.capacity() + size);
+            newBuffer = ByteBuffer.allocate(newSize);
             //获取数据
             data = buffer.array();
         }
