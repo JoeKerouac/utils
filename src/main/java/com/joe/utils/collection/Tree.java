@@ -107,7 +107,7 @@ public class Tree<T> {
      * @param name      节点名
      * @param recursion 是否递归删除，true表示递归删除，如果传入false并且要删除的节点下有子节点则会抛出异常
      */
-    private void delete(String name, boolean recursion) {
+    public void delete(String name, boolean recursion) {
         root.delete(name, recursion);
     }
 
