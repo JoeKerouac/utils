@@ -201,7 +201,7 @@ public class XmlParser {
         Element root = DocumentHelper.createElement(rootName);
         buildDocument(root, source, source.getClass(), !hasNull);
         Long end = System.currentTimeMillis();
-        logger.info("解析xml用时" + (end - start) + "ms");
+        logger.debug("解析xml用时" + (end - start) + "ms");
         return root.asXML();
     }
 
@@ -220,9 +220,9 @@ public class XmlParser {
         for (CustomPropertyDescriptor descriptor : propertyDescriptors) {
             XmlNode xmlNode = descriptor.getAnnotation(XmlNode.class);
             //字段值
-            Object attrValueObj = pojo == null ? null : BeanUtils.getProperty(pojo, descriptor.getName());
+            Object valueObj = pojo == null ? null : BeanUtils.getProperty(pojo, descriptor.getName());
             //判断是否忽略
-            if ((ignoreNull && attrValueObj == null) || (xmlNode != null && xmlNode.ignore())) {
+            if ((ignoreNull && valueObj == null) || (xmlNode != null && xmlNode.ignore())) {
                 logger.debug("忽略空节点或者节点被注解忽略");
                 continue;
             }
@@ -239,7 +239,7 @@ public class XmlParser {
             //判断字段对应的是否是属性
             if (xmlNode != null && xmlNode.isAttribute()) {
                 //属性值，属性值只能是简单值
-                String attrValue = attrValueObj == null ? "" : String.valueOf(attrValueObj);
+                String attrValue = valueObj == null ? "" : String.valueOf(valueObj);
                 Element node;
                 //判断是否是父节点的属性
                 if (StringUtils.isEmpty(xmlNode.name())) {
@@ -266,11 +266,21 @@ public class XmlParser {
                 } else if (Collection.class.isAssignableFrom(descriptor.getRealType())) {
                     //集合类型
                     //判断字段值是否为null
-                    if (attrValueObj != null) {
-                        Collection collection = (Collection) attrValueObj;
+                    if (valueObj != null) {
+                        String arrayNodeName;
+                        Element root;
+                        if (StringUtils.isEmpty(xmlNode.arrayRoot())) {
+                            arrayNodeName = nodeName;
+                            root = parent;
+                        }else{
+                            arrayNodeName = xmlNode.arrayRoot();
+                            root = DocumentHelper.createElement(nodeName);
+                            parent.add(root);
+                        }
+                        Collection collection = (Collection) valueObj;
                         collection.stream().forEach(obj -> {
-                            Element node = DocumentHelper.createElement(nodeName);
-                            parent.add(node);
+                            Element node = DocumentHelper.createElement(arrayNodeName);
+                            root.add(node);
                             buildDocument(node, obj, null, ignoreNull);
                         });
                     }
@@ -283,7 +293,7 @@ public class XmlParser {
                         parent.add(node);
                     }
 
-                    String text = attrValueObj == null ? "" : String.valueOf(attrValueObj);
+                    String text = valueObj == null ? "" : String.valueOf(valueObj);
                     if (isCDATA) {
                         logger.debug("内容[{}]需要CDATA标签包裹", text);
                         node.add(DocumentHelper.createCDATA(text));
@@ -300,7 +310,7 @@ public class XmlParser {
                 Class<?> type = resolveRealType(descriptor);
 
                 //pojo类型
-                buildDocument(node, attrValueObj, type, ignoreNull);
+                buildDocument(node, valueObj, type, ignoreNull);
             }
         }
     }
@@ -398,6 +408,10 @@ public class XmlParser {
             collectionClass = attrXmlNode.arrayType();
         } else {
             collectionClass = (Class<? extends Collection>) field.getType();
+        }
+
+        if (!StringUtils.isEmpty(attrXmlNode.arrayRoot()) && !elements.isEmpty()) {
+            elements = elements.get(0).elements(attrXmlNode.arrayRoot());
         }
 
         //将数据转换为用户指定数据

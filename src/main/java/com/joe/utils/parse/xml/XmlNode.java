@@ -79,6 +79,13 @@ public @interface XmlNode {
     Class<?> general() default String.class;
 
     /**
+     * 当字段为集合时该选项有用
+     *
+     * @return 集合节点的节点名，当该值不为null或者空时会为集合单独创建一个以该函数返回值为名的节点，在节点里边存放集合，否则不创建
+     */
+    String arrayRoot() default "";
+
+    /**
      * 当字段对应的类型是集合类型时应该有该字段，指定需要的集合类
      *
      * @return 字段对应的集合类型，如果不指定那么将会采用默认值
