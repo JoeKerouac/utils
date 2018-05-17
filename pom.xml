@@ -33,6 +33,9 @@
         <profile>
             <!--打包源码和javadoc-->
             <id>javadoc</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <build>
                 <plugins>
                     <!-- Source -->
