@@ -15,12 +15,10 @@ import java.io.InputStream;
 @Slf4j
 public class LogbackReconfigureTest {
     private InputStream config;
-    private LogbackReconfigure logbackReconfigure;
 
     @Before
     public void init() {
         config = LogbackReconfigureTest.class.getClassLoader().getResourceAsStream("error.xml");
-        logbackReconfigure = new LogbackReconfigure();
     }
 
     @Test
@@ -28,7 +26,7 @@ public class LogbackReconfigureTest {
         String level = ((Logger) log).getEffectiveLevel().toString();
         Assert.assertEquals("ERROR", level);
         //更改logback配置
-        logbackReconfigure.reconfigure(config);
+        LogbackReconfigure.reconfigure(config);
         level = ((Logger) log).getEffectiveLevel().toString();
         Assert.assertEquals("INFO", level);
     }

@@ -39,12 +39,15 @@ public class LogbackReconfigure {
         }
     }
 
+    private LogbackReconfigure() {
+    }
+
     /**
-     * 重新配置当前
+     * 重新配置当前logback
      *
-     * @param config
+     * @param config logback的xml配置文件
      */
-    public void reconfigure(InputStream config) {
+    public static void reconfigure(InputStream config) {
         if (CONTEXT == null) {
             log.warn("当前日志上下文不是logback，不能使用该配置器重新配置");
             return;
@@ -68,7 +71,7 @@ public class LogbackReconfigure {
         }
     }
 
-    private List<SaxEvent> removeIncludeEvents(List<SaxEvent> unsanitizedEventList) {
+    private static List<SaxEvent> removeIncludeEvents(List<SaxEvent> unsanitizedEventList) {
         List<SaxEvent> sanitizedEvents = new ArrayList<SaxEvent>();
         if (unsanitizedEventList == null)
             return sanitizedEvents;
@@ -81,7 +84,7 @@ public class LogbackReconfigure {
         return sanitizedEvents;
     }
 
-    private void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList, URL mainURL) {
+    private static void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList, URL mainURL) {
         // failsafe events are used only in case of errors. Therefore, we must *not*
         // invoke file inclusion since the included files may be the cause of the error.
 
