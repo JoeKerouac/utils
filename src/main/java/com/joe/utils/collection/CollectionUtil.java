@@ -53,7 +53,11 @@ public final class CollectionUtil {
 
         //确定扩容后的大小
         int newSize = buffer.capacity() + size;
-        newSize = newSize <= 0 ? Integer.MAX_VALUE : newSize;
+
+        //检查大小
+        if (newSize < 0) {
+            throw new OutOfMemoryError("buffer原大小为：" + buffer.capacity() + "；要扩容的大小为：" + size + "；大于int最大值，请调整size");
+        }
 
         //申请新ByteBuffer，类型和原来的一致，原来是direct就还申请direct类型的，原来是heap就还申请heap类型的
         ByteBuffer newBuffer;
