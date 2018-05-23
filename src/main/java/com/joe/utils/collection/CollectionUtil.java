@@ -29,9 +29,9 @@ public final class CollectionUtil {
      * 对ByteBuffer扩容（扩容后position为从原缓冲区复制的数据的长度，即len参数，mark为-1，limit为新buffer的capacity）
      *
      * @param buffer 原ByteBuffer
-     * @param size   要增加的大小
      * @param offset 要复制原缓冲区数据的起始位置
      * @param len    要复制的数据的长度
+     * @param size   要增加的大小
      * @return 扩容后的ByteBuffer，扩容后的capacity等于原buffer的capacity + size，扩容后的数据等于原来缓冲区offset开始长度为len的数据
      */
     public static ByteBuffer grow(ByteBuffer buffer, int offset, int len, int size) {
