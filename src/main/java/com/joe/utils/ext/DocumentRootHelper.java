@@ -30,11 +30,12 @@ public class DocumentRootHelper {
      * @return 当前系统的doc-root
      */
     public static final File getValidDocumentRoot() {
+        // If document root not explicitly set see if we are running from IDE
+        File file = getIDEDocumentRoot();
         // If document root not explicitly set see if we are running from a war archive
-        File file = getWarOrJarFileDocumentRoot();
+        file = file != null ? file : getWarOrJarFileDocumentRoot();
         // If not a war archive maybe it is an exploded war
         file = file != null ? file : getExplodedWarFileDocumentRoot();
-        file = file != null ? file : getIDEDocumentRoot();
         if (file == null) {
             log.debug("None of the document roots " + Arrays.asList(COMMON_DOC_ROOTS)
                     + " point to a directory and will be ignored.");
@@ -45,13 +46,12 @@ public class DocumentRootHelper {
     }
 
     /**
-     * 获取war或者jar文件
+     * 获取war文件
      *
      * @return war文件
      */
     private static File getWarOrJarFileDocumentRoot() {
-        File file = getArchiveFileDocumentRoot(".war");
-        return file == null ? getArchiveFileDocumentRoot(".jar") : file;
+        return getArchiveFileDocumentRoot(".war");
     }
 
     /**
