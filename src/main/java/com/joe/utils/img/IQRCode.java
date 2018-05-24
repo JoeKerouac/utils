@@ -3,6 +3,7 @@ package com.joe.utils.img;
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+import com.joe.utils.common.IOUtils;
 import net.glxn.qrgen.QRCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,10 @@ import java.net.URL;
  */
 public class IQRCode {
     private static final Logger logger = LoggerFactory.getLogger(IQRCode.class);
+
+    private IQRCode() {
+
+    }
 
     /**
      * 将指定数据生成二维码并保存至指定文件
@@ -46,12 +51,27 @@ public class IQRCode {
      */
     public static void create(String data, OutputStream out, int width, int height) throws IOException {
         logger.debug("生成二维码，要生成的图片的宽为{}，高为{}", width, height);
-        QRCode code = QRCode.from(data);
-        code.withCharset("UTF8");
-        code.withSize(width, height);
+        QRCode code = createQRCode(data, width, height);
         code.writeTo(out);
         out.close();
         logger.debug("二维码生成成功");
+    }
+
+    /**
+     * 将指定数据生成二维码图片的BufferedImage
+     *
+     * @param data   二维码数据
+     * @param width  图片的宽
+     * @param height 图片的高
+     * @return 二维码图片对应的BufferedImage
+     * @throws IOException IO异常
+     */
+    public static BufferedImage createImg(String data, int width, int height) throws IOException {
+        logger.debug("生成二维码，要生成的图片的宽为{}，高为{}", width, height);
+        QRCode code = createQRCode(data, width, height);
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(code.stream().toByteArray()));
+        logger.debug("二维码生成成功");
+        return image;
     }
 
     /**
@@ -93,6 +113,25 @@ public class IQRCode {
         BufferedImage image = ImageIO.read(input);
         return read(image);
     }
+
+
+    /**
+     * 将指定数据生成二维码
+     *
+     * @param data   二维码数据
+     * @param width  图片的宽
+     * @param height 图片的高
+     * @return QRCode QRCode
+     */
+    private static QRCode createQRCode(String data, int width, int height) {
+        logger.debug("生成二维码，要生成的图片的宽为{}，高为{}", width, height);
+        QRCode code = QRCode.from(data);
+        code.withCharset("UTF8");
+        code.withSize(width, height);
+        logger.debug("二维码生成成功");
+        return code;
+    }
+
 
     /**
      * 从二维码图片读取二维码信息
