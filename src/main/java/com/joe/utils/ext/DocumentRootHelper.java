@@ -18,10 +18,16 @@ import java.util.Arrays;
  */
 @Slf4j
 public class DocumentRootHelper {
+    /**
+     * classpath下的doc-root
+     */
     private static final String DEFAULT_DOC_ROOT = Thread.currentThread().getContextClassLoader().getResource("")
             .getFile();
-    private static final String[] COMMON_DOC_ROOTS = {"src/main/webapp", "public",
-            "static"};
+    /**
+     * 本地工作空间的doc-root
+     */
+    private static final String LOCAL_DOC_ROOT = DEFAULT_DOC_ROOT.replace("target/classes", "src/main/webapp");
+    private static final String[] COMMON_DOC_ROOTS = {"src/main/webapp", "public", "static"};
 
 
     /**
@@ -69,9 +75,12 @@ public class DocumentRootHelper {
      * @return doc-root
      */
     private static File getIDEDocumentRoot() {
-        File docRoot = new File(DEFAULT_DOC_ROOT);
+        File docRoot = new File(LOCAL_DOC_ROOT);
         if (docRoot.exists()) {
-            log.debug("当前在IDE中运行");
+            log.debug("当前在IDE中运行，并且找到了工作空间");
+            return docRoot;
+        } else if ((docRoot = new File(DEFAULT_DOC_ROOT)).exists()) {
+            log.debug("当前在IDE中运行，没有找到了工作空间，但是找到了classpath下的doc-root");
             return docRoot;
         } else {
             log.debug("当前没有在IDE中运行");
