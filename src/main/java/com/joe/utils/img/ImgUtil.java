@@ -40,11 +40,23 @@ public class ImgUtil {
                     bufferedImage.setRGB(j2, j1, rgb);
                 }
             }
-            g2D.drawImage(bufferedImage, 0, 0, null);
+//            g2D.drawImage(bufferedImage, 0, 0, null);
 
             // 生成图片为PNG
-
             ImageIO.write(bufferedImage, "png", new File(newPath));
+        } catch (Exception e) {
+            logger.error("图片透明度处理失败");
+        }
+
+    }
+
+    public static void test(String oldPath, String newPath) {
+        /*
+          增加测试项 读取图片，绘制成半透明
+         */
+        try {
+            BufferedImage image = ImageIO.read(new FileInputStream(oldPath));
+
         } catch (Exception e) {
             logger.error("图片透明度处理失败");
         }
@@ -67,13 +79,24 @@ public class ImgUtil {
      * @throws IOException 读取图片异常时抛出
      */
     public static ImgMetadata getImgInfo(final String path) throws IOException {
-        ImgMetadata imgMetadata = new ImgMetadata();
         File file = new File(path);
         BufferedImage image = ImageIO.read(file);
+        ImgMetadata imgMetadata = getImgInfo(image);
+        imgMetadata.setName(file.getName());
+        return imgMetadata;
+    }
+
+    /**
+     * 获取图片的说明
+     *
+     * @param image 图片的数据
+     * @return 图片说明（不包含文件名，获取不到文件名）
+     */
+    public static ImgMetadata getImgInfo(BufferedImage image) {
+        ImgMetadata imgMetadata = new ImgMetadata();
         imgMetadata.setHeight(image.getHeight());
         imgMetadata.setWidth(image.getWidth());
         imgMetadata.setPixelSize(image.getColorModel().getPixelSize());
-        imgMetadata.setName(file.getName());
         return imgMetadata;
     }
 
