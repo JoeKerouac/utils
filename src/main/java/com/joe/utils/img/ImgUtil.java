@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -50,9 +51,13 @@ public class ImgUtil {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+//        String path = "D://2.jpg";
+//        BufferedImage image = ImageIO.read(new FileInputStream(path));
+//        System.out.println("status 是：" + image.getColorModel().getPixelSize());
         setAlpha("D://2.jpg", "D://2.png");
     }
+
 
     /**
      * 获取图片的说明
@@ -67,6 +72,7 @@ public class ImgUtil {
         BufferedImage image = ImageIO.read(file);
         imgMetadata.setHeight(image.getHeight());
         imgMetadata.setWidth(image.getWidth());
+        imgMetadata.setPixelSize(image.getColorModel().getPixelSize());
         imgMetadata.setName(file.getName());
         return imgMetadata;
     }
@@ -76,17 +82,21 @@ public class ImgUtil {
         ImgMetadata() {
         }
 
-        /*
+        /**
          * 图片宽
          */
         private int width;
-        /*
+        /**
          * 图片高
          */
         private int height;
-        /*
+        /**
          * 图片文件名
          */
         private String name;
+        /**
+         * 图片位深
+         */
+        private int pixelSize;
     }
 }
