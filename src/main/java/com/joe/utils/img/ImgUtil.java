@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -68,7 +67,7 @@ public class ImgUtil {
 //        BufferedImage image = ImageIO.read(new FileInputStream(path));
 //        System.out.println("status 是：" + image.getColorModel().getPixelSize());
         BufferedImage image = compression(ImageIO.read(new FileInputStream("D://2.jpg")), 3 , 1);
-        ImageIO.write(image, "png", new File("D://2.png"));
+        ImageIO.write(image, "jpg", new File("D://3.jpg"));
 //        setAlpha("D://2.jpg", "D://2.png");
     }
 
