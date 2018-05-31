@@ -27,12 +27,13 @@ public class ImgUtil {
             logger.debug("图片加载完毕，开始改变图片的alpha值");
 
             ImageIcon imageIcon = new ImageIcon(data);
+            //创建一个新模式的图片（防止原图片没有alpha通道，强制生成一个带alpha通道的图片）
             BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(),
                     BufferedImage.TYPE_4BYTE_ABGR);
             Graphics2D g2D = (Graphics2D) bufferedImage.getGraphics();
             g2D.drawImage(imageIcon.getImage(), 0, 0, imageIcon.getImageObserver());
             // 循环每一个像素点，改变像素点的Alpha值
-            int alpha = 0;
+            int alpha = 20;
             for (int j1 = bufferedImage.getMinY(); j1 < bufferedImage.getHeight() / 2; j1++) {
                 for (int j2 = bufferedImage.getMinX(); j2 < bufferedImage.getWidth(); j2++) {
                     int rgb = bufferedImage.getRGB(j2, j1);
@@ -40,7 +41,6 @@ public class ImgUtil {
                     bufferedImage.setRGB(j2, j1, rgb);
                 }
             }
-//            g2D.drawImage(bufferedImage, 0, 0, null);
 
             // 生成图片为PNG
             ImageIO.write(bufferedImage, "png", new File(newPath));
@@ -67,7 +67,9 @@ public class ImgUtil {
 //        String path = "D://2.jpg";
 //        BufferedImage image = ImageIO.read(new FileInputStream(path));
 //        System.out.println("status 是：" + image.getColorModel().getPixelSize());
-        setAlpha("D://2.jpg", "D://2.png");
+        BufferedImage image = compression(ImageIO.read(new FileInputStream("D://2.jpg")), 3 , 1);
+        ImageIO.write(image, "png", new File("D://2.png"));
+//        setAlpha("D://2.jpg", "D://2.png");
     }
 
 
@@ -99,6 +101,47 @@ public class ImgUtil {
         imgMetadata.setPixelSize(image.getColorModel().getPixelSize());
         return imgMetadata;
     }
+
+    /**
+     * 缩放图片（将图片宽高同时变小，图片将会变模糊同时变小）
+     *
+     * @param src   原图片数据
+     * @param scale 缩放比列，宽高同时缩放
+     * @return 缩放后的图片（会变模糊）
+     */
+    public static BufferedImage compression(BufferedImage src, int scale) {
+        return compression(src, scale, scale);
+    }
+
+    /**
+     * 缩放图片
+     *
+     * @param src         图片源
+     * @param widthScale  宽度缩放比例
+     * @param heightScale 高度缩放比列
+     * @return 缩放后的图片（会变模糊）
+     */
+    public static BufferedImage compression(BufferedImage src, int widthScale, int heightScale) {
+        int oldWidth = src.getWidth();
+        int oldHeight = src.getHeight();
+        int width = oldWidth / widthScale + ((oldWidth % widthScale) > 0 ? 1 : 0);
+        int height = oldHeight / heightScale + ((oldHeight % heightScale) > 0 ? 1 : 0);
+
+        Graphics2D g2D = (Graphics2D) src.getGraphics();
+        g2D.drawImage(src, 0, 0, null);
+
+        BufferedImage dest = new BufferedImage(width, height, src.getType());
+
+        for (int x = src.getMinX(); x < width; x++) {
+            for (int y = src.getMinY(); y < height; y++) {
+                int rgb = src.getRGB(x * widthScale, y * heightScale);
+                dest.setRGB(x, y, rgb);
+            }
+        }
+
+        return dest;
+    }
+
 
     @Data
     public static final class ImgMetadata {
