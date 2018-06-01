@@ -9,6 +9,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -28,6 +29,29 @@ public class DateUtil {
      */
     public final static String SHORT = "yyyy-MM-dd";
 
+    /**
+     * 获取指定年份的天数
+     *
+     * @param date 指定年份
+     * @return 指定年份对应的天数
+     */
+    public static int getYearDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    }
+
+    /**
+     * 获取指定月份的天数
+     *
+     * @param date 指定月份
+     * @return 该月份的天数
+     */
+    public static int getMonthDay(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    }
 
     /**
      * 将指定日期字符串按照指定格式转换为日期对象
