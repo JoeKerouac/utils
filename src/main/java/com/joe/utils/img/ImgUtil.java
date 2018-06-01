@@ -1,90 +1,106 @@
 package com.joe.utils.img;
 
-import com.joe.utils.common.IOUtils;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 
+/**
+ * 图片工具类
+ *
+ * @author joe
+ */
+@Slf4j
 public class ImgUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ImgUtil.class);
+    private ImgUtil() {
+    }
 
-    public static void setAlpha(String oldPath, String newPath) {
-        /*
-          增加测试项 读取图片，绘制成半透明
-         */
-        try {
-            logger.debug("开始读取图片：{}", oldPath);
-            byte[] data = IOUtils.read(new FileInputStream(oldPath));
-            logger.debug("图片加载完毕，开始改变图片的alpha值");
+    /**
+     * 更改图片alpha值
+     *
+     * @param oldPath 图片本地路径
+     * @param newPath 更改alpha值后的图片保存路径
+     * @param alpha   要设置的alpha值
+     * @throws IOException IOException
+     */
+    public static void changeAlpha(String oldPath, String newPath, byte alpha) throws IOException {
+        changeAlpha(new FileInputStream(oldPath), new FileOutputStream(newPath), alpha);
+    }
 
-            ImageIcon imageIcon = new ImageIcon(data);
-            //创建一个新模式的图片（防止原图片没有alpha通道，强制生成一个带alpha通道的图片）
-            BufferedImage bufferedImage = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(),
-                    BufferedImage.TYPE_4BYTE_ABGR);
-            Graphics2D g2D = (Graphics2D) bufferedImage.getGraphics();
-            g2D.drawImage(imageIcon.getImage(), 0, 0, imageIcon.getImageObserver());
-            // 循环每一个像素点，改变像素点的Alpha值
-            int alpha = 20;
-            for (int j1 = bufferedImage.getMinY(); j1 < bufferedImage.getHeight() / 2; j1++) {
-                for (int j2 = bufferedImage.getMinX(); j2 < bufferedImage.getWidth(); j2++) {
-                    int rgb = bufferedImage.getRGB(j2, j1);
+    /**
+     * 更改图片alpha值
+     *
+     * @param oldPath 图片本地路径
+     * @param newPath 更改alpha值后的图片保存路径
+     * @param alpha   要设置的alpha值
+     * @param filter  alpha filter
+     * @throws IOException IOException
+     */
+    public static void changeAlpha(String oldPath, String newPath, byte alpha, AlphaFilter filter) throws IOException {
+        changeAlpha(new FileInputStream(oldPath), new FileOutputStream(newPath), alpha, filter);
+    }
+
+    /**
+     * 更改图片的alpha值
+     *
+     * @param srcInput   图像输入
+     * @param destOutput 图像输出
+     * @param alpha      要设置的alpha值
+     * @throws IOException IOException
+     */
+    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha) throws IOException {
+        changeAlpha(srcInput, destOutput, alpha, null);
+    }
+
+    /**
+     * 更改alpha值
+     *
+     * @param srcInput   图像输入
+     * @param destOutput 图像输出
+     * @param alpha      要设置的alpha值
+     * @param filter     alpha filter
+     * @throws IOException IOException
+     */
+    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha, AlphaFilter filter)
+            throws IOException {
+        //加载图片
+        log.debug("开始加载图片");
+        BufferedImage old = ImageIO.read(srcInput);
+        log.debug("图片加载完毕，开始改变图片的alpha值");
+
+        //使用32位深带alpha通道模式
+        BufferedImage bufferedImage = new BufferedImage(old.getWidth(), old.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+
+        if (filter == null) {
+            filter = (x, y, rgb) -> true;
+        }
+
+        // 循环每一个像素点，改变像素点的Alpha值
+        for (int x = bufferedImage.getMinX(); x < bufferedImage.getWidth(); x++) {
+            for (int y = bufferedImage.getMinY(); y < bufferedImage.getHeight(); y++) {
+                int rgb = old.getRGB(x, y);
+                if (filter.filter(x, y, rgb)) {
                     rgb = (alpha << 24) | (rgb & 0x00ffffff);
-                    bufferedImage.setRGB(j2, j1, rgb);
+                    bufferedImage.setRGB(x, y, rgb);
                 }
             }
-
-            // 生成图片为PNG
-            ImageIO.write(bufferedImage, "png", new File(newPath));
-        } catch (Exception e) {
-            logger.error("图片透明度处理失败");
         }
-
+        log.debug("图片aphasia值更改完毕");
+        // 生成图片为PNG
+        ImageIO.write(bufferedImage, "png", destOutput);
     }
-
-    public static void test(String oldPath, String newPath) {
-        /*
-          增加测试项 读取图片，绘制成半透明
-         */
-        try {
-            BufferedImage image = ImageIO.read(new FileInputStream(oldPath));
-
-        } catch (Exception e) {
-            logger.error("图片透明度处理失败");
-        }
-
-    }
-
-    public static void main(String[] args) throws IOException {
-//        String path = "D://2.jpg";
-//        BufferedImage image = ImageIO.read(new FileInputStream(path));
-//        System.out.println("status 是：" + image.getColorModel().getPixelSize());
-        BufferedImage image = compression(ImageIO.read(new FileInputStream("D://2.jpg")), 3 , 1);
-        ImageIO.write(image, "jpg", new File("D://3.jpg"));
-//        setAlpha("D://2.jpg", "D://2.png");
-    }
-
 
     /**
      * 获取图片的说明
      *
      * @param path 图片的路径
      * @return 图片说明
-     * @throws IOException 读取图片异常时抛出
+     * @throws IOException IOException
      */
     public static ImgMetadata getImgInfo(final String path) throws IOException {
-        File file = new File(path);
-        BufferedImage image = ImageIO.read(file);
-        ImgMetadata imgMetadata = getImgInfo(image);
-        imgMetadata.setName(file.getName());
-        return imgMetadata;
+        return getImgInfo(ImageIO.read(new File(path)));
     }
 
     /**
@@ -98,6 +114,7 @@ public class ImgUtil {
         imgMetadata.setHeight(image.getHeight());
         imgMetadata.setWidth(image.getWidth());
         imgMetadata.setPixelSize(image.getColorModel().getPixelSize());
+        imgMetadata.setAlpha(image.getColorModel().hasAlpha());
         return imgMetadata;
     }
 
@@ -126,9 +143,6 @@ public class ImgUtil {
         int width = oldWidth / widthScale + ((oldWidth % widthScale) > 0 ? 1 : 0);
         int height = oldHeight / heightScale + ((oldHeight % heightScale) > 0 ? 1 : 0);
 
-        Graphics2D g2D = (Graphics2D) src.getGraphics();
-        g2D.drawImage(src, 0, 0, null);
-
         BufferedImage dest = new BufferedImage(width, height, src.getType());
 
         for (int x = src.getMinX(); x < width; x++) {
@@ -141,6 +155,43 @@ public class ImgUtil {
         return dest;
     }
 
+    /**
+     * 复制image
+     *
+     * @param image image源
+     * @return 复制后的image，与原图一模一样
+     */
+    public static BufferedImage copy(BufferedImage image) {
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+        return copy(image, newImage);
+    }
+
+    /**
+     * 将一个image信息复制到另一个image中
+     *
+     * @param src  源
+     * @param dest 目标
+     * @return dest
+     */
+    public static BufferedImage copy(BufferedImage src, BufferedImage dest) {
+        dest.getGraphics().drawImage(src, src.getMinX(), src.getMinY(), null);
+        return dest;
+    }
+
+    /**
+     * alpha filter，设置alpha值的时候使用
+     */
+    public interface AlphaFilter {
+        /**
+         * 根据结果判断更改alpha值
+         *
+         * @param x   像素x坐标
+         * @param y   像素y坐标
+         * @param rgb x、y坐标对应的rgb值
+         * @return 返回true表示需要更改，返回false表示不需要更改
+         */
+        boolean filter(int x, int y, int rgb);
+    }
 
     @Data
     public static final class ImgMetadata {
@@ -163,5 +214,9 @@ public class ImgUtil {
          * 图片位深
          */
         private int pixelSize;
+        /**
+         * 是否有alpha通道
+         */
+        private boolean alpha;
     }
 }
