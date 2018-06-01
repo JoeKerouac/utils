@@ -3,9 +3,7 @@ package com.joe.utils.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
@@ -54,7 +52,8 @@ public class DateUtil {
     }
 
     /**
-     * 将指定日期字符串按照指定格式转换为日期对象
+     * 将指定日期字符串按照指定格式转换为日期对象（该方法发现BUG，只能转换yyyy-MM-dd HH:mm:ss，跟LocalDateTime有关，如
+     * 果需要转换yyyy-MM-dd则需要LocalDate）
      *
      * @param date   格式化日期字符串
      * @param format 日期字符串的格式
@@ -64,6 +63,9 @@ public class DateUtil {
     public static Date parse(String date, String format) {
         LocalDateTime dateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
         return Date.from(dateTime.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
+//        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(format));
+//        LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0,0));
+//        return Date.from(dateTime.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
     }
 
     /**
