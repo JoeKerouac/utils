@@ -82,9 +82,10 @@ public class ImgUtil {
             for (int y = bufferedImage.getMinY(); y < bufferedImage.getHeight(); y++) {
                 int rgb = old.getRGB(x, y);
                 if (filter.filter(x, y, rgb)) {
+                    //设置alpha值
                     rgb = (alpha << 24) | (rgb & 0x00ffffff);
-                    bufferedImage.setRGB(x, y, rgb);
                 }
+                bufferedImage.setRGB(x, y, rgb);
             }
         }
         log.debug("图片aphasia值更改完毕");
