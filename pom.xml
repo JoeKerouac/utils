@@ -119,7 +119,6 @@
         <beanutils.version>1.9.2</beanutils.version>
         <codec.version>1.10</codec.version>
         <img.version>1.0-R1534292</img.version>
-        <ehcache.version>3.3.0</ehcache.version>
         <jmail.version>1.4.7</jmail.version>
         <java.version>1.8</java.version>
         <redisson.version>3.2.3</redisson.version>
@@ -141,12 +140,6 @@
             <groupId>net.glxn</groupId>
             <artifactId>qrgen</artifactId>
             <version>1.4</version>
-        </dependency>
-        <!-- ehcache缓存 -->
-        <dependency>
-            <groupId>org.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>${ehcache.version}</version>
         </dependency>
         <!-- 日志框架 -->
         <dependency>
@@ -174,6 +167,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
             <version>${slf4j.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- 快速生成get set方法 -->
         <dependency>
