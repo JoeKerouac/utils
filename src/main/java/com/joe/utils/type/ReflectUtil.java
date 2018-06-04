@@ -37,7 +37,7 @@ public class ReflectUtil {
      * @throws NoSuchFieldException 当给定对象不存在指定字段的时候抛出该异常
      */
     public static <T extends Object> T getFieldValue(Object obj, String fieldName) throws NoSuchFieldException {
-        Field field = obj.getClass().getField(fieldName);
+        Field field = obj.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         try {
             return (T) field.get(obj);
