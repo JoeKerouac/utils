@@ -5,10 +5,14 @@ import org.slf4j.LoggerFactory;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 日期工具类
@@ -19,6 +23,10 @@ import java.util.Date;
 public class DateUtil {
     private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
     /**
+     * formatter缓存
+     */
+    private final static Map<String, DateTimeFormatter> FORMATTER_CACHE = new HashMap<>();
+    /**
      * 常用格式化yyyy-MM-dd HH:mm:ss
      */
     public final static String BASE = "yyyy-MM-dd HH:mm:ss";
@@ -26,6 +34,9 @@ public class DateUtil {
      * 常用格式化yyyy-MM-dd
      */
     public final static String SHORT = "yyyy-MM-dd";
+
+    private DateUtil() {
+    }
 
     /**
      * 获取指定年份的天数
@@ -52,8 +63,7 @@ public class DateUtil {
     }
 
     /**
-     * 将指定日期字符串按照指定格式转换为日期对象（该方法发现BUG，只能转换yyyy-MM-dd HH:mm:ss，跟LocalDateTime有关，如
-     * 果需要转换yyyy-MM-dd则需要LocalDate）
+     * 将指定日期字符串按照指定格式转换为日期对象（如果传入的时间没有当前时分秒信息或者年月日信息则默认填充当前时间）
      *
      * @param date   格式化日期字符串
      * @param format 日期字符串的格式
@@ -61,8 +71,29 @@ public class DateUtil {
      * @throws DateUtilException 格式错误时返回该异常
      */
     public static Date parse(String date, String format) {
-        LocalDateTime dateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
-        return Date.from(dateTime.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
+        DateTimeFormatter formatter;
+        //优先从缓存取，取不到创建一个，不用加锁
+        if ((formatter = FORMATTER_CACHE.get(format)) == null) {
+            formatter = DateTimeFormatter.ofPattern(format);
+            FORMATTER_CACHE.put(format, formatter);
+        }
+
+        TemporalAccessor accessor = formatter.parse(date);
+        LocalDateTime time;
+
+        if (accessor.isSupported(ChronoField.DAY_OF_YEAR) && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
+            time = LocalDateTime.from(accessor);
+        } else if (accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
+            LocalTime localTime = LocalTime.from(accessor);
+            time = localTime.atDate(LocalDate.now());
+        } else if (accessor.isSupported(ChronoField.DAY_OF_YEAR)) {
+            LocalDate localDate = LocalDate.from(accessor);
+            time = localDate.atTime(LocalTime.now());
+        } else {
+            throw new RuntimeException("日期类解析异常，时间为：" + date + "；格式为：" + format);
+        }
+
+        return Date.from(time.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
 //        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(format));
 //        LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0,0));
 //        return Date.from(dateTime.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
