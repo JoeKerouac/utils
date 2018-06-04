@@ -34,6 +34,11 @@ public class DateUtil {
      * 常用格式化yyyy-MM-dd
      */
     public final static String SHORT = "yyyy-MM-dd";
+    /**
+     * 常用格式化HH:mm:ss
+     */
+    public final static String TIME = "HH:mm:ss";
+
 
     private DateUtil() {
     }
@@ -103,7 +108,7 @@ public class DateUtil {
             LocalDate localDate = LocalDate.from(accessor);
             time = localDate.atTime(LocalTime.now());
         } else {
-            throw new RuntimeException("日期类解析异常，时间为：" + date + "；格式为：" + format);
+            throw new DateUtilException("日期类解析异常，时间为：" + date + "；格式为：" + format);
         }
 
         //返回对应日期
