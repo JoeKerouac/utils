@@ -2,6 +2,7 @@ package com.joe.utils.data;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * @version 2018.05.24 14:03
  */
 @Data
-public class BaseDTO<T> {
+public class BaseDTO<T> implements Serializable {
     private static final long serialVersionUID = 5075924626508128661L;
     private static final Map<String, String> MSG = new HashMap<>();
 
@@ -41,6 +42,25 @@ public class BaseDTO<T> {
      */
     public BaseDTO() {
         this.success();
+    }
+
+    /**
+     * 设置一个状态的构造器
+     *
+     * @param status 默认状态
+     */
+    public BaseDTO(String status) {
+        this.setStatus(status);
+    }
+
+    /**
+     * 添加全局status-msg对（200、500为预设状态，200表示成功，500表示系统异常）
+     *
+     * @param status 状态码
+     * @param msg    对应的消息
+     */
+    public static void addStatus(String status, String msg) {
+        MSG.put(status, msg);
     }
 
     /**
@@ -110,7 +130,7 @@ public class BaseDTO<T> {
     }
 
     /**
-     * 构建系统异常对象
+     * 构建系统异常对象，status为500，msg为用户传入参数
      *
      * @param msg 异常消息
      * @param <T> 数据类型
