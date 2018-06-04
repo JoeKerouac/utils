@@ -39,6 +39,18 @@ public class DateUtil {
     }
 
     /**
+     * 将一种格式的日期转换为另一种格式
+     *
+     * @param date      日期字符串
+     * @param format    日期对应的格式
+     * @param newFormat 要转换的新格式
+     * @return 新格式的日期
+     */
+    public static String convert(String date, String format, String newFormat) {
+        return getFormatDate(newFormat, parse(date, format));
+    }
+
+    /**
      * 获取指定年份的天数
      *
      * @param date 指定年份
@@ -81,6 +93,7 @@ public class DateUtil {
         TemporalAccessor accessor = formatter.parse(date);
         LocalDateTime time;
 
+        //判断日期类型，新版日期类将时间分为年月日（LocalDate）、时分秒（LocalTime）、年月日时分秒（LocalDateTime）三种类型
         if (accessor.isSupported(ChronoField.DAY_OF_YEAR) && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
             time = LocalDateTime.from(accessor);
         } else if (accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
@@ -93,10 +106,8 @@ public class DateUtil {
             throw new RuntimeException("日期类解析异常，时间为：" + date + "；格式为：" + format);
         }
 
+        //返回对应日期
         return Date.from(time.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
-//        LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ofPattern(format));
-//        LocalDateTime dateTime = LocalDateTime.of(localDate, LocalTime.of(0,0));
-//        return Date.from(dateTime.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
     }
 
     /**
