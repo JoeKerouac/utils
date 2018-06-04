@@ -23,6 +23,30 @@ public class ReflectUtil {
     private static final Pattern superPattern = Pattern.compile("(.*) super.*");
     private static final Pattern extendsPattern = Pattern.compile("(.*) extends.*");
 
+    private ReflectUtil() {
+    }
+
+
+    /**
+     * 获取指定对象中指定字段名对应的字段的值
+     *
+     * @param obj       对象
+     * @param fieldName 字段名
+     * @param <T>       字段类型
+     * @return 指定对象中指定字段名对应字段的值
+     * @throws NoSuchFieldException 当给定对象不存在指定字段的时候抛出该异常
+     */
+    public static <T extends Object> T getFieldValue(Object obj, String fieldName) throws NoSuchFieldException {
+        Field field = obj.getClass().getField(fieldName);
+        field.setAccessible(true);
+        try {
+            return (T) field.get(obj);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            //不可能有这种情况
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * /**
      * 构建map类型的JavaType
