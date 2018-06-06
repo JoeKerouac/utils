@@ -5,8 +5,11 @@ import com.joe.utils.cluster.redis.RedisClusterManager;
 import com.joe.utils.cluster.redis.RedisClusterManagerFactory;
 
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -34,6 +37,33 @@ public interface ClusterManager {
      * @return 指定名字的lock
      */
     ReadWriteLock getReadWriteLock(String name);
+
+    /**
+     * 获取指定名字的BlockingDeque
+     *
+     * @param name 名字
+     * @param <V>  BlockingDeque中的数据类型
+     * @return 指定名字对应的BlockingDeque
+     */
+    <V> BlockingDeque<V> getBlockingDeque(String name);
+
+    /**
+     * 获取指定名字的BlockingQueue
+     *
+     * @param name 名字
+     * @param <V>  BlockingQueue中的数据类型
+     * @return 指定名字对应的BlockingQueue
+     */
+    <V> BlockingQueue<V> getBlockingQueue(String name);
+
+    /**
+     * 获取指定名字的list
+     *
+     * @param name 名字
+     * @param <V>  list中的数据类型
+     * @return 指定名字对应的list
+     */
+    <V> List<V> getList(String name);
 
     /**
      * 获取指定名字的Map，该Map必须能够自动在集群间同步

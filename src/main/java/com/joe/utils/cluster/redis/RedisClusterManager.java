@@ -5,8 +5,11 @@ import com.joe.utils.cluster.Topic;
 import com.joe.utils.cluster.redis.RedisTopic;
 import org.redisson.api.RedissonClient;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -31,6 +34,21 @@ public class RedisClusterManager implements ClusterManager {
     @Override
     public ReadWriteLock getReadWriteLock(String name) {
         return redissonClient.getReadWriteLock(name);
+    }
+
+    @Override
+    public <V> BlockingDeque<V> getBlockingDeque(String name) {
+        return redissonClient.getBlockingDeque(name);
+    }
+
+    @Override
+    public <V> BlockingQueue<V> getBlockingQueue(String name) {
+        return redissonClient.getBlockingQueue(name);
+    }
+
+    @Override
+    public <V> List<V> getList(String name) {
+        return redissonClient.getList(name);
     }
 
     @Override
