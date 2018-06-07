@@ -1,9 +1,9 @@
 package com.joe.utils.collection;
 
-import com.joe.utils.common.MathUtils;
+
+import com.joe.utils.math.MathUtil;
 
 import java.nio.ByteBuffer;
-import java.nio.InvalidMarkException;
 import java.util.*;
 import java.util.function.BiFunction;
 
@@ -169,7 +169,7 @@ public final class CollectionUtil {
         if (list == null || list.isEmpty()) {
             return Collections.emptyList();
         }
-        long size = MathUtils.factorial(list.size());
+        long size = MathUtil.factorial(list.size());
         if (size > Integer.MAX_VALUE) {
             throw new OutOfMemoryError("全排列结果集大小为[" + size + "]，超过数组能容纳的最大结果");
         }

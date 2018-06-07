@@ -78,8 +78,8 @@ public class ImgUtil {
         }
 
         // 循环每一个像素点，改变像素点的Alpha值
-        for (int x = bufferedImage.getMinX(); x < bufferedImage.getWidth(); x++) {
-            for (int y = bufferedImage.getMinY(); y < bufferedImage.getHeight(); y++) {
+        for (int x = 0; x < bufferedImage.getWidth(); x++) {
+            for (int y = 0; y < bufferedImage.getHeight(); y++) {
                 int rgb = old.getRGB(x, y);
                 if (filter.filter(x, y, rgb)) {
                     //设置alpha值
@@ -92,6 +92,38 @@ public class ImgUtil {
         // 生成图片为PNG
         ImageIO.write(bufferedImage, "png", destOutput);
     }
+
+//    public static BufferedImage spin(BufferedImage image, double angle) {
+//        int width = image.getWidth();
+//        int height = image.getHeight();
+//        BufferedImage bufferedImage = new BufferedImage(height, width, image.getType());
+//
+//        int x = width >> 1;
+//        int y = height >> 1;
+//
+//        for (int i = 0; i < width; i++) {
+//            for (int j = 0; j < height; j++) {
+//                int rgb = image.getRGB(i, j);
+//                Point point = MathUtil.spin(new Point(i - x, j - y), angle);
+//                int newX = (int)Math.round(point.getX()) + x;
+//                int newY = (int) Math.round(point.getY()) + y;
+//                try {
+//
+//                    bufferedImage.setRGB(newX, newY, rgb);
+//                } catch (Exception e) {
+//
+//                }
+//            }
+//        }
+//
+//        return bufferedImage;
+//    }
+
+//    public static void main(String[] args) throws IOException{
+//        BufferedImage old = ImageIO.read(new FileInputStream("D:\\2.jpg"));
+//        BufferedImage image = spin(old, MathUtil.ANGLE_90);
+//        ImageIO.write(image, "jpg", new FileOutputStream("D:\\3.jpg"));
+//    }
 
     /**
      * 获取图片的说明
@@ -146,8 +178,8 @@ public class ImgUtil {
 
         BufferedImage dest = new BufferedImage(width, height, src.getType());
 
-        for (int x = src.getMinX(); x < width; x++) {
-            for (int y = src.getMinY(); y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 int rgb = src.getRGB(x * widthScale, y * heightScale);
                 dest.setRGB(x, y, rgb);
             }
@@ -175,7 +207,7 @@ public class ImgUtil {
      * @return dest
      */
     public static BufferedImage copy(BufferedImage src, BufferedImage dest) {
-        dest.getGraphics().drawImage(src, src.getMinX(), src.getMinY(), null);
+        dest.getGraphics().drawImage(src, 0, 0, null);
         return dest;
     }
 
