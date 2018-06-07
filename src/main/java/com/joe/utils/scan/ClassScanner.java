@@ -61,7 +61,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     /**
      * 扫描指定的包中的所有class
      *
-     * @param filters 过滤器，不能为null
+     * @param filters 过滤器，不能为null，filter返回true时扫描出的class将被过滤
      * @param args    参数（String类型，要扫描的包的集合）
      * @return 扫描结果
      * @throws ScannerException 扫描异常
@@ -96,7 +96,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * 根据包名扫描类，同时使用过滤器过滤
      *
      * @param pack    包名
-     * @param filters 过滤器组合，不能为null
+     * @param filters 过滤器组合，不能为null，filter返回true时扫描出的class将被过滤
      * @return 过滤后的所有Class
      */
     public List<Class<?>> scan(String pack, List<ClassFilter> filters) {
@@ -218,7 +218,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * 使用指定过滤器组合过滤类
      *
      * @param clazz   要过滤的类
-     * @param filters 过滤器组合，不能为null
+     * @param filters 过滤器组合，不能为null，filter返回true时扫描出的class将被过滤
      * @return 返回true说明指定的类通过了过滤器组合的过滤
      */
     private boolean filter(Class<?> clazz, List<ClassFilter> filters) {

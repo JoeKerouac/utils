@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * java类型相关工具类
@@ -24,6 +24,21 @@ public class ReflectUtil {
     private static final Pattern extendsPattern = Pattern.compile("(.*) extends.*");
 
     private ReflectUtil() {
+    }
+
+    /**
+     * 获取指定类型内所有带有指定注解的方法的集合
+     *
+     * @param type       指定类型
+     * @param annotation 指定注解
+     * @return 带有指定注解的方法集合
+     */
+    public static List<Method> getAllAnnotationPresentMethod(Class<?> type, Class<? extends Annotation> annotation) {
+        Method[] methods = type.getDeclaredMethods();
+        if (methods.length == 0) {
+            return Collections.emptyList();
+        }
+        return Stream.of(methods).filter(method -> method.isAnnotationPresent(annotation)).collect(Collectors.toList());
     }
 
 
