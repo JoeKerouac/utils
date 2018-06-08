@@ -3,11 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.JoeKerouac</groupId>
     <artifactId>utils</artifactId>
-    <version>1.8.004</version>
+    <version>1.8.005</version>
     <name>utils</name>
     <packaging>jar</packaging>
     <description>常用工具类</description>
     <url>https://github.com/JoeKerouac/utils</url>
+
+    <parent>
+        <groupId>com.github.JoeKerouac</groupId>
+        <artifactId>java-parent</artifactId>
+        <version>1.0</version>
+    </parent>
 
     <licenses>
         <license>
@@ -113,104 +119,76 @@
         </profile>
     </profiles>
 
-    <properties>
-        <slf4j.version>1.7.21</slf4j.version>
-        <lombok.version>1.16.8</lombok.version>
-        <beanutils.version>1.9.2</beanutils.version>
-        <codec.version>1.10</codec.version>
-        <img.version>1.0-R1534292</img.version>
-        <jmail.version>1.4.7</jmail.version>
-        <java.version>1.8</java.version>
-        <redisson.version>3.2.3</redisson.version>
-        <yaml.version>2.8.7</yaml.version>
-        <jackson.version>2.8.5</jackson.version>
-        <dom4j.version>1.6.1</dom4j.version>
-        <junit.version>4.12</junit.version>
-    </properties>
-
     <dependencies>
         <!-- JMail工具 -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
-            <version>${jmail.version}</version>
         </dependency>
         <!-- 二维码操作工具类 -->
         <dependency>
             <groupId>net.glxn</groupId>
             <artifactId>qrgen</artifactId>
-            <version>1.4</version>
         </dependency>
         <!-- 日志框架 -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <!--用于LogbackReconfigure，不使用该功能可以不提供-->
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-core -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.2.3</version>
             <scope>provided</scope>
         </dependency>
         <!-- 解决common-logging依赖，该包可以替换common-logging依赖 -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>${slf4j.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- 快速生成get set方法 -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- redis支持（支持分布式锁和分布式数据结构），暂时未用 -->
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
-            <version>${redisson.version}</version>
         </dependency>
         <!-- redisson必要的依赖 -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>${yaml.version}</version>
         </dependency>
         <!-- 用到了MD5的类 -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>${codec.version}</version>
         </dependency>
         <!-- dom4j依赖，解析xml用 -->
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
-            <version>${dom4j.version}</version>
         </dependency>
         <!-- json依赖 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <!--test-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -220,11 +198,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <encoding>UTF8</encoding>
+                    <encoding>${encode}</encoding>
                 </configuration>
             </plugin>
         </plugins>
