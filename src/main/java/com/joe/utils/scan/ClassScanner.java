@@ -42,6 +42,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     /**
      * 参数必须为String数组，该参数为要扫描的包名
      */
+    @Override
     public List<Class<?>> scan(Object... args) {
         if (args == null || args.length == 0) {
             return Collections.emptyList();
@@ -61,13 +62,14 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     /**
      * 扫描指定的包中的所有class
      *
-     * @param filters 过滤器，不能为null，filter返回true时扫描出的class将被过滤
+     * @param excludeFilters 过滤器，不能为null，filter返回true时扫描出的class将被过滤
      * @param args    参数（String类型，要扫描的包的集合）
      * @return 扫描结果
      * @throws ScannerException 扫描异常
      */
-    public List<Class<?>> scan(List<ClassFilter> filters, Object... args) throws ScannerException {
-        logger.debug("搜索扫描所有的类，过滤器为：{}，参数为：{}", filters, args);
+    @Override
+    public List<Class<?>> scan(List<ClassFilter> excludeFilters, Object... args) throws ScannerException {
+        logger.debug("搜索扫描所有的类，过滤器为：{}，参数为：{}", excludeFilters, args);
 
         if (args == null || args.length == 0) {
             return Collections.emptyList();
@@ -82,7 +84,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
 
         List<Class<?>> result = null;
         for (Object obj : args) {
-            List<Class<?>> list = scan((String) obj, filters);
+            List<Class<?>> list = scan((String) obj, excludeFilters);
             if (result == null) {
                 result = list;
             } else {

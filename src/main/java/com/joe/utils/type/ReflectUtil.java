@@ -2,6 +2,9 @@ package com.joe.utils.type;
 
 import com.joe.utils.common.BeanUtils;
 import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
+import com.joe.utils.scan.ClassScanner;
+import com.joe.utils.scan.MethodScanner;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,12 +21,35 @@ import java.util.stream.Stream;
  *
  * @author joe
  */
+@Slf4j
 public class ReflectUtil {
     private static final Logger logger = LoggerFactory.getLogger(ReflectUtil.class);
     private static final Pattern superPattern = Pattern.compile("(.*) super.*");
     private static final Pattern extendsPattern = Pattern.compile("(.*) extends.*");
+    private static final ClassScanner CLASS_SCANNER = ClassScanner.getInstance();
+    private static final MethodScanner METHOD_SCANNER = MethodScanner.getInstance();
 
     private ReflectUtil() {
+    }
+
+    /**
+     * 获取指定包中所有带指定注解的类
+     *
+     * @param annotation 注解
+     * @param packages   包集合
+     * @return 包集合中所有带指定注解的类
+     */
+    public static List<Class<?>> getAllAnnotationPresentClass(Class<? extends Annotation> annotation, String...
+            packages) {
+        if (packages == null || packages.length == 0) {
+            return Collections.emptyList();
+        }
+
+        log.debug("开始扫描包{}下的带注解[{}]的列表", packages, annotation);
+        List<Class<?>> classes = CLASS_SCANNER.scan(Collections.singletonList(clazz -> {
+            return !clazz.isAnnotationPresent(annotation);
+        }), packages);
+        return classes;
     }
 
     /**

@@ -21,9 +21,9 @@ public interface Scanner<T, F> {
     /**
      * 扫描所有并且用Filter过滤
      *
-     * @param filters 过滤器
+     * @param excludeFilters 过滤器，返回true时子项将被过滤删除
      * @param args    参数
      * @return 扫描结果
      */
-    List<T> scan(List<F> filters, Object... args);
+    List<T> scan(List<F> excludeFilters, Object... args);
 }

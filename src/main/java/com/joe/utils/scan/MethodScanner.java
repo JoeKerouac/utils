@@ -29,11 +29,13 @@ public class MethodScanner implements Scanner<Method, MethodFilter> {
         return methodScanner;
     }
 
+    @Override
     public List<Method> scan(Object... args) {
         return null;
     }
 
-    public List<Method> scan(List<MethodFilter> filters, Object... args) {
+    @Override
+    public List<Method> scan(List<MethodFilter> excludeFilters, Object... args) {
         if (args == null || args.length == 0) {
             return Collections.emptyList();
         }
@@ -41,12 +43,12 @@ public class MethodScanner implements Scanner<Method, MethodFilter> {
         for (Object obj : args) {
             Class<?> clazz = (Class<?>) obj;
             Method[] methods = clazz.getMethods();
-            if (filters == null || filters.isEmpty()) {
+            if (excludeFilters == null || excludeFilters.isEmpty()) {
                 result.addAll(Arrays.asList(methods));
             } else {
                 for (Method method : methods) {
                     boolean flag = true;
-                    for (MethodFilter filter : filters) {
+                    for (MethodFilter filter : excludeFilters) {
                         if (!filter.filter(method)) {
                             flag = false;
                             break;
