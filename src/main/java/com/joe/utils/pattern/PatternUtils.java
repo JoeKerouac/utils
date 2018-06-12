@@ -32,7 +32,7 @@ public class PatternUtils {
      * @return 返回true时表示是IP格式的字符串
      */
     public static boolean isIp(String data) {
-        return check(data, IP_PATTERN);
+        return !StringUtils.isEmpty(data) && check(data, IP_PATTERN);
     }
 
     /**
@@ -42,6 +42,9 @@ public class PatternUtils {
      * @return 如果参数是数字则返回<code>true</code>
      */
     public static boolean isNumber(String arg) {
+        if (StringUtils.isEmpty(arg)) {
+            return false;
+        }
         Matcher matcher = NUMBER_PARTER.matcher(arg);
         return matcher.matches();
     }
@@ -53,7 +56,7 @@ public class PatternUtils {
      * @return 返回true表示是手机号
      */
     public static boolean isPhone(String data) {
-        return check(data, PHONE_PATTERN);
+        return !StringUtils.isEmpty(data) && check(data, PHONE_PATTERN);
     }
 
     /**
