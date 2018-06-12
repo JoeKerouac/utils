@@ -1,6 +1,7 @@
 package com.joe.utils.common;
 
 import com.joe.utils.collection.LRUCacheMap;
+import com.joe.utils.common.exception.BeanException;
 import com.joe.utils.type.ReflectUtil;
 import lombok.Data;
 import org.slf4j.Logger;
@@ -42,14 +43,9 @@ public class BeanUtils {
             return false;
         }
         Class<?> clazz = obj.getClass();
+        Field field = getField(clazz, propName);
         try {
-            Field field = getField(clazz, propName);
-            CustomPropertyDescriptor propertyDescriptor = buildDescriptor(field, clazz);
-            if (propertyDescriptor == null) {
-                return false;
-            }
-            // 调用反射复制
-            propertyDescriptor.getWriteMethod().invoke(obj, value);
+            field.set(obj, value);
             logger.debug("写入成功");
             return true;
         } catch (Exception e) {
@@ -63,28 +59,24 @@ public class BeanUtils {
      *
      * @param obj      指定对象
      * @param propName 要获取的字段的名称
-     * @return 该字段的值，发生异常时返回null（注意：不能以null来判断是否发生异常，因为当该字段的值也为null时结果也是null，同时当传进来的参数为null时也返回null）
+     * @param <T>      字段的类型
+     * @return 该字段的值
      */
-    public static Object getProperty(Object obj, String propName) {
+
+    public static <T> T getProperty(Object obj, String propName) {
         logger.debug("开始获取{}的{}字段的值", obj, propName);
         if (obj == null || StringUtils.isEmpty(propName)) {
             logger.warn("获取字段值失败，参数存在空值");
             return null;
         }
-        Class<?> clazz = obj.getClass();
+        Field field = getField(obj.getClass(), propName);
         try {
-            Field field = getField(clazz, propName);
-            CustomPropertyDescriptor propertyDescriptor = buildDescriptor(field, clazz);
-            if (propertyDescriptor == null) {
-                return false;
-            }
-            // 调用反射复制
-            Object result = propertyDescriptor.getReadMethod().invoke(obj);
-            logger.debug("获取{}的{}字段值成功，获取到的值为：{}", obj, propName, result);
-            return result;
+            logger.debug("成功获取到[{}]的[{}]字段", obj.getClass(), propName);
+            T value = (T) field.get(obj);
+            return value;
         } catch (Exception e) {
             logger.error("获取{}的{}字段值失败", obj, propName, e);
-            return null;
+            throw new BeanException("获取[" + obj.getClass() + "]的字段[" + propName + "]的值失败", e);
         }
     }
 
@@ -288,11 +280,17 @@ public class BeanUtils {
         logger.debug("类{}的字段为：{}", clazz, fields);
         result = fields.toArray(new Field[fields.size()]);
         fieldCache.put(clazz, result);
+        for (Field field : result) {
+            try {
+                field.setAccessible(true);
+            } catch (Throwable e) {
+            }
+        }
         return result;
     }
 
     /**
-     * 根据字段名获取指定类的指定字段
+     * 根据字段名获取指定类的指定字段（会尝试将字段设置为可访问的）
      *
      * @param clazz 指定类
      * @param name  字段名
