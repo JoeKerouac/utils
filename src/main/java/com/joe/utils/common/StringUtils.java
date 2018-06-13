@@ -1,5 +1,6 @@
 package com.joe.utils.common;
 
+import com.joe.utils.annotation.Nullable;
 import com.joe.utils.pattern.PatternUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,6 +15,54 @@ import java.util.Map;
  */
 @Slf4j
 public class StringUtils {
+    /**
+     * 判断字符串长度是否大于0
+     *
+     * @param str 字符串
+     * @return 长度大于0时返回true，字符串为null或者字符串长度等于0时返回false
+     */
+    public static boolean hasLength(String str) {
+        return str != null && !str.isEmpty();
+    }
+
+    /**
+     * 替换字符串中的字符
+     *
+     * @param inString   字符串
+     * @param oldPattern 旧字符
+     * @param newPattern 新字符
+     * @return 替换后的字符串
+     */
+    public static String replace(String inString, String oldPattern, @Nullable String newPattern) {
+        if (!hasLength(inString) || !hasLength(oldPattern) || newPattern == null) {
+            return inString;
+        }
+        int index = inString.indexOf(oldPattern);
+        if (index == -1) {
+            // no occurrence -> can return input as-is
+            return inString;
+        }
+
+        int capacity = inString.length();
+        if (newPattern.length() > oldPattern.length()) {
+            capacity += 16;
+        }
+        StringBuilder sb = new StringBuilder(capacity);
+
+        int pos = 0;  // our position in the old string
+        int patLen = oldPattern.length();
+        while (index >= 0) {
+            sb.append(inString.substring(pos, index));
+            sb.append(newPattern);
+            pos = index + patLen;
+            index = inString.indexOf(oldPattern, pos);
+        }
+
+        // append any characters to the right of a match
+        sb.append(inString.substring(pos));
+        return sb.toString();
+    }
+
     /**
      * 删除字符串的前/后缀
      *
