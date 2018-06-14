@@ -25,11 +25,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class POIUtils {
-
-    /**
-     * 所有的Excel单元格数据类型
-     */
-    private static final Map<Class, ExcelDataWriter<?>> EXCEL_DATAS = new HashMap<>();
     /**
      * 默认内存中最多多好行单元格
      */
@@ -53,17 +48,47 @@ public class POIUtils {
         }
         return c1.sort() - c2.sort();
     };
+    /**
+     * 默认实例
+     */
+    private static final POIUtils UTILS = new POIUtils();
+    /**
+     * 所有的Excel单元格数据类型
+     */
+    private final Map<Class, ExcelDataWriter<?>> writers = new HashMap<>();
+
+    private POIUtils() {
+        init();
+    }
 
     /**
-     * 注册默认的DataWriter
+     * 初始化，注册默认的DataWriter
      */
-    static {
-        EXCEL_DATAS.put(BooleanDataWriter.class, new BooleanDataWriter());
-        EXCEL_DATAS.put(CalendarDataWriter.class, new CalendarDataWriter());
-        EXCEL_DATAS.put(DateDataWriter.class, new DateDataWriter());
-        EXCEL_DATAS.put(EnumDataWriter.class, new EnumDataWriter());
-        EXCEL_DATAS.put(NumberDataWriter.class, new NumberDataWriter());
-        EXCEL_DATAS.put(StringDataWriter.class, new StringDataWriter());
+    private void init() {
+        writers.put(BooleanDataWriter.class, new BooleanDataWriter());
+        writers.put(CalendarDataWriter.class, new CalendarDataWriter());
+        writers.put(DateDataWriter.class, new DateDataWriter());
+        writers.put(EnumDataWriter.class, new EnumDataWriter());
+        writers.put(NumberDataWriter.class, new NumberDataWriter());
+        writers.put(StringDataWriter.class, new StringDataWriter());
+    }
+
+    /**
+     * 获取POIUtils的实例
+     *
+     * @return POIUtils实例，多次获取的一样
+     */
+    public static POIUtils getInstance() {
+        return UTILS;
+    }
+
+    /**
+     * 构建新的POIUtils
+     *
+     * @return 新的POIUtils，每次返回的实例都不一样
+     */
+    public static POIUtils buildInstance() {
+        return new POIUtils();
     }
 
     /**
@@ -71,9 +96,9 @@ public class POIUtils {
      *
      * @param writer DataWriter
      */
-    public static void registerDataWriter(ExcelDataWriter<?> writer) {
+    public void registerDataWriter(ExcelDataWriter<?> writer) {
         if (writer != null) {
-            EXCEL_DATAS.put(writer.getClass(), writer);
+            writers.put(writer.getClass(), writer);
         }
     }
 
@@ -83,8 +108,8 @@ public class POIUtils {
      * @param writer DataWriter
      * @return 返回true表示包含
      */
-    public static boolean containsDataWriter(ExcelDataWriter<?> writer) {
-        return EXCEL_DATAS.containsKey(writer.getClass());
+    public boolean containsDataWriter(ExcelDataWriter<?> writer) {
+        return writers.containsKey(writer.getClass());
     }
 
     /**
@@ -92,10 +117,10 @@ public class POIUtils {
      *
      * @param type 数据类型
      */
-    public static void register(Class<? extends ExcelDataWriter> type) {
+    public void register(Class<? extends ExcelDataWriter> type) {
         if (type != null) {
             try {
-                EXCEL_DATAS.put(type, type.newInstance());
+                writers.put(type, type.newInstance());
             } catch (Exception e) {
                 log.warn("注册类型[{}]失败", type, e);
             }
@@ -110,7 +135,7 @@ public class POIUtils {
      * @param path     excel本地路径
      * @throws IOException IO异常
      */
-    public static void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path) throws IOException {
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path) throws IOException {
         writeToExcel(datas, hasTitle, path, IN_MEMORY);
     }
 
@@ -123,7 +148,7 @@ public class POIUtils {
      * @param inMemory 最多保留在内存中多少行
      * @throws IOException IO异常
      */
-    public static void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path, int inMemory) throws
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path, int inMemory) throws
             IOException {
         writeToExcel(datas, hasTitle, new FileOutputStream(path), inMemory);
     }
@@ -136,7 +161,7 @@ public class POIUtils {
      * @param outputStream 输出流
      * @throws IOException IO异常
      */
-    public static void writeToExcel(List<? extends Object> datas, boolean hasTitle, OutputStream outputStream) throws
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, OutputStream outputStream) throws
             IOException {
         writeToExcel(datas, hasTitle, outputStream, IN_MEMORY);
     }
@@ -150,7 +175,7 @@ public class POIUtils {
      * @param inMemory     最多保留在内存中多少行
      * @throws IOException IO异常
      */
-    public static void writeToExcel(List<? extends Object> datas, boolean hasTitle, OutputStream outputStream, int
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, OutputStream outputStream, int
             inMemory)
             throws IOException {
         log.info("准备将数据写入excel");
@@ -170,7 +195,7 @@ public class POIUtils {
      * @param workbook 工作簿
      * @return 写入后的工作簿
      */
-    public static Workbook writeToExcel(List<? extends Object> datas, boolean hasTitle, Workbook workbook) {
+    public Workbook writeToExcel(List<? extends Object> datas, boolean hasTitle, Workbook workbook) {
         if (CollectionUtil.safeIsEmpty(datas)) {
             log.warn("给定数据集合为空");
             return workbook;
@@ -190,7 +215,7 @@ public class POIUtils {
             log.debug("检查字段[{}]是否可以写入", name);
             Class<?> type = field.getType();
 
-            List<ExcelDataWriter<?>> data = EXCEL_DATAS.values().stream().filter(excelData -> excelData.writeable(type))
+            List<ExcelDataWriter<?>> data = writers.values().stream().filter(excelData -> excelData.writeable(type))
                     .collect(Collectors.toList());
             if (data.isEmpty()) {
                 log.info("字段[{}]不能写入", name);
@@ -262,9 +287,9 @@ public class POIUtils {
      * @param workbook 工作簿
      * @return 写入数据后的工作簿
      */
-    public static Workbook writeToExcel(List<? extends ExcelDataWriter> titles, List<List<? extends
+    public Workbook writeToExcel(List<? extends ExcelDataWriter> titles, List<List<? extends
             ExcelDataWriter<?>>> datas,
-                                        boolean hasTitle, Workbook workbook) {
+                                 boolean hasTitle, Workbook workbook) {
         if (CollectionUtil.safeIsEmpty(datas)) {
             log.warn("数据为空，不写入直接返回");
             return workbook;
@@ -308,7 +333,7 @@ public class POIUtils {
      * @param data 要写入单元格的数据
      * @return 返回不为空表示能写入，并返回单元格数据，返回空表示无法写入
      */
-    public static ExcelDataWriter<?> build(Object data) {
+    public ExcelDataWriter<?> build(Object data) {
         return build(data, 0, 0);
     }
 
@@ -320,8 +345,8 @@ public class POIUtils {
      * @param column 数据所在列
      * @return 返回不为空表示能写入，并返回单元格数据，返回空表示无法写入
      */
-    public static ExcelDataWriter<?> build(Object data, int row, int column) {
-        List<ExcelDataWriter<?>> dataBuilder = EXCEL_DATAS.values().parallelStream().filter(excelData -> excelData
+    public ExcelDataWriter<?> build(Object data, int row, int column) {
+        List<ExcelDataWriter<?>> dataBuilder = writers.values().parallelStream().filter(excelData -> excelData
                 .writeable(data)).collect(Collectors.toList());
         if (dataBuilder.isEmpty()) {
             return null;
