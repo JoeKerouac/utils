@@ -180,9 +180,8 @@ public class POIUtils {
             log.debug("检查字段[{}]是否可以写入", name);
             Class<?> type = field.getType();
 
-            List<ExcelData<?>> data = EXCEL_DATAS.values().stream().filter(excelData -> {
-                return excelData.writeable(type);
-            }).collect(Collectors.toList());
+            List<ExcelData<?>> data = EXCEL_DATAS.values().stream().filter(excelData -> excelData.writeable(type))
+                    .collect(Collectors.toList());
             if (data.isEmpty()) {
                 log.info("字段[{}]不能写入", name);
             } else {
