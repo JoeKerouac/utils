@@ -1,15 +1,16 @@
 package com.joe.utils.poi.data;
 
+import com.joe.utils.poi.ExcelDataWriter;
 import org.apache.poi.ss.usermodel.Cell;
 
 /**
  * @author joe
  * @version 2018.06.14 14:31
  */
-public class StringData extends ExcelData<String> {
+public class StringDataWriter extends ExcelDataWriter<String> {
     @Override
-    public <D extends ExcelData<String>> D build(Object object) {
-        StringData data = new StringData();
+    public <D extends ExcelDataWriter<String>> D build(Object object) {
+        StringDataWriter data = new StringDataWriter();
         data.setData(object);
         return (D) data;
     }

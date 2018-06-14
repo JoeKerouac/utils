@@ -1,5 +1,6 @@
 package com.joe.utils.poi.data;
 
+import com.joe.utils.poi.ExcelDataWriter;
 import org.apache.poi.ss.usermodel.Cell;
 
 import java.util.Date;
@@ -10,10 +11,10 @@ import java.util.Date;
  * @author joe
  * @version 2018.06.14 11:49
  */
-public final class DateData extends ExcelData<Date> {
+public final class DateDataWriter extends ExcelDataWriter<Date> {
     @Override
-    public <D extends ExcelData<Date>> D build(Object object) {
-        DateData data = new DateData();
+    public <D extends ExcelDataWriter<Date>> D build(Object object) {
+        DateDataWriter data = new DateDataWriter();
         data.setData(object);
         return (D) data;
     }

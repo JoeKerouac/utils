@@ -1,5 +1,6 @@
 package com.joe.utils.poi.data;
 
+import com.joe.utils.poi.ExcelDataWriter;
 import com.joe.utils.type.ReflectUtil;
 import org.apache.poi.ss.usermodel.Cell;
 
@@ -9,10 +10,10 @@ import org.apache.poi.ss.usermodel.Cell;
  * @author joe
  * @version 2018.06.14 11:51
  */
-public final class NumberData extends ExcelData<Number> {
+public final class NumberDataWriter extends ExcelDataWriter<Number> {
     @Override
-    public <D extends ExcelData<Number>> D build(Object object) {
-        NumberData data = new NumberData();
+    public <D extends ExcelDataWriter<Number>> D build(Object object) {
+        NumberDataWriter data = new NumberDataWriter();
         data.setData(object);
         return (D) data;
     }

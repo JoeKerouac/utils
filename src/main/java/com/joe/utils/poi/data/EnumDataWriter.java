@@ -1,34 +1,35 @@
 package com.joe.utils.poi.data;
 
+import com.joe.utils.poi.ExcelDataWriter;
 import org.apache.poi.ss.usermodel.Cell;
 
-import java.util.Calendar;
-
 /**
+ * 枚举类型
+ *
  * @author joe
- * @version 2018.06.14 11:59
+ * @version 2018.06.14 15:10
  */
-public final class CalendarData extends ExcelData<Calendar> {
+public class EnumDataWriter extends ExcelDataWriter<Enum> {
     @Override
-    public <D extends ExcelData<Calendar>> D build(Object object) {
-        CalendarData data = new CalendarData();
+    public <D extends ExcelDataWriter<Enum>> D build(Object object) {
+        EnumDataWriter data = new EnumDataWriter();
         data.setData(object);
         return (D) data;
     }
 
     @Override
     public void write(Cell cell) {
-        cell.setCellValue(data);
+        cell.setCellValue(data == null ? "" : data.toString());
     }
 
     @Override
     public boolean writeable(Object data) {
-        return (data instanceof Calendar);
+        return (data instanceof Enum);
     }
 
     @Override
     public boolean writeable(Class<?> type) {
-        if (type != null && type.equals(Calendar.class)) {
+        if (type != null && type.equals(Enum.class)) {
             return true;
         }
         return false;
@@ -36,6 +37,6 @@ public final class CalendarData extends ExcelData<Calendar> {
 
     @Override
     public void setData(Object data) {
-        super.data = (Calendar) data;
+        super.data = (Enum) data;
     }
 }

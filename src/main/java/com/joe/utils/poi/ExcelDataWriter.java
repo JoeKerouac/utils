@@ -1,13 +1,10 @@
-package com.joe.utils.poi.data;
+package com.joe.utils.poi;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.apache.poi.ss.usermodel.Cell;
 
 /**
- * excel数据
+ * excel单元格的DataWriter，用于往单元格写入数据，可以自己定制，例如要加入样式的时候可以自己定制
  *
  * @author joe
  * @version 2018.06.14 11:46
@@ -16,11 +13,21 @@ import org.apache.poi.ss.usermodel.Cell;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class ExcelData<T> {
+public abstract class ExcelDataWriter<T> {
     /**
      * 数据
      */
     protected T data;
+    /**
+     * 列
+     */
+    @Setter
+    private int column;
+    /**
+     * 行
+     */
+    @Setter
+    private int row;
 
     /**
      * 根据给定数据构建一个excel数据，给定数据不做校验
@@ -29,7 +36,7 @@ public abstract class ExcelData<T> {
      * @param <D>    excel数据实际类型
      * @return 构建的excel单元格数据
      */
-    public abstract <D extends ExcelData<T>> D build(Object object);
+    public abstract <D extends ExcelDataWriter<T>> D build(Object object);
 
     /**
      * 将数据写入单元格
