@@ -300,8 +300,7 @@ public class ReflectUtil {
     }
 
     /**
-     * 判断Class对象是否为八大基本类型的封装类型
-     * 这六种类型将会认为该类型是一个复杂类型）
+     * 判断Class对象是否为八大基本类型的封装类型，这六种类型将会认为该类型是一个复杂类型）
      *
      * @param clazz Class对象，不能为null
      * @return 如果是基本类型则返回<code>true</code>

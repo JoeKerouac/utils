@@ -115,6 +115,7 @@ public interface ClusterManager {
      * @param host redis的主机地址，例如192.168.1.100
      * @param port redis的端口，例如8080
      * @return redis实现的分布式锁管理器
+     * @throws MalformedURLException MalformedURLException
      */
     static RedisClusterManager getInstance(String host, int port) throws MalformedURLException {
         return RedisClusterManagerFactory.getInstance(host, port);
@@ -127,6 +128,7 @@ public interface ClusterManager {
      * @param port     redis的端口，例如8080
      * @param password 密码
      * @return redis实现的分布式锁管理器
+     * @throws MalformedURLException MalformedURLException
      */
     static RedisClusterManager getInstance(String host, int port, String password) throws MalformedURLException {
         return RedisClusterManagerFactory.getInstance(host, port, password);

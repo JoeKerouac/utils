@@ -15,6 +15,26 @@ import java.util.function.BiFunction;
 public final class CollectionUtil {
 
     /**
+     * 安全判断集合是否为空
+     *
+     * @param collection collection集合
+     * @return 返回true表示空
+     */
+    public static boolean safeIsEmpty(Collection collection) {
+        return collection == null || collection.isEmpty();
+    }
+
+    /**
+     * 安全判断集合是否为空
+     *
+     * @param map map集合
+     * @return 返回true表示空
+     */
+    public static boolean safeIsEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+
+    /**
      * 对ByteBuffer扩容（扩容后position为buffer.capacity()，mark为-1，limit为新buffer的capacity）
      *
      * @param buffer 原ByteBuffer
