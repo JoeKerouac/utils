@@ -18,13 +18,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * POI工具类
+ * Excel执行器，将数据写入excel，用户可以注册自己的excel单元格数据类型处理器{@link ExcelDataWriter ExcelDataWriter}来做
+ * 一些特殊处理，例如添加单元格样式等，系统默认会注册Date、Calendar、String、Number、Boolean、Enum类型的数据处理器。
  *
  * @author joe
  * @version 2018.06.14 11:42
  */
 @Slf4j
-public class POIUtils {
+public class ExcelExecutor {
     /**
      * 默认内存中最多多好行单元格
      */
@@ -51,13 +52,13 @@ public class POIUtils {
     /**
      * 默认实例
      */
-    private static final POIUtils UTILS = new POIUtils();
+    private static final ExcelExecutor UTILS = new ExcelExecutor();
     /**
      * 所有的Excel单元格数据类型
      */
     private final Map<Class<?>, ExcelDataWriter<?>> writers = new HashMap<>();
 
-    private POIUtils() {
+    private ExcelExecutor() {
         init();
     }
 
@@ -78,7 +79,7 @@ public class POIUtils {
      *
      * @return POIUtils实例，多次获取的一样
      */
-    public static POIUtils getInstance() {
+    public static ExcelExecutor getInstance() {
         return UTILS;
     }
 
@@ -87,8 +88,8 @@ public class POIUtils {
      *
      * @return 新的POIUtils，每次返回的实例都不一样
      */
-    public static POIUtils buildInstance() {
-        return new POIUtils();
+    public static ExcelExecutor buildInstance() {
+        return new ExcelExecutor();
     }
 
 
@@ -165,7 +166,7 @@ public class POIUtils {
      *
      * @param datas        要写入excel的pojo数据
      * @param hasTitle     是否需要标题
-     * @param outputStream 输出流
+     * @param outputStream 输出流（该流不会关闭，需要用户手动关闭）
      * @throws IOException IO异常
      */
     public void writeToExcel(List<? extends Object> datas, boolean hasTitle, OutputStream outputStream) throws
@@ -178,7 +179,7 @@ public class POIUtils {
      *
      * @param datas        要写入excel的pojo数据
      * @param hasTitle     是否需要标题
-     * @param outputStream 输出流
+     * @param outputStream 输出流（该流不会关闭，需要用户手动关闭）
      * @param inMemory     最多保留在内存中多少行
      * @throws IOException IO异常
      */
@@ -190,7 +191,6 @@ public class POIUtils {
         writeToExcel(datas, hasTitle, wb);
         log.info("数据写入excel完毕，准备写入本地文件");
         wb.write(outputStream);
-        outputStream.close();
         wb.dispose();
     }
 
@@ -286,7 +286,7 @@ public class POIUtils {
     }
 
     /**
-     * 写入excel
+     * 写入excel（实际处理方法，在该方法中数据将会被写入excel）
      *
      * @param titles   标题列表
      * @param datas    数据列表
@@ -294,9 +294,8 @@ public class POIUtils {
      * @param workbook 工作簿
      * @return 写入数据后的工作簿
      */
-    public Workbook writeToExcel(List<? extends ExcelDataWriter> titles, List<List<? extends
-            ExcelDataWriter<?>>> datas,
-                                 boolean hasTitle, Workbook workbook) {
+    private Workbook writeToExcel(List<? extends ExcelDataWriter> titles, List<List<? extends ExcelDataWriter<?>>>
+            datas, boolean hasTitle, Workbook workbook) {
         if (CollectionUtil.safeIsEmpty(datas)) {
             log.warn("数据为空，不写入直接返回");
             return workbook;
@@ -335,16 +334,6 @@ public class POIUtils {
     }
 
     /**
-     * 构建单元格数据，没有行列信息
-     *
-     * @param data 要写入单元格的数据
-     * @return 返回不为空表示能写入，并返回单元格数据，返回空表示无法写入
-     */
-    public ExcelDataWriter<?> build(Object data) {
-        return build(data, 0, 0);
-    }
-
-    /**
      * 构建单元格数据
      *
      * @param data   要写入单元格的数据
@@ -352,7 +341,7 @@ public class POIUtils {
      * @param column 数据所在列
      * @return 返回不为空表示能写入，并返回单元格数据，返回空表示无法写入
      */
-    public ExcelDataWriter<?> build(Object data, int row, int column) {
+    private ExcelDataWriter<?> build(Object data, int row, int column) {
         List<ExcelDataWriter<?>> dataBuilder = writers.values().parallelStream().filter(excelData -> excelData
                 .writeable(data)).collect(Collectors.toList());
         if (dataBuilder.isEmpty()) {
