@@ -55,7 +55,7 @@ public class POIUtils {
     /**
      * 所有的Excel单元格数据类型
      */
-    private final Map<Class, ExcelDataWriter<?>> writers = new HashMap<>();
+    private final Map<Class<?>, ExcelDataWriter<?>> writers = new HashMap<>();
 
     private POIUtils() {
         init();
@@ -65,12 +65,12 @@ public class POIUtils {
      * 初始化，注册默认的DataWriter
      */
     private void init() {
-        writers.put(BooleanDataWriter.class, new BooleanDataWriter());
-        writers.put(CalendarDataWriter.class, new CalendarDataWriter());
-        writers.put(DateDataWriter.class, new DateDataWriter());
-        writers.put(EnumDataWriter.class, new EnumDataWriter());
-        writers.put(NumberDataWriter.class, new NumberDataWriter());
-        writers.put(StringDataWriter.class, new StringDataWriter());
+        writers.put(Boolean.class, new BooleanDataWriter());
+        writers.put(Calendar.class, new CalendarDataWriter());
+        writers.put(Date.class, new DateDataWriter());
+        writers.put(Enum.class, new EnumDataWriter());
+        writers.put(Number.class, new NumberDataWriter());
+        writers.put(String.class, new StringDataWriter());
     }
 
     /**
@@ -91,25 +91,32 @@ public class POIUtils {
         return new POIUtils();
     }
 
+
     /**
      * 注册一个新的excel单元格DataWriter（如果原来存在那么将会覆盖原来的DataWriter）
      *
+     * @param type   DataWriter处理的数据类型的Class
      * @param writer DataWriter
+     * @param <T>    DataWriter处理的数据类型
+     * @return 如果原来存在该类型的DataWriter那么返回原来的DataWriter
      */
-    public void registerDataWriter(ExcelDataWriter<?> writer) {
+    public <T> ExcelDataWriter<?> registerDataWriter(Class<T> type, ExcelDataWriter<T> writer) {
         if (writer != null) {
-            writers.put(writer.getClass(), writer);
+            return writers.put(type, writer);
+        } else {
+            return null;
         }
     }
 
     /**
-     * 当前系统是否包含指定DataWriter
+     * 当前系统是否包含指定类型的DataWriter
      *
-     * @param writer DataWriter
+     * @param type DataWriter对应的数据类型的Class
+     * @param <T>  DataWriter对应的数据类型
      * @return 返回true表示包含
      */
-    public boolean containsDataWriter(ExcelDataWriter<?> writer) {
-        return writers.containsKey(writer.getClass());
+    public <T> boolean containsDataWriter(Class<T> type) {
+        return writers.containsKey(type);
     }
 
     /**
