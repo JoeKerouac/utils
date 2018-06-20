@@ -11,16 +11,9 @@ import java.util.Date;
  * @author joe
  * @version 2018.06.14 11:49
  */
-public final class DateDataWriter extends ExcelDataWriter<Date> {
+public final class DateDataWriter implements ExcelDataWriter<Date> {
     @Override
-    public <D extends ExcelDataWriter<Date>> D build(Object object) {
-        DateDataWriter data = new DateDataWriter();
-        data.setData(object);
-        return (D) data;
-    }
-
-    @Override
-    public void write(Cell cell) {
+    public void write(Cell cell, Date data) {
         cell.setCellValue(data);
     }
 
@@ -35,10 +28,5 @@ public final class DateDataWriter extends ExcelDataWriter<Date> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void setData(Object data) {
-        super.data = (Date) data;
     }
 }

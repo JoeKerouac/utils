@@ -9,17 +9,10 @@ import org.apache.poi.ss.usermodel.Cell;
  * @author joe
  * @version 2018.06.14 15:10
  */
-public class EnumDataWriter extends ExcelDataWriter<Enum> {
+public class EnumDataWriter implements ExcelDataWriter<Enum> {
     @Override
-    public <D extends ExcelDataWriter<Enum>> D build(Object object) {
-        EnumDataWriter data = new EnumDataWriter();
-        data.setData(object);
-        return (D) data;
-    }
-
-    @Override
-    public void write(Cell cell) {
-        cell.setCellValue(data == null ? "" : data.toString());
+    public void write(Cell cell, Enum data) {
+        cell.setCellValue(data == null ? null : data.toString());
     }
 
     @Override
@@ -33,10 +26,5 @@ public class EnumDataWriter extends ExcelDataWriter<Enum> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void setData(Object data) {
-        super.data = (Enum) data;
     }
 }

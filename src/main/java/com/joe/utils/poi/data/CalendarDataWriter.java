@@ -9,16 +9,9 @@ import java.util.Calendar;
  * @author joe
  * @version 2018.06.14 11:59
  */
-public final class CalendarDataWriter extends ExcelDataWriter<Calendar> {
+public final class CalendarDataWriter implements ExcelDataWriter<Calendar> {
     @Override
-    public <D extends ExcelDataWriter<Calendar>> D build(Object object) {
-        CalendarDataWriter data = new CalendarDataWriter();
-        data.setData(object);
-        return (D) data;
-    }
-
-    @Override
-    public void write(Cell cell) {
+    public void write(Cell cell, Calendar data) {
         cell.setCellValue(data);
     }
 
@@ -35,8 +28,4 @@ public final class CalendarDataWriter extends ExcelDataWriter<Calendar> {
         return false;
     }
 
-    @Override
-    public void setData(Object data) {
-        super.data = (Calendar) data;
-    }
 }

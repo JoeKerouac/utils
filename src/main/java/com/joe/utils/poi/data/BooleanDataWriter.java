@@ -7,16 +7,9 @@ import org.apache.poi.ss.usermodel.Cell;
  * @author joe
  * @version 2018.06.14 11:50
  */
-public final class BooleanDataWriter extends ExcelDataWriter<Boolean> {
+public final class BooleanDataWriter implements ExcelDataWriter<Boolean> {
     @Override
-    public <D extends ExcelDataWriter<Boolean>> D build(Object object) {
-        BooleanDataWriter data = new BooleanDataWriter();
-        data.setData(object);
-        return (D)data;
-    }
-
-    @Override
-    public void write(Cell cell) {
+    public void write(Cell cell, Boolean data) {
         cell.setCellValue(data);
     }
 
@@ -36,8 +29,4 @@ public final class BooleanDataWriter extends ExcelDataWriter<Boolean> {
         return false;
     }
 
-    @Override
-    public void setData(Object data) {
-        super.data = (boolean) data;
-    }
 }

@@ -7,17 +7,10 @@ import org.apache.poi.ss.usermodel.Cell;
  * @author joe
  * @version 2018.06.14 14:31
  */
-public class StringDataWriter extends ExcelDataWriter<String> {
+public class StringDataWriter implements ExcelDataWriter<String> {
     @Override
-    public <D extends ExcelDataWriter<String>> D build(Object object) {
-        StringDataWriter data = new StringDataWriter();
-        data.setData(object);
-        return (D) data;
-    }
-
-    @Override
-    public void write(Cell cell) {
-        cell.setCellValue(data);
+    public void write(Cell cell, String s) {
+        cell.setCellValue(s);
     }
 
     @Override
@@ -33,12 +26,4 @@ public class StringDataWriter extends ExcelDataWriter<String> {
         return false;
     }
 
-    @Override
-    public void setData(Object data) {
-        if (data == null) {
-            super.data = "null";
-        } else {
-            super.data = (String) data;
-        }
-    }
 }

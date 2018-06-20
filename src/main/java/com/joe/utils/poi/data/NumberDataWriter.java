@@ -10,17 +10,10 @@ import org.apache.poi.ss.usermodel.Cell;
  * @author joe
  * @version 2018.06.14 11:51
  */
-public final class NumberDataWriter extends ExcelDataWriter<Number> {
+public final class NumberDataWriter implements ExcelDataWriter<Number> {
     @Override
-    public <D extends ExcelDataWriter<Number>> D build(Object object) {
-        NumberDataWriter data = new NumberDataWriter();
-        data.setData(object);
-        return (D) data;
-    }
-
-    @Override
-    public void write(Cell cell) {
-        cell.setCellValue(data.doubleValue());
+    public void write(Cell cell, Number data) {
+        cell.setCellValue(data == null ? null : data.doubleValue());
     }
 
     @Override
@@ -35,10 +28,5 @@ public final class NumberDataWriter extends ExcelDataWriter<Number> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void setData(Object data) {
-        super.data = (Number) data;
     }
 }
