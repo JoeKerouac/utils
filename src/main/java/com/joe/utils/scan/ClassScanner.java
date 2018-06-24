@@ -1,7 +1,10 @@
 package com.joe.utils.scan;
 
+import com.joe.utils.common.ClassUtils;
+import com.joe.utils.type.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.Reflection;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +13,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -24,19 +28,39 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     private static final Logger logger = LoggerFactory.getLogger(ClassScanner.class);
     private static final Object lock = new Object();
     private static volatile ClassScanner classScanner;
+    private static Map<ClassLoader, ClassScanner> classScannerMap = new ConcurrentHashMap<>();
+
+    /**
+     * 用于加载class
+     */
+    private ClassLoader classLoader;
 
     private ClassScanner() {
     }
 
+    /**
+     * 使用默认ClassLoader获取一个ClassScanner实例
+     *
+     * @return ClassScanner实例
+     */
     public static ClassScanner getInstance() {
-        if (classScanner == null) {
-            synchronized (lock) {
-                if (classScanner == null) {
-                    classScanner = new ClassScanner();
-                }
-            }
+        return getInstance(ClassUtils.getDefaultClassLoader());
+    }
+
+    /**
+     * 使用指定ClassLoader获取一个ClassScanner实例
+     *
+     * @param classLoader 用于加载查找到的class的ClassLoader
+     * @return ClassScanner实例
+     */
+    public static ClassScanner getInstance(ClassLoader classLoader) {
+        ClassScanner scanner = classScannerMap.putIfAbsent(classLoader, new ClassScanner());
+        if (scanner == null) {
+            scanner = classScannerMap.get(classLoader);
+            scanner.classLoader = classLoader;
         }
-        return classScanner;
+
+        return scanner;
     }
 
     /**
@@ -63,7 +87,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * 扫描指定的包中的所有class
      *
      * @param excludeFilters 过滤器，不能为null，filter返回true时扫描出的class将被过滤
-     * @param args    参数（String类型，要扫描的包的集合）
+     * @param args           参数（String类型，要扫描的包的集合）
      * @return 扫描结果
      * @throws ScannerException 扫描异常
      */
@@ -204,7 +228,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                         try {
                             logger.debug("尝试构建class：{}", className);
                             // 添加到classes
-                            classes.add(Class.forName(className));
+                            classes.add(classLoader.loadClass(className));
                         } catch (Throwable e) {
                             logger.warn("找不到{}文件", className + ".class", e);
                         }
@@ -254,8 +278,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
             return Collections.emptySet();
         }
         // 如果存在 就获取包下的所有文件 包括目录
-        File[] dirfiles = dir.listFiles(file -> (recursive && file.isDirectory()) || (file.getName().endsWith("" +
-                ".class")));
+        File[] dirfiles = dir.listFiles(file -> (recursive && file.isDirectory()) || (file.getName().endsWith("" + ""
+                + ".class")));
 
         if (dirfiles == null || dirfiles.length == 0) {
             return Collections.emptySet();
@@ -273,7 +297,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                 try {
                     packageName = packageName.replaceAll("/", ".");
                     className = packageName + '.' + className;
-                    classes.add(Class.forName(className));
+                    classes.add(classLoader.loadClass(className));
                 } catch (Throwable e) {
                     logger.error("添加用户自定义视图类错误 找不到此类的.class文件", e);
                 }
