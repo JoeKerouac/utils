@@ -21,4 +21,29 @@ public class ClassUtils {
         }
         return loader;
     }
+
+    /**
+     * 使用默认ClassLoader加载class
+     *
+     * @param className class名字
+     * @param <T>       class实际类型
+     * @return class
+     * @throws ClassNotFoundException class不存在时返回该异常
+     */
+    public static <T> Class<T> loadClass(String className) throws ClassNotFoundException {
+        return (Class<T>) getDefaultClassLoader().loadClass(className);
+    }
+
+    /**
+     * 使用指定ClassLoader加载class
+     *
+     * @param className class名字
+     * @param loader    加载class的ClassLoader
+     * @param <T>       class实际类型
+     * @return class
+     * @throws ClassNotFoundException class不存在时返回该异常
+     */
+    public static <T> Class<T> loadClass(String className, ClassLoader loader) throws ClassNotFoundException {
+        return (Class<T>) loader.loadClass(className);
+    }
 }
