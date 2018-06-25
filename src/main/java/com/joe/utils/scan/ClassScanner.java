@@ -1,10 +1,8 @@
 package com.joe.utils.scan;
 
 import com.joe.utils.common.ClassUtils;
-import com.joe.utils.type.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.reflect.Reflection;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +24,6 @@ import java.util.stream.Collectors;
  */
 public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     private static final Logger logger = LoggerFactory.getLogger(ClassScanner.class);
-    private static final Object lock = new Object();
-    private static volatile ClassScanner classScanner;
     private static Map<ClassLoader, ClassScanner> classScannerMap = new ConcurrentHashMap<>();
 
     /**
