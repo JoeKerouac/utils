@@ -22,8 +22,6 @@ import java.util.Map;
 public class RSA implements Encipher {
     private static final IBase64 BASE_64 = new IBase64();
     private static final Map<String, ObjectPool<Signature>> CACHE = new HashMap<>();
-    private String privateKey;
-    private RSAType rsaType;
     private String id;
 
     /**
@@ -33,8 +31,6 @@ public class RSA implements Encipher {
      * @param rsaType    rsa加密类型
      */
     public RSA(String privateKey, RSAType rsaType) {
-        this.privateKey = privateKey;
-        this.rsaType = rsaType;
         this.id = (privateKey + rsaType.toString()).intern();
 
         ObjectPool<Signature> pool = CACHE.get(this.id);
