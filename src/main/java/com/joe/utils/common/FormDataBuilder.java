@@ -14,10 +14,17 @@ public class FormDataBuilder {
     private Map<String, String> datas;
 
     private FormDataBuilder(boolean sort) {
+        this(sort, null);
+    }
+
+    private FormDataBuilder(boolean sort, Map<String, String> data) {
         if (sort) {
             this.datas = new TreeMap<>();
         } else {
             this.datas = new HashMap<>();
+        }
+        if (data != null && !data.isEmpty()) {
+            this.datas.putAll(data);
         }
     }
 
@@ -61,7 +68,17 @@ public class FormDataBuilder {
      * @return FormDataBuilder
      */
     public static FormDataBuilder builder() {
-        return builder(false);
+        return builder(false, null);
+    }
+
+    /**
+     * 构建一个FormDataBuilder（不排序）
+     *
+     * @param data 预设data
+     * @return FormDataBuilder
+     */
+    public static FormDataBuilder builder(Map<String, String> data) {
+        return new FormDataBuilder(false, data);
     }
 
     /**
@@ -71,6 +88,17 @@ public class FormDataBuilder {
      * @return FormDataBuilder
      */
     public static FormDataBuilder builder(boolean sort) {
-        return new FormDataBuilder(sort);
+        return builder(sort, null);
+    }
+
+    /**
+     * 构建一个FormDataBuilder
+     *
+     * @param sort 是否排序（默认按照字典序排）
+     * @param data 预设data
+     * @return FormDataBuilder
+     */
+    public static FormDataBuilder builder(boolean sort, Map<String, String> data) {
+        return new FormDataBuilder(sort, data);
     }
 }
