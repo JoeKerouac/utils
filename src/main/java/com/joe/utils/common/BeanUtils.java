@@ -1,32 +1,94 @@
 package com.joe.utils.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.joe.utils.collection.LRUCacheMap;
 import com.joe.utils.common.exception.BeanException;
+import com.joe.utils.parse.xml.XmlNode;
 import com.joe.utils.type.ReflectUtil;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Bean常用操作
  *
  * @author joe
  */
+@Slf4j
 public class BeanUtils {
-    private static final Logger logger = LoggerFactory.getLogger(BeanUtils.class);
     private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> cache = new LRUCacheMap<>();
     private static final LRUCacheMap<Class<?>, Field[]> fieldCache = new LRUCacheMap<>();
     private static final LRUCacheMap<FieldCache, CustomPropertyDescriptor> fieldDescriporCache = new LRUCacheMap<>();
+
+    /**
+     * 将pojo的所有字段映射为map，默认包含null值
+     *
+     * @param pojo           pojo
+     * @param annotationType 别名注解类型，支持{@link JsonProperty JsonProperty}和{@link XmlNode XmlNode}
+     * @return map，当pojo为null时返回空map
+     */
+    public static Map<String, T> convert(Object pojo, Class<? extends Annotation> annotationType) {
+        return convert(pojo, annotationType, true);
+    }
+
+    /**
+     * 将pojo的所有字段映射为map
+     *
+     * @param pojo           pojo
+     * @param annotationType 别名注解类型，支持{@link JsonProperty JsonProperty}和{@link XmlNode XmlNode}
+     * @param hasNull        是否包含null值，true表示包含
+     * @return map，当pojo为null时返回空map
+     */
+    public static <T> Map<String, T> convert(Object pojo, Class<? extends Annotation> annotationType, boolean
+            hasNull) {
+        log.debug("获取[{}]的字段映射，使用注解[{}]的值作为别名", pojo, annotationType);
+        if (pojo == null) {
+            return Collections.emptyMap();
+        }
+
+        if (annotationType != null && !JsonProperty.class.isAssignableFrom(annotationType) && !XmlNode.class
+                .isAssignableFrom(annotationType)) {
+            throw new IllegalArgumentException("不支持的注解类型：" + annotationType);
+        }
+
+        Field[] fields = getAllFields(pojo.getClass());
+        Map<String, T> map = new HashMap<>();
+        if (fields.length == 0) {
+            return Collections.emptyMap();
+        }
+        for (Field field : fields) {
+            log.debug("获取字段[{}]的值", field);
+            JsonProperty jsonProperty = field.getDeclaredAnnotation(JsonProperty.class);
+            XmlNode xmlNode = field.getDeclaredAnnotation(XmlNode.class);
+
+            String name;
+            if (annotationType == null) {
+                name = getName(jsonProperty, xmlNode, field);
+            } else if (JsonProperty.class.isAssignableFrom(annotationType)) {
+                name = getName(jsonProperty, null, field);
+            } else if (XmlNode.class.isAssignableFrom(annotationType)) {
+                name = getName(null, xmlNode, field);
+            } else {
+                throw new IllegalArgumentException("不支持的注解类型：" + annotationType);
+            }
+
+            T value = getProperty(pojo, field.getName());
+            if (value == null && !hasNull) {
+                log.debug("字段[{}]值为null，当前不包含null值，忽略字段[{}]", name, name);
+                continue;
+            }
+            map.put(name, value);
+        }
+        log.debug("获取[{}]的字段映射map为[{}]", pojo, map);
+        return map;
+    }
 
     /**
      * 为对象的属性注入指定值
@@ -37,19 +99,19 @@ public class BeanUtils {
      * @return 如果注入成功则返回<code>true</code>
      */
     public static boolean setProperty(Object obj, String propName, Object value) {
-        logger.debug("开始为{}的{}字段写入值{}", obj, propName, value);
+        log.debug("开始为{}的{}字段写入值{}", obj, propName, value);
         if (obj == null || StringUtils.isEmpty(propName)) {
-            logger.warn("写入数值失败，参数存在空值");
+            log.warn("写入数值失败，参数存在空值");
             return false;
         }
         Class<?> clazz = obj.getClass();
         Field field = getField(clazz, propName);
         try {
             field.set(obj, value);
-            logger.debug("写入成功");
+            log.debug("写入成功");
             return true;
         } catch (Exception e) {
-            logger.error("写入数值失败，写入过程中发生异常", e);
+            log.error("写入数值失败，写入过程中发生异常", e);
             return false;
         }
     }
@@ -64,18 +126,18 @@ public class BeanUtils {
      */
 
     public static <T> T getProperty(Object obj, String propName) {
-        logger.debug("开始获取{}的{}字段的值", obj, propName);
+        log.debug("开始获取{}的{}字段的值", obj, propName);
         if (obj == null || StringUtils.isEmpty(propName)) {
-            logger.warn("获取字段值失败，参数存在空值");
+            log.warn("获取字段值失败，参数存在空值");
             return null;
         }
         Field field = getField(obj.getClass(), propName);
         try {
-            logger.debug("成功获取到[{}]的[{}]字段", obj.getClass(), propName);
+            log.debug("成功获取到[{}]的[{}]字段", obj.getClass(), propName);
             T value = (T) field.get(obj);
             return value;
         } catch (Exception e) {
-            logger.error("获取{}的{}字段值失败", obj, propName, e);
+            log.error("获取{}的{}字段值失败", obj, propName, e);
             throw new BeanException("获取[" + obj.getClass() + "]的字段[" + propName + "]的值失败", e);
         }
     }
@@ -94,12 +156,12 @@ public class BeanUtils {
         }
         E target;
         String targetClassName = targetClass.getName();
-        logger.debug("生成{}的实例", targetClassName);
+        log.debug("生成{}的实例", targetClassName);
         try {
             // 没有权限访问该类或者该类（为接口、抽象类）不能实例化时将抛出异常
             target = targetClass.newInstance();
         } catch (Exception e) {
-            logger.error("target生成失败，请检查代码；失败原因：", e);
+            log.error("target生成失败，请检查代码；失败原因：", e);
             return null;
         }
 
@@ -148,11 +210,11 @@ public class BeanUtils {
 
         Class<?> sourceClass = source.getClass();
         String sourceName = sourceClass.getName();
-        logger.debug("开始获取{}的字段说明", sourceName);
+        log.debug("开始获取{}的字段说明", sourceName);
 
         CustomPropertyDescriptor[] descriptors = getPropertyDescriptors(sourceClass);
         if (descriptors.length == 0) {
-            logger.debug("源{}中不存在已经声明的字段", sourceName);
+            log.debug("源{}中不存在已经声明的字段", sourceName);
             return dest;
         }
 
@@ -164,21 +226,21 @@ public class BeanUtils {
                 // NoSuchFieldException, SecurityException
                 CustomPropertyDescriptor propertyDescriptor = buildDescriptor(field, destClass);
                 if (propertyDescriptor == null) {
-                    logger.debug("目标{}中不存在已经声明的字段[{}]", targetClassName, field.getName());
+                    log.debug("目标{}中不存在已经声明的字段[{}]", targetClassName, field.getName());
                     continue;
                 }
 
                 if (propertyDescriptor.getWriteMethod() == null) {
-                    logger.debug("目标{}中不存在字段[{}]的write方法", targetClassName, field.getName());
+                    log.debug("目标{}中不存在字段[{}]的write方法", targetClassName, field.getName());
                 } else if (descriptor.getReadMethod() == null) {
-                    logger.debug("源{}中不存在字段[{}]的read方法", sourceName, field.getName());
+                    log.debug("源{}中不存在字段[{}]的read方法", sourceName, field.getName());
                 } else {
                     // 调用反射复制
                     propertyDescriptor.getWriteMethod().invoke(dest, descriptor.getReadMethod().invoke(source));
-                    logger.info("copy {}.{} to {}.{}", source.getClass().getName(), name, targetClassName, name);
+                    log.info("copy {}.{} to {}.{}", source.getClass().getName(), name, targetClassName, name);
                 }
             } catch (Exception e) {
-                logger.warn("copy中复制{}时发生错误，忽略该字段", name, e);
+                log.warn("copy中复制{}时发生错误，忽略该字段", name, e);
             }
         }
         return dest;
@@ -226,7 +288,7 @@ public class BeanUtils {
         // 首先从缓存中检查
         CustomPropertyDescriptor[] descriptors = cache.get(clazz);
         if (descriptors != null) {
-            logger.debug("获取Class {} 的说明时发现缓存中有，取出缓存中的说明返回", clazz);
+            log.debug("获取Class {} 的说明时发现缓存中有，取出缓存中的说明返回", clazz);
             return descriptors;
         }
 
@@ -234,7 +296,7 @@ public class BeanUtils {
 
         descriptors = new CustomPropertyDescriptor[fields.length];
         if (fields.length == 0) {
-            logger.debug("源{}中不存在已经声明的字段", clazz.getName());
+            log.debug("源{}中不存在已经声明的字段", clazz.getName());
             cache.put(clazz, descriptors);
             return descriptors;
         }
@@ -248,13 +310,13 @@ public class BeanUtils {
         }
 
         if (j < descriptors.length) {
-            logger.debug("构建构成中发生了异常，数组中有null，除去null");
+            log.debug("构建构成中发生了异常，数组中有null，除去null");
             CustomPropertyDescriptor[] propertyDescriptor = new CustomPropertyDescriptor[j];
             System.arraycopy(descriptors, 0, propertyDescriptor, 0, j);
             cache.put(clazz, propertyDescriptor);
             return propertyDescriptor;
         } else {
-            logger.debug("构建没有异常，构建成功");
+            log.debug("构建没有异常，构建成功");
             cache.put(clazz, descriptors);
             return descriptors;
         }
@@ -271,13 +333,13 @@ public class BeanUtils {
         if (result != null) {
             return result;
         }
-        logger.debug("获取类{}的字段", clazz);
+        log.debug("获取类{}的字段", clazz);
         List<Field> fields = new ArrayList<>();
         fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
         if (clazz.getSuperclass() != null) {
             fields.addAll(Arrays.asList(getAllFields(clazz.getSuperclass())));
         }
-        logger.debug("类{}的字段为：{}", clazz, fields);
+        log.debug("类{}的字段为：{}", clazz, fields);
         result = fields.toArray(new Field[fields.size()]);
         fieldCache.put(clazz, result);
         for (Field field : result) {
@@ -326,15 +388,15 @@ public class BeanUtils {
         CustomPropertyDescriptor customPropertyDescriptor = null;
         try {
             if (ReflectUtil.isFinal(field)) {
-                logger.debug("字段{}是final类型，尝试为该字段创建说明", name);
+                log.debug("字段{}是final类型，尝试为该字段创建说明", name);
                 customPropertyDescriptor = tryBuildFinal(field, clazz);
             } else {
-                logger.debug("字段不是final类型，开始构建字段{}的说明", name);
+                log.debug("字段不是final类型，开始构建字段{}的说明", name);
                 customPropertyDescriptor = convert(field, new PropertyDescriptor(name, clazz), clazz);
             }
         } catch (IntrospectionException e) {
             //挣扎一下，尝试自己构建（针对继承方法有效）
-            logger.info("尝试自定义构建PropertyDescriptor");
+            log.info("尝试自定义构建PropertyDescriptor");
             Method readMethod;
             Method writeMethod = null;
             String methodName = StringUtils.toFirstUpperCase(name);
@@ -349,20 +411,40 @@ public class BeanUtils {
             }
 
             if (writeMethod == null) {
-                logger.warn("说明构建失败，忽略{}字段", field.getName(), e);
+                log.warn("说明构建失败，忽略{}字段", field.getName(), e);
             } else {
-                logger.info("自定义构建PropertyDescriptor成功");
+                log.info("自定义构建PropertyDescriptor成功");
                 try {
                     customPropertyDescriptor = convert(field, new PropertyDescriptor(name, readMethod, writeMethod),
                             clazz);
                 } catch (IntrospectionException e1) {
-                    logger.info("构建失败，忽略字段[{}]", field.getName(), e1);
+                    log.info("构建失败，忽略字段[{}]", field.getName(), e1);
                 }
             }
         }
 
         fieldDescriporCache.put(fieldCache, customPropertyDescriptor);
         return customPropertyDescriptor;
+    }
+
+    /**
+     * 从注解获取字段名字
+     *
+     * @param jsonProperty json注解
+     * @param xmlNode      xml注解
+     * @param field        字段
+     * @return 字段名
+     */
+    private static String getName(JsonProperty jsonProperty, XmlNode xmlNode, Field field) {
+        String name;
+        if (jsonProperty != null) {
+            name = jsonProperty.value();
+        } else if (xmlNode != null) {
+            name = xmlNode.name();
+        } else {
+            name = field.getName();
+        }
+        return name;
     }
 
     /**
@@ -394,20 +476,20 @@ public class BeanUtils {
     private static CustomPropertyDescriptor tryBuildFinal(Field field, Class<?> clazz) throws IntrospectionException {
         String name = field.getName();
         String readMethodName;
-        logger.debug("尝试为final类型的字段{}创建字段说明", name);
+        log.debug("尝试为final类型的字段{}创建字段说明", name);
 
         if (Boolean.class.isAssignableFrom(field.getType())) {
-            logger.debug("字段是boolean类型");
+            log.debug("字段是boolean类型");
             if (name.startsWith("is")) {
                 readMethodName = name;
             } else {
                 readMethodName = "is" + StringUtils.toFirstUpperCase(name);
             }
         } else {
-            logger.debug("字段不是boolean类型");
+            log.debug("字段不是boolean类型");
             readMethodName = "get" + StringUtils.toFirstUpperCase(name);
         }
-        logger.debug("猜测final类型的字段{}的read方法名为{}", name, readMethodName);
+        log.debug("猜测final类型的字段{}的read方法名为{}", name, readMethodName);
         return convert(field, new PropertyDescriptor(name, clazz, readMethodName, null), clazz);
     }
 
