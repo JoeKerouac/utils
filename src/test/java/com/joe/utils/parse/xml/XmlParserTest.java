@@ -14,13 +14,27 @@ import java.util.*;
  */
 public class XmlParserTest {
     private static final XmlParser PARSER = XmlParser.getInstance();
-    private static final String NOTHASNULL = "<USER><NAME>joe</NAME><ALIAS>qiao</ALIAS><age>18</age><users1><NAME>u1" +
-            "</NAME><ALIAS>u1</ALIAS><age>0</age></users1><users2><user><NAME>u1</NAME><ALIAS>u1</ALIAS><age>0</age" +
-            "></user></users2><userSet><NAME>u2</NAME><ALIAS>u2</ALIAS><age>0</age></userSet></USER>";
-    private static final String HASNULL = "<USER><NAME>joe</NAME><ALIAS>qiao</ALIAS><age>18</age><users1><NAME>u1" +
-            "</NAME><ALIAS>u1</ALIAS><age>0</age></users1><users2><user><NAME>u1</NAME><ALIAS>u1</ALIAS><age>0</age" +
-            "></user></users2><userSet><NAME>u2</NAME><ALIAS>u2</ALIAS><age>0</age></userSet></USER>";
+    private static final String NOTHASNULL = "<USER><users2><user><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></user" +
+            "></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao</ALIAS><userSet" +
+            "><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME></USER>";
+    private static final String HASNULL = "<USER><users2><user><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></user" +
+            "></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao</ALIAS><userSet" +
+            "><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME></USER>";
+    private static final String MAP_XML = "<root><test>test</test><user><users2><user><ALIAS>u1</ALIAS><age>0</age" +
+            "><NAME>u1</NAME></user></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao" +
+            "</ALIAS><userSet><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME" +
+            "></user></root>";
 
+
+    @Test
+    public void doMapToXml() {
+        User user = build();
+        Map<String, Object> map = new HashMap<>();
+        map.put("test", "test");
+        map.put("user", user);
+        String xml = PARSER.toXml(map);
+        Assert.assertTrue(xml.equals(MAP_XML));
+    }
 
     @Test
     public void doToXml() {

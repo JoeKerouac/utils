@@ -11,13 +11,13 @@ import java.util.TreeMap;
  * @version 2018.05.14 11:15
  */
 public class FormDataBuilder {
-    private Map<String, String> datas;
+    private Map<String, Object> datas;
 
     private FormDataBuilder(boolean sort) {
         this(sort, null);
     }
 
-    private FormDataBuilder(boolean sort, Map<String, String> data) {
+    private FormDataBuilder(boolean sort, Map<String, ?> data) {
         if (sort) {
             this.datas = new TreeMap<>();
         } else {
@@ -35,7 +35,7 @@ public class FormDataBuilder {
      * @param value value
      * @return FormDataBuilder
      */
-    public FormDataBuilder form(String key, String value) {
+    public FormDataBuilder form(String key, Object value) {
         datas.put(key, value == null ? "" : value);
         return this;
     }
@@ -58,7 +58,7 @@ public class FormDataBuilder {
      */
     public String data() {
         StringBuilder sb = new StringBuilder();
-        datas.forEach((k, v) -> sb.append("&").append(k).append("=").append(v));
+        datas.forEach((k, v) -> sb.append("&").append(k).append("=").append(String.valueOf(v)));
         return sb.toString().substring(1);
     }
 
@@ -77,7 +77,7 @@ public class FormDataBuilder {
      * @param data 预设data
      * @return FormDataBuilder
      */
-    public static FormDataBuilder builder(Map<String, String> data) {
+    public static FormDataBuilder builder(Map<String, ?> data) {
         return new FormDataBuilder(false, data);
     }
 
@@ -98,7 +98,7 @@ public class FormDataBuilder {
      * @param data 预设data
      * @return FormDataBuilder
      */
-    public static FormDataBuilder builder(boolean sort, Map<String, String> data) {
+    public static FormDataBuilder builder(boolean sort, Map<String, ?> data) {
         return new FormDataBuilder(sort, data);
     }
 }

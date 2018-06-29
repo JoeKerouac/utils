@@ -5,11 +5,12 @@ import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.parse.xml.converter.XmlTypeConverterUtil;
 import com.joe.utils.type.ReflectUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,8 +21,8 @@ import java.util.stream.Collectors;
  *
  * @author JoeKerouac
  */
+@Slf4j
 public class XmlParser {
-    private static final Logger logger = LoggerFactory.getLogger(XmlParser.class);
     private static final XmlParser xmlParser = new XmlParser();
     private static final String DEFAULT_ROOT = "root";
 
@@ -50,7 +51,7 @@ public class XmlParser {
                 return (HashMap<String, Object>) parse(root);
             }
         } catch (Exception e) {
-            logger.error("xml格式不正确", e);
+            log.error("xml格式不正确", e);
             return null;
         }
     }
@@ -80,7 +81,7 @@ public class XmlParser {
             // 没有权限访问该类或者该类（为接口、抽象类）不能实例化时将抛出异常
             pojo = clazz.newInstance();
         } catch (Exception e) {
-            logger.error("class对象生成失败，请检查代码；失败原因：", e);
+            log.error("class对象生成失败，请检查代码；失败原因：", e);
             throw new RuntimeException(e);
         }
 
@@ -88,7 +89,7 @@ public class XmlParser {
         try {
             document = DocumentHelper.parseText(xml);
         } catch (Exception e) {
-            logger.error("xml解析错误", e);
+            log.error("xml解析错误", e);
             return null;
         }
 
@@ -110,24 +111,24 @@ public class XmlParser {
                 //如果节点不是被忽略的节点那么继续
                 //获取节点名称，优先使用注解，如果注解没有设置名称那么使用字段名
                 nodeName = StringUtils.isEmpty(xmlNode.name()) ? fieldName : xmlNode.name();
-                logger.debug("字段[{}]对应的节点名为：{}", fieldName, nodeName);
+                log.debug("字段[{}]对应的节点名为：{}", fieldName, nodeName);
 
                 //判断节点是否是属性值
                 if (xmlNode.isAttribute()) {
                     //如果节点是属性值，那么需要同时设置节点名和属性名，原则上如果是属性的话必须设置节点名，但是为了防止
                     //用户忘记设置，在用户没有设置的时候使用字段名
                     if (StringUtils.isEmpty(xmlNode.attributeName())) {
-                        logger.warn("字段[{}]是属性值，但是未设置属性名（attributeName字段），将采用字段名作为属性名", descript.getName());
+                        log.warn("字段[{}]是属性值，但是未设置属性名（attributeName字段），将采用字段名作为属性名", descript.getName());
                         attributeName = fieldName;
                     } else {
                         attributeName = xmlNode.attributeName();
                     }
                     if (StringUtils.isEmpty(xmlNode.name())) {
-                        logger.debug("该字段是属性值，并且未设置节点名（name字段），设置isParent为true");
+                        log.debug("该字段是属性值，并且未设置节点名（name字段），设置isParent为true");
                         isParent = true;
                     }
                 } else {
-                    logger.debug("字段[{}]对应的是节点");
+                    log.debug("字段[{}]对应的是节点");
                 }
             } else {
                 ignore = true;
@@ -153,7 +154,7 @@ public class XmlParser {
                         setValue(nodes, attributeName, pojo, descript);
                     } else if (Map.class.isAssignableFrom(type)) {
                         //是Map
-                        logger.warn("当前暂时不支持解析map");
+                        log.warn("当前暂时不支持解析map");
                     } else {
                         //不是集合，直接赋值
                         setValue(nodes.get(0), attributeName, pojo, descript);
@@ -184,7 +185,7 @@ public class XmlParser {
      */
     public String toXml(Object source, String rootName, boolean hasNull) {
         if (source == null) {
-            logger.warn("传入的source为null，返回null");
+            log.warn("传入的source为null，返回null");
             return null;
         }
 
@@ -201,7 +202,7 @@ public class XmlParser {
         Element root = DocumentHelper.createElement(rootName);
         buildDocument(root, source, source.getClass(), !hasNull);
         Long end = System.currentTimeMillis();
-        logger.debug("解析xml用时" + (end - start) + "ms");
+        log.debug("解析xml用时" + (end - start) + "ms");
         return root.asXML();
     }
 
@@ -209,61 +210,90 @@ public class XmlParser {
      * 根据pojo构建xml的document（方法附件参考附件xml解析器思路）
      *
      * @param parent     父节点
-     * @param pojo       pojo
+     * @param pojo       pojo，不能为空
+     * @param clazz      pojo的Class
      * @param ignoreNull 是否忽略空元素
      */
     @SuppressWarnings("unchecked")
     private void buildDocument(Element parent, Object pojo, Class<?> clazz, boolean ignoreNull) {
-        CustomPropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(clazz == null ? pojo
-                .getClass() : clazz);
+        //字段描述，key是节点名，value是XmlData
+        Map<String, XmlData> map = new HashMap<>();
+        //构建字段描述
+        if (pojo instanceof Map) {
+            Map<?, ?> pojoMap = (Map<?, ?>) pojo;
+            pojoMap.forEach((k, v) -> {
+                if (k == null) {
+                    log.debug("忽略map中key为null的值");
+                } else {
+                    if (ignoreNull && v == null) {
+                        log.debug("当前配置为忽略空值，[{}]的值为空，忽略", k);
+                    } else {
+                        map.put(String.valueOf(k), new XmlData(null, v, v == null ? null : v.getClass()));
+                    }
+                }
+            });
+        } else {
+            CustomPropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(clazz == null ? pojo
+                    .getClass() : clazz);
+            for (CustomPropertyDescriptor descriptor : propertyDescriptors) {
+                XmlNode xmlNode = descriptor.getAnnotation(XmlNode.class);
+                //字段值
+                Object valueObj = pojo == null ? null : BeanUtils.getProperty(pojo, descriptor.getName());
+                //判断是否忽略
+                if ((ignoreNull && valueObj == null) || (xmlNode != null && xmlNode.ignore())) {
+                    log.debug("忽略空节点或者节点被注解忽略");
+                    continue;
+                }
 
-        for (CustomPropertyDescriptor descriptor : propertyDescriptors) {
-            XmlNode xmlNode = descriptor.getAnnotation(XmlNode.class);
-            //字段值
-            Object valueObj = pojo == null ? null : BeanUtils.getProperty(pojo, descriptor.getName());
-            //判断是否忽略
-            if ((ignoreNull && valueObj == null) || (xmlNode != null && xmlNode.ignore())) {
-                logger.debug("忽略空节点或者节点被注解忽略");
-                continue;
+                //节点名
+                String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name())) ? descriptor.getName() :
+                        xmlNode.name();
+                map.put(nodeName, new XmlData(xmlNode, valueObj, descriptor.getRealType()));
             }
+        }
+
+        map.forEach((k, v) -> {
+            XmlNode xmlNode = v.getXmlNode();
+            Object valueObj = v.getData();
 
             //节点名
-            String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name())) ? descriptor.getName() :
-                    xmlNode.name();
+            String nodeName = k;
             //属性名
-            String attrName = (xmlNode == null || StringUtils.isEmpty(xmlNode.attributeName())) ? descriptor.getName() :
-                    xmlNode.attributeName();
+            String attrName = (xmlNode == null || StringUtils.isEmpty(xmlNode.attributeName())) ? nodeName : xmlNode
+                    .attributeName();
             //是否是cdata
             boolean isCDATA = xmlNode != null && xmlNode.isCDATA();
+            //数据类型
+            Class<?> type = v.getType();
+            //构建一个对应的节点
+            Element node = parent.element(nodeName);
+            if (node == null) {
+                //搜索不到，创建一个（在属性是父节点属性的情况和节点是list的情况需要将该节点删除）
+                node = DocumentHelper.createElement(nodeName);
+                parent.add(node);
+            }
 
             //判断字段对应的是否是属性
             if (xmlNode != null && xmlNode.isAttribute()) {
                 //属性值，属性值只能是简单值
                 String attrValue = valueObj == null ? "" : String.valueOf(valueObj);
-                Element node;
                 //判断是否是父节点的属性
                 if (StringUtils.isEmpty(xmlNode.name())) {
+                    //如果是父节点那么删除之前添加的
+                    parent.remove(node);
                     node = parent;
-                } else {
-                    //属性不是根节点的属性，先尝试从现有节点中搜索
-                    node = parent.element(nodeName);
-                    if (node == null) {
-                        //搜索不到，创建一个
-                        node = DocumentHelper.createElement(nodeName);
-                        parent.add(node);
-                    }
                 }
                 //为属性对应的节点添加属性
                 node.addAttribute(attrName, attrValue);
-                continue;
-            }
-
-            //判断是否是简单类型或者集合类型
-            if (ReflectUtil.isSimple(descriptor.getRealType())) {
+            } else if (type == null) {
+                log.debug("当前不知道节点[{}]的类型，忽略该节点", k);
+            } else if (ReflectUtil.isSimple(type)) {
                 //是简单类型或者集合类型
-                if (Map.class.isAssignableFrom(descriptor.getRealType())) {
-                    logger.warn("xml解析器不能处理map类型，该类型将被忽略");
-                } else if (Collection.class.isAssignableFrom(descriptor.getRealType())) {
+                if (Map.class.isAssignableFrom(type)) {
+                    log.warn("当前字段[{}]是map类型", k);
+                    buildDocument(node, v.getData(), type, ignoreNull);
+                } else if (Collection.class.isAssignableFrom(type)) {
+                    parent.remove(node);
                     //集合类型
                     //判断字段值是否为null
                     if (valueObj != null) {
@@ -272,63 +302,49 @@ public class XmlParser {
                         if (StringUtils.isEmpty(xmlNode.arrayRoot())) {
                             arrayNodeName = nodeName;
                             root = parent;
-                        }else{
+                        } else {
                             arrayNodeName = xmlNode.arrayRoot();
                             root = DocumentHelper.createElement(nodeName);
                             parent.add(root);
                         }
                         Collection collection = (Collection) valueObj;
                         collection.stream().forEach(obj -> {
-                            Element node = DocumentHelper.createElement(arrayNodeName);
-                            root.add(node);
-                            buildDocument(node, obj, null, ignoreNull);
+                            Element n = DocumentHelper.createElement(arrayNodeName);
+                            root.add(n);
+                            buildDocument(n, obj, null, ignoreNull);
                         });
                     }
                 } else {
-                    //基本类型
-                    Element node = parent.element(nodeName);
-                    if (node == null) {
-                        //搜索不到，创建一个
-                        node = DocumentHelper.createElement(nodeName);
-                        parent.add(node);
-                    }
-
                     String text = valueObj == null ? "" : String.valueOf(valueObj);
                     if (isCDATA) {
-                        logger.debug("内容[{}]需要CDATA标签包裹", text);
+                        log.debug("内容[{}]需要CDATA标签包裹", text);
                         node.add(DocumentHelper.createCDATA(text));
                     } else {
                         node.setText(text);
                     }
                 }
             } else {
-                //对象类型
-                Element node = DocumentHelper.createElement(nodeName);
-                parent.add(node);
-
                 //猜测字段类型（防止字段的声明是一个接口，优先采用xmlnode中申明的类型）
-                Class<?> type = resolveRealType(descriptor);
-
+                Class<?> realType = resolveRealType(type, xmlNode);
                 //pojo类型
-                buildDocument(node, valueObj, type, ignoreNull);
+                buildDocument(node, valueObj, realType, ignoreNull);
             }
-        }
+        });
     }
 
     /**
      * 确定字段的真实类型
      *
-     * @param descriptor 字段说明
+     * @param fieldType 字段类型
+     * @param xmlNode   字段XmlNode注解
      * @return 字段实际类型而不是接口或者抽象类
      */
-    private Class<?> resolveRealType(CustomPropertyDescriptor descriptor) {
-        XmlNode xmlNode = descriptor.getAnnotation(XmlNode.class);
+    private Class<?> resolveRealType(Class<?> fieldType, XmlNode xmlNode) {
         //猜测字段类型（防止字段的声明是一个接口，优先采用xmlnode中申明的类型）
-        Class<?> type = (xmlNode == null || xmlNode.general() == null) ? descriptor.getRealType() : xmlNode
-                .general();
+        Class<?> type = (xmlNode == null || xmlNode.general() == null) ? fieldType : xmlNode.general();
 
-        if (!descriptor.getRealType().isAssignableFrom(type) && !descriptor.getRealType().equals(type)) {
-            type = descriptor.getRealType();
+        if (!fieldType.isAssignableFrom(type)) {
+            type = fieldType;
         }
         return type;
     }
@@ -381,10 +397,10 @@ public class XmlParser {
      */
     private void setValue(Element element, String attrName, Object pojo, CustomPropertyDescriptor field) {
         XmlNode attrXmlNode = field.getAnnotation(XmlNode.class);
-        logger.debug("要赋值的fieldName为{}", field.getName());
+        log.debug("要赋值的fieldName为{}", field.getName());
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
         if (!BeanUtils.setProperty(pojo, field.getName(), convert.read(element, attrName))) {
-            logger.warn("copy中复制{}时发生错误，属性[{}]的值将被忽略", field.getName(), field.getName());
+            log.warn("copy中复制{}时发生错误，属性[{}]的值将被忽略", field.getName(), field.getName());
         }
     }
 
@@ -399,7 +415,7 @@ public class XmlParser {
     @SuppressWarnings("unchecked")
     private void setValue(List<Element> elements, String attrName, Object pojo, CustomPropertyDescriptor field) {
         XmlNode attrXmlNode = field.getAnnotation(XmlNode.class);
-        logger.debug("要赋值的fieldName为{}", field.getName());
+        log.debug("要赋值的fieldName为{}", field.getName());
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
 
         Class<? extends Collection> collectionClass;
@@ -420,7 +436,7 @@ public class XmlParser {
         if (trySetValue(list, pojo, field, collectionClass) && !collectionClass.equals(field.getType())) {
             //使用注解标记的类型赋值失败并且注解的集合类型与实际字段类型不符时尝试使用字段实际类型赋值
             if (trySetValue(list, pojo, field, (Class<? extends Collection>) field.getType())) {
-                logger.warn("无法为字段[{}]赋值", field.getName());
+                log.warn("无法为字段[{}]赋值", field.getName());
             }
         }
     }
@@ -438,18 +454,18 @@ public class XmlParser {
     @SuppressWarnings("unchecked")
     private boolean trySetValue(List<?> datas, Object pojo, CustomPropertyDescriptor field, Class<? extends
             Collection> clazz) {
-        logger.debug("要赋值的fieldName为{}", field.getName());
+        log.debug("要赋值的fieldName为{}", field.getName());
 
         Collection collection = tryBuildCollection(clazz);
         if (collection == null) {
-            logger.warn("无法为class[{}]构建实例", clazz);
+            log.warn("无法为class[{}]构建实例", clazz);
             return true;
         }
         collection.addAll(datas);
         try {
             return !BeanUtils.setProperty(pojo, field.getName(), collection);
         } catch (Exception e) {
-            logger.debug("字段[{}]赋值失败，使用的集合类为[{}]", field.getName(), clazz, e);
+            log.debug("字段[{}]赋值失败，使用的集合类为[{}]", field.getName(), clazz, e);
             return true;
         }
     }
@@ -469,18 +485,42 @@ public class XmlParser {
             try {
                 return clazz.newInstance();
             } catch (Exception e) {
-                logger.warn("指定class[{}]无法创建对象，请为其添加公共无参数构造器，将使用默认实现ArrayList", clazz, e);
+                log.warn("指定class[{}]无法创建对象，请为其添加公共无参数构造器，将使用默认实现ArrayList", clazz, e);
                 return new ArrayList();
             }
         } else if (Set.class.isAssignableFrom(clazz)) {
             try {
                 return clazz.newInstance();
             } catch (Exception e) {
-                logger.warn("指定class[{}]无法创建对象，请为其添加公共无参数构造器，将使用默认实现HashSet", clazz, e);
+                log.warn("指定class[{}]无法创建对象，请为其添加公共无参数构造器，将使用默认实现HashSet", clazz, e);
                 return new HashSet();
             }
         } else {
             return null;
+        }
+    }
+
+    /**
+     * XML节点数据
+     */
+    @Data
+    @AllArgsConstructor
+    private static class XmlData {
+        /**
+         * 节点注解，可以为空
+         */
+        private XmlNode xmlNode;
+        /**
+         * 节点数据
+         */
+        private Object data;
+        /**
+         * 节点数据的实际类型，可以为空
+         */
+        private Class<?> type;
+
+        public XmlData(Object data) {
+            this.data = data;
         }
     }
 }
