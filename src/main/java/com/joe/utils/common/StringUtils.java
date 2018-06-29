@@ -16,6 +16,47 @@ import java.util.Map;
 @Slf4j
 public class StringUtils {
     /**
+     * 替换指定结束位置之前的所有字符
+     *
+     * @param str 字符串
+     * @param end 要替换的结束位置（包含该位置）
+     * @param rp  替换字符串
+     * @return 替换后的字符串，例如对123456替换3,*，结果为*56
+     */
+    public static String replaceBefor(String str, int end, String rp) {
+        return replace(str, 0, end, rp);
+    }
+
+    /**
+     * 替换指定起始位置之后的所有字符
+     *
+     * @param str   字符串
+     * @param start 要替换的起始位置（包含该位置）
+     * @param rp    替换字符串
+     * @return 替换后的字符串，例如对123456替换3,*，结果为123*
+     */
+    public static String replaceAfter(String str, int start, String rp) {
+        return replace(str, start, str.length() - 1, rp);
+    }
+
+    /**
+     * 替换指定区间位置的所有字符
+     *
+     * @param str   字符串
+     * @param start 要替换的起始位置（包含该位置）
+     * @param end   要替换的结束位置（包含该位置）
+     * @param rp    替换字符串
+     * @return 替换后的字符串，例如对123456替换1,3,*，结果为1*56
+     */
+    public static String replace(String str, int start, int end, String rp) {
+        if (str == null || start < 0 || start > end || end >= str.length()) {
+            throw new IllegalArgumentException("参数非法");
+        }
+
+        return str.substring(0, start) + rp + str.substring(end + 1);
+    }
+
+    /**
      * 判断字符串长度是否大于0
      *
      * @param str 字符串
