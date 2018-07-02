@@ -117,12 +117,6 @@
             <artifactId>jcl-over-slf4j</artifactId>
             <scope>provided</scope>
         </dependency>
-        <!-- 快速生成get set方法 -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <!-- redis支持（支持分布式锁和分布式数据结构），暂时未用 -->
         <dependency>
             <groupId>org.redisson</groupId>
@@ -148,11 +142,10 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-        <!--test-->
+        <!--bean验证框架-->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
         </dependency>
     </dependencies>
 
