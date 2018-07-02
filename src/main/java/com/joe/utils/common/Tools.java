@@ -1,8 +1,12 @@
 package com.joe.utils.common;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.UUID;
 
 public class Tools {
+    protected static final DecimalFormat NUMFORMAT = new DecimalFormat("#.00");
+
     /**
      * 生成一个32位的UUID
      *
@@ -48,5 +52,30 @@ public class Tools {
             chars[i] = (char) ((Math.random() * 10) + 48);
         }
         return new String(chars);
+    }
+
+    /**
+     * 处理浮点数，保留小数点后两位，不足的补0
+     *
+     * @param bigDecimal 浮点数
+     * @return 处理结果，例如：1.00、1.10
+     */
+    public static String dealDouble(BigDecimal bigDecimal) {
+        double count = bigDecimal.doubleValue();
+        return dealDouble(count);
+    }
+
+    /**
+     * 处理浮点数，保留小数点后两位，不足的补0
+     *
+     * @param count 浮点数
+     * @return 处理结果，例如：1.00、1.10
+     */
+    public static String dealDouble(double count) {
+        if (count < 0.005 && count > -0.005) {
+            return "0.00";
+        }
+        String result = NUMFORMAT.format(count);
+        return result.startsWith(".") ? "0" + result : result;
     }
 }
