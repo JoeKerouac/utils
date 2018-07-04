@@ -21,9 +21,9 @@ public class PatternUtils {
      */
     private static final Pattern PHONE_PATTERN = Pattern.compile("^1[3|4|5|7|8]\\d{9}$");
     /**
-     * 匹配数字正则
+     * 匹配数字正则（开头不能是0，末尾可以是0）
      */
-    private static Pattern NUMBER_PARTER = Pattern.compile("-?[0-9]+\\.?[0-9]+");
+    private static Pattern NUMBER_PARTER = Pattern.compile("-?(((1-9)\\d*)|(\\d))(\\.\\d*)");
 
     /**
      * 判断字符串是否是IP格式的字符串
