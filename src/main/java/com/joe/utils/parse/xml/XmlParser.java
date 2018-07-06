@@ -17,7 +17,6 @@ import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.stream.XMLInputFactory;
 import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,6 +24,8 @@ import java.util.stream.Collectors;
 /**
  * XML解析（反向解析为java对象时不区分大小写），该解析器由于大量使用反射，所以在第一次解析
  * 某个类型的对象时效率较低，解析过一次系统会自动添加缓存，速度将会大幅提升（测试中提升了25倍）
+ * <p>
+ * XXE漏洞：https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
  *
  * @author JoeKerouac
  */
@@ -63,13 +64,13 @@ public class XmlParser {
     /**
      * 使用指定配置构建一个新的XmlParser实例（如果不做设置则默认禁用了外部DTD）
      *
-     * @param prop 配置
+     * @param prop 功能配置
      * @return 新的XmlParser实例
      */
-    public static XmlParser buildInstance(Map<String, Object> prop) {
+    public static XmlParser buildInstance(Map<String, Boolean> prop) {
         XmlParser xmlParser = new XmlParser();
         if (!CollectionUtil.safeIsEmpty(prop)) {
-            prop.forEach(xmlParser::setProperty);
+            prop.forEach(xmlParser::setFeature);
         }
         return xmlParser;
     }
@@ -80,20 +81,25 @@ public class XmlParser {
      * @param enable true表示支持DTD，false表示不支持
      */
     public void enableDTD(boolean enable) {
-        setProperty(XMLInputFactory.SUPPORT_DTD, enable);
+        if (enable) {
+            //不允许DTD
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
+        } else {
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        }
     }
 
     /**
      * 配置SAXReader
      *
-     * @param k name
-     * @param v value
+     * @param k      name
+     * @param enable 是否允许，true表示允许
      */
-    public void setProperty(String k, Object v) {
+    public void setFeature(String k, boolean enable) {
         try {
-            reader.setProperty(k, v);
+            reader.setFeature(k, enable);
         } catch (SAXException e) {
-            throw new RuntimeException("设置属性失败:[" + k + ":" + v + "]");
+            throw new RuntimeException("设置属性失败:[" + k + ":" + enable + "]");
         }
     }
 
