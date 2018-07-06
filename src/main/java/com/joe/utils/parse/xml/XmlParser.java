@@ -83,9 +83,13 @@ public class XmlParser {
     public void enableDTD(boolean enable) {
         if (enable) {
             //不允许DTD
-            setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
-        } else {
             setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            setFeature("http://xml.org/sax/features/external-general-entities", false);
+            setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        } else {
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
+            setFeature("http://xml.org/sax/features/external-general-entities", true);
+            setFeature("http://xml.org/sax/features/external-parameter-entities", true);
         }
     }
 
