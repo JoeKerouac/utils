@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * RSA加密
+ * 使用private key加密
  *
  * @author joe
  * @version 2018.06.28 15:52
@@ -22,25 +22,45 @@ import java.util.Map;
 public class RSA implements Encipher {
     private static final IBase64 BASE_64 = new IBase64();
     private static final Map<String, ObjectPool<Signature>> CACHE = new HashMap<>();
-    private String id;
+    /**
+     * 私钥ID
+     */
+    private String privateId;
+    /**
+     * 公钥ID
+     */
+    private String publicId;
 
     /**
      * 默认构造器
      *
      * @param privateKey 私钥
+     * @param publicKey  对应的公钥，可以为空，为空时不能校验
      * @param rsaType    rsa加密类型
      */
-    public RSA(String privateKey, RSAType rsaType) {
-        this.id = (privateKey + rsaType.toString()).intern();
-
-        ObjectPool<Signature> pool = CACHE.get(this.id);
-        if (pool == null) {
-            synchronized (id) {
-                pool = CACHE.get(id);
-                if (pool == null) {
+    public RSA(String privateKey, String publicKey, RSAType rsaType) {
+        this.privateId = (privateKey + rsaType.toString()).intern();
+        ObjectPool<Signature> privatePool = CACHE.get(this.privateId);
+        if (privatePool == null) {
+            synchronized (privateId) {
+                privatePool = CACHE.get(privateId);
+                if (privatePool == null) {
                     build(privateKey, rsaType);
-                    pool = new ObjectPool(() -> build(privateKey, rsaType));
-                    CACHE.put(id, pool);
+                    privatePool = new ObjectPool(() -> build(privateKey, rsaType));
+                    CACHE.put(privateId, privatePool);
+                }
+            }
+        }
+
+        this.publicId = (publicKey + rsaType.toString()).intern();
+        ObjectPool<Signature> publicPool = CACHE.get(this.publicId);
+        if (publicPool == null) {
+            synchronized (publicId) {
+                publicPool = CACHE.get(publicId);
+                if (publicPool == null) {
+                    build(publicKey, rsaType);
+                    publicPool = new ObjectPool(() -> build(publicKey, rsaType));
+                    CACHE.put(publicId, publicPool);
                 }
             }
         }
@@ -74,12 +94,41 @@ public class RSA implements Encipher {
     @Override
     public byte[] encrypt(byte[] content) {
         try {
-            ObjectPool.PoolObjectHolder<Signature> holder = CACHE.get(id).get();
+            ObjectPool.PoolObjectHolder<Signature> holder = CACHE.get(privateId).get();
             Signature signature = holder.get();
             signature.update(content);
             byte[] result = BASE_64.encrypt(signature.sign());
             holder.close();
             return result;
+        } catch (Exception e) {
+            throw new SecureException("加密失败", e);
+        }
+    }
+
+    /**
+     * 使用公钥校验私钥加密的内容
+     *
+     * @param content 原文
+     * @param data    私钥加密的数据
+     * @return 返回true表示校验成功
+     */
+    public boolean check(String content, String data) {
+        return check(content.getBytes(), data.getBytes());
+    }
+
+    /**
+     * 使用公钥校验私钥加密的内容
+     *
+     * @param content 原文
+     * @param data    私钥加密的数据（使用BASE64加密过的数据）
+     * @return 返回true表示校验成功
+     */
+    public boolean check(byte[] content, byte[] data) {
+        try {
+            ObjectPool.PoolObjectHolder<Signature> holder = CACHE.get(publicId).get();
+            Signature signature = holder.get();
+            signature.update(content);
+            return signature.verify(BASE_64.decrypt(data));
         } catch (Exception e) {
             throw new SecureException("加密失败", e);
         }
@@ -116,7 +165,7 @@ public class RSA implements Encipher {
 
     @Override
     public int hashCode() {
-        return this.id.hashCode();
+        return this.privateId.hashCode();
     }
 
     @Override
@@ -126,15 +175,8 @@ public class RSA implements Encipher {
         }
         if (obj instanceof RSA) {
             RSA rsa = (RSA) obj;
-            return rsa.id.equals(this.id);
+            return rsa.privateId.equals(this.privateId);
         }
         return false;
-    }
-
-    /**
-     * RSA加密类型
-     */
-    public enum RSAType {
-        SHA256WithRSA, SHA1WithRSA,
     }
 }
