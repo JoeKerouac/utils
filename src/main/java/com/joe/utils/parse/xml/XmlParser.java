@@ -1,5 +1,6 @@
 package com.joe.utils.parse.xml;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.BeanUtils;
 import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.common.StringUtils;
@@ -9,9 +10,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.dom4j.Document;
+import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.stream.XMLInputFactory;
+import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,11 +30,126 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class XmlParser {
-    private static final XmlParser xmlParser = new XmlParser();
+    private static final XmlParser DEFAULT = new XmlParser();
     private static final String DEFAULT_ROOT = "root";
+    private SAXReader reader;
 
+    static {
+        DEFAULT.enableDTD(false);
+    }
+
+    /**
+     * 获取默认实例（禁用了外部DTD）
+     *
+     * @return 默认实例
+     */
     public static XmlParser getInstance() {
+        return DEFAULT;
+    }
+
+    /**
+     * 构建一个新的XmlParser实例（默认禁用了外部DTD）
+     *
+     * @return 新的XmlParser实例
+     */
+    public static XmlParser buildInstance() {
+        return buildInstance(null);
+    }
+
+    /**
+     * 使用指定配置构建一个新的XmlParser实例（如果不做设置则默认禁用了外部DTD）
+     *
+     * @param prop 配置
+     * @return 新的XmlParser实例
+     */
+    public static XmlParser buildInstance(Map<String, Object> prop) {
+        XmlParser xmlParser = new XmlParser();
+        xmlParser.reader = new SAXReader();
+        if (!CollectionUtil.safeIsEmpty(prop)) {
+            prop.forEach(xmlParser::setProperty);
+        }
         return xmlParser;
+    }
+
+    /**
+     * 设置DTD支持
+     *
+     * @param enable true表示支持DTD，false表示不支持
+     */
+    public void enableDTD(boolean enable) {
+        setProperty(XMLInputFactory.SUPPORT_DTD, enable);
+    }
+
+    /**
+     * 配置SAXReader
+     *
+     * @param k name
+     * @param v value
+     */
+    public void setProperty(String k, Object v) {
+        try {
+            reader.setProperty(k, v);
+        } catch (SAXException e) {
+            throw new RuntimeException("设置属性失败:[" + k + ":" + v + "]");
+        }
+    }
+
+    /**
+     * 将xml解析为Document
+     *
+     * @param text xml文本
+     * @return Document
+     * @throws DocumentException DocumentException
+     */
+    private Document parseText(String text) throws DocumentException {
+        Document result;
+
+        String encoding = getEncoding(text);
+
+        InputSource source = new InputSource(new StringReader(text));
+        source.setEncoding(encoding);
+
+        result = reader.read(source);
+
+        // if the XML parser doesn't provide a way to retrieve the encoding,
+        // specify it manually
+        if (result.getXMLEncoding() == null) {
+            result.setXMLEncoding(encoding);
+        }
+
+        return result;
+    }
+
+    /**
+     * 获取xml的编码方式
+     *
+     * @param text xml文件
+     * @return xml的编码
+     */
+    private String getEncoding(String text) {
+        String result = null;
+
+        String xml = text.trim();
+
+        if (xml.startsWith("<?xml")) {
+            int end = xml.indexOf("?>");
+            String sub = xml.substring(0, end);
+            StringTokenizer tokens = new StringTokenizer(sub, " =\"\'");
+
+            while (tokens.hasMoreTokens()) {
+                String token = tokens.nextToken();
+
+                if ("encoding".equals(token)) {
+                    if (tokens.hasMoreTokens()) {
+                        result = tokens.nextToken();
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -41,7 +163,7 @@ public class XmlParser {
     @SuppressWarnings("unchecked")
     public Map<String, Object> parse(String xml) {
         try {
-            Document document = DocumentHelper.parseText(xml);
+            Document document = parseText(xml);
             Element root = document.getRootElement();
             if (root.elements().size() == 0) {
                 Map<String, Object> map = new HashMap<>();
@@ -87,7 +209,7 @@ public class XmlParser {
 
         // 解析XML
         try {
-            document = DocumentHelper.parseText(xml);
+            document = parseText(xml);
         } catch (Exception e) {
             log.error("xml解析错误", e);
             return null;

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 public interface XmlConverter<T> extends XmlTypeConvert<T> {
     Logger logger = LoggerFactory.getLogger(XmlConverter.class);
-    XmlParser PARSER = XmlParser.getInstance();
+    XmlParser PARSER = XmlParser.buildInstance();
 
     @SuppressWarnings("unchecked")
     @Override
