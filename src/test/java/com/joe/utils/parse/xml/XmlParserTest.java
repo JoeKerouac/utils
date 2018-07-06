@@ -13,7 +13,7 @@ import java.util.*;
  * @version 2018.05.08 10:25
  */
 public class XmlParserTest {
-    private static final XmlParser PARSER = XmlParser.buildInstance();
+    private static final XmlParser PARSER = XmlParser.getInstance();
     private static final String NOTHASNULL = "<USER><users2><user><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></user" +
             "></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao</ALIAS><userSet" +
             "><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME></USER>";
