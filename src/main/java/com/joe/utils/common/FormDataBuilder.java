@@ -1,5 +1,7 @@
 package com.joe.utils.common;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -60,6 +62,44 @@ public class FormDataBuilder {
         StringBuilder sb = new StringBuilder();
         datas.forEach((k, v) -> sb.append("&").append(k).append("=").append(String.valueOf(v)));
         return sb.toString().substring(1);
+    }
+
+    /**
+     * 获取form数据
+     *
+     * @param useUrlencode 是否使用URLEncode对value进行编码，true表示使用URLEncode进行编码
+     * @param charset      编码字符集
+     * @return form数据
+     */
+    public String data(boolean useUrlencode, String charset) {
+        StringBuilder sb = new StringBuilder();
+        if (useUrlencode) {
+            datas.forEach((k, v) -> sb.append("&")
+                    .append(k)
+                    .append("=")
+                    .append(urlencode(String.valueOf(v), charset)));
+        } else {
+            datas.forEach((k, v) -> sb.append("&")
+                    .append(k)
+                    .append("=")
+                    .append(String.valueOf(v)));
+        }
+        return sb.toString().substring(1);
+    }
+
+    /**
+     * 对数据进行URLEncode编码
+     *
+     * @param data    数据
+     * @param charset 字符集
+     * @return 编码后的数据
+     */
+    private String urlencode(String data, String charset) {
+        try {
+            return URLEncoder.encode(String.valueOf(data), charset);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
