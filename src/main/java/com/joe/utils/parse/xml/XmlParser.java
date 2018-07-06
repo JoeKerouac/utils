@@ -81,6 +81,7 @@ public class XmlParser {
      * @param enable true表示支持DTD，false表示不支持
      */
     public void enableDTD(boolean enable) {
+        //允许DTD会有XXE漏洞，关于XXE漏洞：https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
         if (enable) {
             //不允许DTD
             setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
