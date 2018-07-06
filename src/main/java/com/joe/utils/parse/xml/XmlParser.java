@@ -34,6 +34,10 @@ public class XmlParser {
     private static final String DEFAULT_ROOT = "root";
     private SAXReader reader;
 
+    private XmlParser() {
+        this.reader = new SAXReader();
+    }
+
     static {
         DEFAULT.enableDTD(false);
     }
@@ -64,7 +68,6 @@ public class XmlParser {
      */
     public static XmlParser buildInstance(Map<String, Object> prop) {
         XmlParser xmlParser = new XmlParser();
-        xmlParser.reader = new SAXReader();
         if (!CollectionUtil.safeIsEmpty(prop)) {
             prop.forEach(xmlParser::setProperty);
         }
