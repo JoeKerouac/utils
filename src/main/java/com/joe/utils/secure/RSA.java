@@ -3,13 +3,16 @@ package com.joe.utils.secure;
 import com.joe.utils.common.IOUtils;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.pool.ObjectPool;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +22,7 @@ import java.util.Map;
  * @author joe
  * @version 2018.06.28 15:52
  */
+@Slf4j
 public class RSA implements Encipher {
     private static final IBase64 BASE_64 = new IBase64();
     private static final Map<String, ObjectPool<Signature>> CACHE = new HashMap<>();
@@ -45,8 +49,7 @@ public class RSA implements Encipher {
             synchronized (privateId) {
                 privatePool = CACHE.get(privateId);
                 if (privatePool == null) {
-                    build(privateKey, rsaType);
-                    privatePool = new ObjectPool(() -> build(privateKey, rsaType));
+                    privatePool = new ObjectPool(() -> buildPrivateSignature(privateKey, rsaType));
                     CACHE.put(privateId, privatePool);
                 }
             }
@@ -58,8 +61,7 @@ public class RSA implements Encipher {
             synchronized (publicId) {
                 publicPool = CACHE.get(publicId);
                 if (publicPool == null) {
-                    build(publicKey, rsaType);
-                    publicPool = new ObjectPool(() -> build(publicKey, rsaType));
+                    publicPool = new ObjectPool(() -> buildPublicSignature(publicKey, rsaType));
                     CACHE.put(publicId, publicPool);
                 }
             }
@@ -73,12 +75,32 @@ public class RSA implements Encipher {
      * @param rsaType    RSA加密类型
      * @return RSA加密器
      */
-    private Signature build(String privateKey, RSAType rsaType) {
+    private Signature buildPrivateSignature(String privateKey, RSAType rsaType) {
+        log.debug("构建私钥加密器");
         try {
-            PrivateKey priKey = getPrivateKeyFromPKCS8("RSA", new ByteArrayInputStream(privateKey
-                    .getBytes()));
+            PrivateKey priKey = getPrivateKeyFromPKCS8("RSA", new ByteArrayInputStream(privateKey.getBytes()));
             Signature signature = Signature.getInstance(rsaType.toString());
             signature.initSign(priKey);
+            return signature;
+        } catch (Exception e) {
+            //不会发生这种情况
+            throw new SecureException("创建RSA加密器失败", e);
+        }
+    }
+
+    /**
+     * 使用指定公钥和RSA加密类型获取RSA验证器
+     *
+     * @param publicKey 公钥
+     * @param rsaType   RSA加密类型
+     * @return RSA验证器
+     */
+    private Signature buildPublicSignature(String publicKey, RSAType rsaType) {
+        log.debug("构建公钥验证器");
+        try {
+            PublicKey pubKey = getPublicKeyFromX509("RSA", new ByteArrayInputStream(publicKey.getBytes()));
+            Signature signature = Signature.getInstance(rsaType.toString());
+            signature.initVerify(pubKey);
             return signature;
         } catch (Exception e) {
             //不会发生这种情况
@@ -128,7 +150,9 @@ public class RSA implements Encipher {
             ObjectPool.PoolObjectHolder<Signature> holder = CACHE.get(publicId).get();
             Signature signature = holder.get();
             signature.update(content);
-            return signature.verify(BASE_64.decrypt(data));
+            boolean result = signature.verify(BASE_64.decrypt(data));
+            holder.close();
+            return result;
         } catch (Exception e) {
             throw new SecureException("加密失败", e);
         }
@@ -144,7 +168,6 @@ public class RSA implements Encipher {
         throw new SecureException("RSA不支持解密");
     }
 
-
     /**
      * 从PKCS8格式的文件中获取私钥
      *
@@ -153,7 +176,7 @@ public class RSA implements Encipher {
      * @return 私钥
      * @throws Exception Exception
      */
-    public static PrivateKey getPrivateKeyFromPKCS8(String algorithm, InputStream ins) throws Exception {
+    private static PrivateKey getPrivateKeyFromPKCS8(String algorithm, InputStream ins) throws Exception {
         if (ins == null || StringUtils.isEmpty(algorithm)) {
             return null;
         }
@@ -161,6 +184,24 @@ public class RSA implements Encipher {
         byte[] encodedKey = IOUtils.read(ins);
         encodedKey = BASE_64.decrypt(encodedKey);
         return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
+    }
+
+    /**
+     * 从X509格式的文件中获取public key
+     *
+     * @param algorithm 加密算法名称
+     * @param ins       X509格式的public key文件的输入流
+     * @return 公钥
+     * @throws Exception Exception
+     */
+    private static PublicKey getPublicKeyFromX509(String algorithm, InputStream ins) throws Exception {
+        if (ins == null || StringUtils.isEmpty(algorithm)) {
+            return null;
+        }
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        byte[] encodedKey = IOUtils.read(ins);
+        encodedKey = BASE_64.decrypt(encodedKey);
+        return keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
     }
 
     @Override
