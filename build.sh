@@ -3,7 +3,6 @@
 #第一个参数是成功打印，第二个是失败打印
 checkAndExit(){
     check $1 $2
-    ehco "执行结果是：$?"
     exit $?
 }
 
