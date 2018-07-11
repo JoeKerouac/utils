@@ -31,8 +31,8 @@ public interface CipherUtil {
     /**
      * 解密
      *
-     * @param byteContent 要解密的内容
+     * @param content 要解密的内容
      * @return 解密后的数据
      */
-    byte[] decrypt(byte[] byteContent);
+    byte[] decrypt(byte[] content);
 }

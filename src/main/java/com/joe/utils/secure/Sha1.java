@@ -20,7 +20,7 @@ public class Sha1 implements CipherUtil {
 	}
 
 	@Override
-	public byte[] decrypt(byte[] byteContent) {
+	public byte[] decrypt(byte[] content) {
 		return null;
 	}
 
