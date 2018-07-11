@@ -80,6 +80,10 @@ public @interface XmlNode {
 
     /**
      * 当字段为集合时该选项有用
+     * <p>
+     * 例如字段名为set，arrayRoot值为user，则生成的xml为&lt;set&gt;&lt;user&gt;123&lt;/user&gt;&lt;user&gt;456&lt;/user&gt;&lt;/set&gt;
+     * <p>
+     * 而当该字段为空时则会直接以字段名为节点名生成xml，生成xml如下：&lt;set&gt;123&lt;/set&gt;&lt;set&gt;456&lt;/set&gt;
      *
      * @return 集合节点的节点名，当该值不为null或者空时会为集合单独创建一个以该函数返回值为名的节点，在节点里边存放集合，否则不创建
      */
