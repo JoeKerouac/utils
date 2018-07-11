@@ -53,7 +53,7 @@ public class RedisSingleServerConfig extends RedisBaseConfig {
     private boolean dnsMonitoring = false;
 
     /**
-     * Interval in milliseconds to check DNS
+     * Interval in milliseconds to checkSign DNS
      */
     private long dnsMonitoringInterval = 5000;
 }

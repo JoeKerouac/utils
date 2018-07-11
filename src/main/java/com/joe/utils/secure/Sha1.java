@@ -2,7 +2,7 @@ package com.joe.utils.secure;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-public class Sha1 implements Encipher{
+public class Sha1 implements CipherUtil {
 
 	@Override
 	public String encrypt(String content) {

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.JoeKerouac</groupId>
     <artifactId>utils</artifactId>
-    <version>1.8.009</version>
+    <version>1.8.010</version>
     <name>utils</name>
     <packaging>jar</packaging>
     <description>常用工具类</description>
@@ -126,11 +126,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
-        </dependency>
-        <!-- 用到了MD5的类 -->
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
         </dependency>
         <!-- dom4j依赖，解析xml用 -->
         <dependency>

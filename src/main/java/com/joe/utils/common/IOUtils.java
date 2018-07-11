@@ -1,8 +1,7 @@
 package com.joe.utils.common;
 
 import com.joe.utils.collection.ByteArray;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 
@@ -11,9 +10,8 @@ import java.io.*;
  *
  * @author joe
  */
+@Slf4j
 public class IOUtils {
-    private static final Logger logger = LoggerFactory.getLogger(IOUtils.class);
-
     /**
      * 将流中的数据读取为字符串（缓冲区大小为256byte）
      *
@@ -23,10 +21,10 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static String read(InputStream in, String charset) throws IOException {
-        logger.debug("开始从流中读取内容");
+        log.debug("开始从流中读取内容");
         charset = charset == null ? "UTF8" : charset;
         int bufSize = 256;
-        logger.debug("文本编码为：{}，缓冲区大小为{}byte", charset, bufSize);
+        log.debug("文本编码为：{}，缓冲区大小为{}byte", charset, bufSize);
         return new String(read(in, bufSize), charset);
     }
 
@@ -62,19 +60,19 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static void saveAsFile(byte[] data, String addr) throws IOException {
-        logger.debug("将字节数据保存到本地文件");
+        log.debug("将字节数据保存到本地文件");
         File file = new File(addr);
         if (!file.exists()) {
             if (!file.getParentFile().mkdirs()) {
-                logger.error("创建目录{}失败", addr);
+                log.error("创建目录{}失败", addr);
             }
         }
-        logger.debug("保存路径为：{}", file.getAbsolutePath());
+        log.debug("保存路径为：{}", file.getAbsolutePath());
         FileOutputStream out = new FileOutputStream(file);
         out.write(data);
         out.flush();
         out.close();
-        logger.debug("文件保存完毕");
+        log.debug("文件保存完毕");
     }
 
     /**
@@ -86,14 +84,14 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static byte[] read(InputStream in, int bufSize) throws IOException {
-        logger.debug("开始从流中读取数据，缓冲区大小为{}byte", bufSize);
+        log.debug("开始从流中读取数据，缓冲区大小为{}byte", bufSize);
         ByteArray array = new ByteArray();
         int len;
         byte[] buffer = new byte[bufSize];
         while ((len = in.read(buffer, 0, buffer.length)) != -1) {
             array.append(buffer, 0, len);
         }
-        logger.debug("读取完毕");
+        log.debug("读取完毕");
         return array.getData();
     }
 
@@ -105,5 +103,18 @@ public class IOUtils {
      */
     public static InputStream convert(byte[] data) {
         return new ByteArrayInputStream(data);
+    }
+
+    /**
+     * 关闭closeable，忽略抛出的异常
+     *
+     * @param closeable closeable
+     */
+    public static void closeQuietly(AutoCloseable closeable) {
+        try {
+            closeable.close();
+        } catch (Exception e) {
+            log.warn("关闭[{}]时异常，忽略", closeable, e);
+        }
     }
 }

@@ -7,6 +7,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.joe.utils.codec.IBase64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author joe
  */
-public class AES implements Encipher {
+public class AES implements CipherUtil {
     private static final Logger logger = LoggerFactory.getLogger(AES.class);
     /*
      * 加密密码

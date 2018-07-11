@@ -1,6 +1,9 @@
 package com.joe.utils.secure;
 
-public interface Encipher {
+/**
+ * 加密工具
+ */
+public interface CipherUtil {
     /**
      * 加密
      *

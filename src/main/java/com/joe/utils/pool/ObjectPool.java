@@ -79,8 +79,10 @@ public class ObjectPool<T> {
     public static class PoolObjectHolder<T> implements AutoCloseable {
         private T data;
         private ObjectPool<T> pool;
+        private boolean closed;
 
         private PoolObjectHolder(T data, ObjectPool<T> pool) {
+            this.closed = false;
             this.data = data;
             this.pool = pool;
         }
@@ -95,8 +97,12 @@ public class ObjectPool<T> {
         }
 
         @Override
-        public void close() {
+        public synchronized void close() {
+            if (closed) {
+                return;
+            }
             pool.pool.addLast(this);
+            this.closed = true;
         }
     }
 }
