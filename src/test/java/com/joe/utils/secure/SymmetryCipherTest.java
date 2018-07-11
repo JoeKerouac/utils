@@ -8,15 +8,22 @@ import org.junit.Test;
  * @version 2018.07.11 20:59
  */
 public class SymmetryCipherTest {
-    private SymmetryCipher cipher;
+    private SymmetryCipher aesCipher;
+    private SymmetryCipher desCipher;
 
     @Before
     public void init() {
-        cipher = new SymmetryCipher(AbstractCipher.Algorithms.DES, "123123123123123123", 100);
+        desCipher = new SymmetryCipher(AbstractCipher.Algorithms.DES, "123123123123123123");
+        aesCipher = new SymmetryCipher(AbstractCipher.Algorithms.AES, "123123123123123123" , 128);
     }
 
     @Test
-    public void doCipher() {
-        CipherUtilTest.checkCipher(cipher);
+    public void doAesCipher() {
+        CipherUtilTest.checkCipher(aesCipher);
+    }
+
+    @Test
+    public void doDesCipher() {
+        CipherUtilTest.checkCipher(desCipher);
     }
 }

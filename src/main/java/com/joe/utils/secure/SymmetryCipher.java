@@ -43,7 +43,9 @@ public class SymmetryCipher extends AbstractCipher {
      *
      * @param algorithms 算法，支持DES和AES
      * @param password   密码，用来作为随机数的种子
-     * @param keySize    密码大小（AES支持128、192、256，DES只支持56）
+     * @param keySize    密码大小（AES支持128、192、256，当使用大于128的空间时需要下载JCE Unlimited Strength Jurisdiction
+     *                   Policy Files，地址为：
+     *                   http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html ，DES只支持56）
      */
     public SymmetryCipher(Algorithms algorithms, String password, int keySize) {
         super(algorithms, password, keySize);
