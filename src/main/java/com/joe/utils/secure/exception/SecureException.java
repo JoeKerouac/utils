@@ -1,4 +1,4 @@
-package com.joe.utils.secure;
+package com.joe.utils.secure.exception;
 
 /**
  * @author joe

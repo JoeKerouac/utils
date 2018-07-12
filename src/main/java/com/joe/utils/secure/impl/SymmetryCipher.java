@@ -1,5 +1,8 @@
-package com.joe.utils.secure;
+package com.joe.utils.secure.impl;
 
+import com.joe.utils.secure.CipherUtil;
+import com.joe.utils.secure.KeyTools;
+import com.joe.utils.secure.exception.SecureException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.BadPaddingException;
@@ -28,8 +31,8 @@ public class SymmetryCipher extends AbstractCipher {
      * @param seed 随机数种子
      * @return SymmetryCipher
      */
-    public static SymmetryCipher getInstance(String seed) {
-        return getInstance(Algorithms.AES, seed, 128);
+    public static CipherUtil buildInstance(String seed) {
+        return buildInstance(Algorithms.AES, seed, 128);
     }
 
     /**
@@ -39,14 +42,14 @@ public class SymmetryCipher extends AbstractCipher {
      * @param seed       随机数种子
      * @return SymmetryCipher
      */
-    public static SymmetryCipher getInstance(Algorithms algorithms, String seed) {
+    public static CipherUtil buildInstance(Algorithms algorithms, String seed) {
         int keySize = 0;
         if (algorithms == Algorithms.AES) {
             keySize = 128;
         } else if (algorithms == Algorithms.DES) {
             keySize = 56;
         }
-        return getInstance(algorithms, seed, keySize);
+        return buildInstance(algorithms, seed, keySize);
     }
 
     /**
@@ -57,7 +60,7 @@ public class SymmetryCipher extends AbstractCipher {
      * @param keySize    keySize
      * @return SymmetryCipher
      */
-    public static SymmetryCipher getInstance(Algorithms algorithms, String seed, int keySize) {
+    public static CipherUtil buildInstance(Algorithms algorithms, String seed, int keySize) {
         String id = (algorithms.name() + seed + keySize).intern();
         SecretKey key;
         if ((key = KEY_CACHE.get(id)) == null) {
@@ -68,7 +71,7 @@ public class SymmetryCipher extends AbstractCipher {
                 }
             }
         }
-        return getInstance(algorithms, key.getEncoded());
+        return buildInstance(algorithms, key.getEncoded());
     }
 
 
@@ -78,7 +81,7 @@ public class SymmetryCipher extends AbstractCipher {
      * @param algorithms 算法
      * @param keySpec    keySpec
      */
-    public static SymmetryCipher getInstance(Algorithms algorithms, byte[] keySpec) {
+    public static CipherUtil buildInstance(Algorithms algorithms, byte[] keySpec) {
         SecretKey key = KeyTools.buildKey(algorithms, keySpec);
         return new SymmetryCipher(algorithms, key);
     }

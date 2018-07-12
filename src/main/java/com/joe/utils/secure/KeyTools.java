@@ -3,6 +3,8 @@ package com.joe.utils.secure;
 import com.joe.utils.codec.IBase64;
 import com.joe.utils.common.IOUtils;
 import com.joe.utils.common.StringUtils;
+import com.joe.utils.secure.exception.SecureException;
+import com.joe.utils.secure.impl.AbstractCipher;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.KeyGenerator;

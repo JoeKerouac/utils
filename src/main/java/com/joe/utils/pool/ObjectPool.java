@@ -1,7 +1,7 @@
 package com.joe.utils.pool;
 
 import com.joe.utils.function.GetObjectFunction;
-import com.joe.utils.secure.RSA;
+import com.joe.utils.secure.impl.SignatureUtilImpl;
 
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -9,7 +9,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 /**
  * Object池，从Object池中获取到的数据使用完后应该调用close关闭归还池
  * <p>
- * 主要用于缓存一些有状态、同一时间只能一个客户端使用但是可以多次使用的对象，例如{@link RSA RSA}类
+ * 主要用于缓存一些有状态、同一时间只能一个客户端使用但是可以多次使用的对象，例如{@link SignatureUtilImpl SignatureUtilImpl}类
  *
  * @author joe
  * @version 2018.06.28 16:32

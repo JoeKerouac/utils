@@ -281,7 +281,7 @@ public class XmlParser {
                 }
                 if (!nodes.isEmpty()) {
                     //如果还不为空，那么为pojo赋值
-                    Class<?> type = descript.getType();
+                    Class<?> type = descript.getRealType();
 
                     //开始赋值
                     //判断字段是否是集合
@@ -555,11 +555,17 @@ public class XmlParser {
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
 
         Class<? extends Collection> collectionClass;
+        Class<? extends Collection> real = (Class<? extends Collection>) field.getRealType();
+
 
         if (attrXmlNode != null) {
             collectionClass = attrXmlNode.arrayType();
+            if (!collectionClass.equals(real) && !real.isAssignableFrom(collectionClass)) {
+                log.warn("用户指定的集合类型[{}]不是字段的实际集合类型[{}]的子类，使用字段的实际集合类型", collectionClass, real);
+                collectionClass = real;
+            }
         } else {
-            collectionClass = (Class<? extends Collection>) field.getType();
+            collectionClass = real;
         }
 
         if (!StringUtils.isEmpty(attrXmlNode.arrayRoot()) && !elements.isEmpty()) {
@@ -569,9 +575,9 @@ public class XmlParser {
         //将数据转换为用户指定数据
         List<?> list = elements.stream().map(d -> convert.read(d, attrName)).collect(Collectors.toList());
 
-        if (trySetValue(list, pojo, field, collectionClass) && !collectionClass.equals(field.getType())) {
+        if (!trySetValue(list, pojo, field, collectionClass)) {
             //使用注解标记的类型赋值失败并且注解的集合类型与实际字段类型不符时尝试使用字段实际类型赋值
-            if (trySetValue(list, pojo, field, (Class<? extends Collection>) field.getType())) {
+            if (!trySetValue(list, pojo, field, real)) {
                 log.warn("无法为字段[{}]赋值", field.getName());
             }
         }
@@ -595,14 +601,14 @@ public class XmlParser {
         Collection collection = tryBuildCollection(clazz);
         if (collection == null) {
             log.warn("无法为class[{}]构建实例", clazz);
-            return true;
+            return false;
         }
         collection.addAll(datas);
         try {
-            return !BeanUtils.setProperty(pojo, field.getName(), collection);
+            return BeanUtils.setProperty(pojo, field.getName(), collection);
         } catch (Exception e) {
             log.debug("字段[{}]赋值失败，使用的集合类为[{}]", field.getName(), clazz, e);
-            return true;
+            return false;
         }
     }
 
@@ -632,6 +638,7 @@ public class XmlParser {
                 return new HashSet();
             }
         } else {
+            log.warn("未知集合类型：[{}]", clazz);
             return null;
         }
     }

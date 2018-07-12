@@ -1,5 +1,7 @@
-package com.joe.utils.secure;
+package com.joe.utils.secure.impl;
 
+import com.joe.utils.secure.CipherUtil;
+import com.joe.utils.secure.CipherUtilTest;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,7 +10,7 @@ import org.junit.Test;
  * @version 2018.07.11 21:50
  */
 public class AsymmetricCipherTest {
-    private AsymmetricCipher cipher;
+    private CipherUtil cipher;
 
     @Before
     public void init() {
@@ -43,7 +45,7 @@ public class AsymmetricCipherTest {
                 "Al2r/xabdsEm8WbnumeYKO1HOXhZQfDGpdlYozRo+snQO+NYL5avJkYLzgoL1t8qKgL4ZyQ4eq2lLHBI4Gp2ec5qdBoe2qn3wIDA" +
                 "" + "QAB";
 
-        cipher = AsymmetricCipher.getInstance(privateKey, publicKey);
+        cipher = AsymmetricCipher.buildInstance(privateKey, publicKey);
     }
 
     @Test

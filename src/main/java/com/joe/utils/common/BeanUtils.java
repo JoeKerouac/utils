@@ -6,6 +6,7 @@ import com.joe.utils.common.exception.BeanException;
 import com.joe.utils.parse.xml.XmlNode;
 import com.joe.utils.type.ReflectUtil;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.formula.functions.T;
 
@@ -546,17 +547,21 @@ public class BeanUtils {
      *
      * @author joe
      */
-    @Data
     public final static class CustomPropertyDescriptor {
         // 字段名称
+        @Getter
         private final String name;
         // 字段的写方法
+        @Getter
         private final Method writeMethod;
         // 字段的读方法
+        @Getter
         private final Method readMethod;
         // 字段所属的class（字段所在类的Class，不是字段本身的Class！！）
+        @Getter
         private final Class<?> clazz;
         // 字段
+        @Getter
         private final Field field;
         //字段的类型
         private Class<?> type;

@@ -1,6 +1,7 @@
-package com.joe.utils.secure;
+package com.joe.utils.secure.impl;
 
 import com.joe.utils.common.Assert;
+import com.joe.utils.secure.MessageDigestUtil;
 import org.junit.Test;
 
 /**
@@ -16,7 +17,7 @@ public class MessageDigestUtilTest {
     @Test
     public void doDigest() {
         for (String algorithms : algorithmsList) {
-            util = new MessageDigestUtil(MessageDigestUtil.Algorithms.valueOf(algorithms));
+            util = MessageDigestUtilImpl.buildInstance(MessageDigestUtilImpl.Algorithms.valueOf(algorithms));
             Assert.notNull(util.digest("你好啊"));
         }
     }

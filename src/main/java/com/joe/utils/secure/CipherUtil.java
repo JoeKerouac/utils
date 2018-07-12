@@ -67,7 +67,7 @@ public interface CipherUtil {
     Algorithms getAlgorithms();
 
     /**
-     * 算法列表
+     * 加密算法
      */
     enum Algorithms {
         RSA, AES, DES

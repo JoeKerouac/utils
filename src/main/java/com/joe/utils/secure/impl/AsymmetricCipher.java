@@ -1,6 +1,9 @@
-package com.joe.utils.secure;
+package com.joe.utils.secure.impl;
 
 import com.joe.utils.common.IOUtils;
+import com.joe.utils.secure.CipherUtil;
+import com.joe.utils.secure.KeyTools;
+import com.joe.utils.secure.exception.SecureException;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.BadPaddingException;
@@ -16,7 +19,7 @@ import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPublicKey;
 
 /**
- * 非对称加密（RSA）
+ * 非对称加密（SignatureUtilImpl）
  *
  * @author joe
  * @version 2018.07.11 21:17
@@ -33,8 +36,8 @@ public class AsymmetricCipher extends AbstractCipher {
      * @param privateKey PKCS8格式的私钥
      * @param publicKey  X509格式的公钥
      */
-    public static AsymmetricCipher getInstance(String privateKey, String publicKey) {
-        return getInstance(privateKey.getBytes(), publicKey.getBytes());
+    public static CipherUtil buildInstance(String privateKey, String publicKey) {
+        return buildInstance(privateKey.getBytes(), publicKey.getBytes());
     }
 
     /**
@@ -43,7 +46,7 @@ public class AsymmetricCipher extends AbstractCipher {
      * @param privateKey PKCS8格式的私钥
      * @param publicKey  X509格式的公钥
      */
-    public static AsymmetricCipher getInstance(byte[] privateKey, byte[] publicKey) {
+    public static CipherUtil buildInstance(byte[] privateKey, byte[] publicKey) {
         PrivateKey priKey = KeyTools.getPrivateKeyFromPKCS8(Algorithms.RSA.name(), new ByteArrayInputStream
                 (privateKey));
         PublicKey pubKey = KeyTools.getPublicKeyFromX509(Algorithms.RSA.name(), new ByteArrayInputStream(publicKey));

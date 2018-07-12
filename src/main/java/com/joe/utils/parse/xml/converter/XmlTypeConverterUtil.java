@@ -84,9 +84,9 @@ public class XmlTypeConverterUtil {
         XmlTypeConvert convert;
         if (filed.isGeneralType() || filed.isBasic()) {
             convert = XmlTypeConverterUtil.converters.get(filed.getTypeName());
-        } else if (String.class.equals(filed.getType())) {
+        } else if (String.class.equals(filed.getRealType())) {
             convert = DEFAULT_CONVERTER;
-        } else if (Collection.class.isAssignableFrom(filed.getType())) {
+        } else if (Collection.class.isAssignableFrom(filed.getRealType())) {
             //到这里的只有两种可能，一、用户没有指定converter；二、用户没有加注解XmlNode
             XmlNode xmlnode = filed.getAnnotation(XmlNode.class);
             if (xmlnode == null) {
@@ -98,7 +98,7 @@ public class XmlTypeConverterUtil {
             }
         } else {
             //字段不是基本类型，假设是pojo，使用xml转换器
-            convert = (XmlConverter) filed::getType;
+            convert = (XmlConverter) filed::getRealType;
         }
         return convert;
     }

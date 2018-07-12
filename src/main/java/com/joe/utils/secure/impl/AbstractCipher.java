@@ -1,7 +1,9 @@
-package com.joe.utils.secure;
+package com.joe.utils.secure.impl;
 
 import com.joe.utils.codec.IBase64;
 import com.joe.utils.pool.ObjectPool;
+import com.joe.utils.secure.CipherUtil;
+import com.joe.utils.secure.exception.SecureException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,7 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 加密工具辅助类
@@ -23,7 +26,7 @@ import java.util.Map;
  */
 @Slf4j
 public abstract class AbstractCipher implements CipherUtil {
-    private static final Map<String, ObjectPool<CipherHolder>> CACHE = new HashMap<>();
+    private static final Map<String, ObjectPool<CipherHolder>> CACHE = new ConcurrentHashMap<>();
     protected static final IBase64 BASE_64 = new IBase64();
     private String id;
     private Algorithms algorithms;
@@ -36,16 +39,12 @@ public abstract class AbstractCipher implements CipherUtil {
         this.priKey = priKey;
         this.pubKey = pubKey;
 
-
-        if (CACHE.get(this.id) == null) {
-            synchronized (this.id) {
-                if (CACHE.get(this.id) == null) {
-                    CACHE.put(this.id, new ObjectPool<>(this::build));
-                }
-            }
-        }
-        //调用验证
-        CACHE.get(this.id).get().close();
+        CACHE.computeIfAbsent(this.id , key -> {
+            ObjectPool<CipherHolder> pool = new ObjectPool<>(this::build);
+            //快速验证
+            pool.get().close();
+            return pool;
+        });
     }
 
     /**
