@@ -1,2 +1,6 @@
 java中安全相关的文档
 https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html
+
+对称加密当使用大于128的空间时需要下载JCE Unlimited Strength Jurisdiction Policy Files，地址为：
+http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
+DES的keySize固定只能是56，AES可以是128、192、256

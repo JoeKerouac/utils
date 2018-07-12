@@ -4,12 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 对称加密工具
@@ -19,57 +16,71 @@ import java.security.SecureRandom;
  */
 @Slf4j
 public class SymmetryCipher extends AbstractCipher {
-    /**
-     * 默认采用AES算法，密钥空间大小为256
-     *
-     * @param password 密码，用来作为随机数的种子
-     */
-    public SymmetryCipher(String password) {
-        this(Algorithms.AES, password);
+    private static final Map<String, SecretKey> KEY_CACHE = new HashMap<>();
+
+    private SymmetryCipher(Algorithms algorithms, SecretKey key) {
+        super(new String(key.getEncoded()), algorithms, key, key);
     }
 
     /**
-     * AES默认密钥空间大小为256，DES默认密钥空间大小为56
+     * 生成AES加密器
+     *
+     * @param seed 随机数种子
+     * @return SymmetryCipher
+     */
+    public static SymmetryCipher getInstance(String seed) {
+        return getInstance(Algorithms.AES, seed, 128);
+    }
+
+    /**
+     * SymmetryCipher构造器，采用默认keySize
      *
      * @param algorithms 算法，当前仅支持AES和DES
-     * @param password   密码，用来作为随机数的种子
+     * @param seed       随机数种子
+     * @return SymmetryCipher
      */
-    public SymmetryCipher(Algorithms algorithms, String password) {
-        this(algorithms, password, -1);
+    public static SymmetryCipher getInstance(Algorithms algorithms, String seed) {
+        int keySize = 0;
+        if (algorithms == Algorithms.AES) {
+            keySize = 128;
+        } else if (algorithms == Algorithms.DES) {
+            keySize = 56;
+        }
+        return getInstance(algorithms, seed, keySize);
     }
 
     /**
-     * 构造器
+     * SymmetryCipher构造器
      *
-     * @param algorithms 算法，支持DES和AES
-     * @param password   密码，用来作为随机数的种子
-     * @param keySize    密码大小（AES支持128、192、256，当使用大于128的空间时需要下载JCE Unlimited Strength Jurisdiction
-     *                   Policy Files，地址为：
-     *                   http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html ，DES只支持56）
+     * @param algorithms 算法，当前仅支持AES和DES
+     * @param seed       随机数种子
+     * @param keySize    keySize
+     * @return SymmetryCipher
      */
-    public SymmetryCipher(Algorithms algorithms, String password, int keySize) {
-        super(algorithms, password, keySize);
-    }
-
-    @Override
-    protected Key buildPrivateKey(Algorithms algorithm, String privateKey, int keySize) {
-        log.debug("开始构建对称加密[{}]的Key，Keysize为：[{}]", algorithm, keySize);
-        String name = algorithm.toString();
-        try {
-            KeyGenerator kgen = KeyGenerator.getInstance(name);
-            kgen.init(keySize, new SecureRandom(privateKey.getBytes()));
-            SecretKey secretKey = kgen.generateKey();
-            byte[] enCodeFormat = secretKey.getEncoded();
-            SecretKeySpec key = new SecretKeySpec(enCodeFormat, name);
-            return key;
-        } catch (NoSuchAlgorithmException e) {
-            throw new SecureException("构建[" + algorithm + "]的key失败，keySize是：" + keySize, e);
+    public static SymmetryCipher getInstance(Algorithms algorithms, String seed, int keySize) {
+        String id = (algorithms.name() + seed + keySize).intern();
+        SecretKey key;
+        if ((key = KEY_CACHE.get(id)) == null) {
+            synchronized (id) {
+                if ((key = KEY_CACHE.get(id)) == null) {
+                    key = KeyTools.buildKey(algorithms, seed, keySize);
+                    KEY_CACHE.put(id, key);
+                }
+            }
         }
+        return getInstance(algorithms, key.getEncoded());
     }
 
-    @Override
-    protected Key buildPublicKey(Algorithms algorithm, String publicKey, int keySize) {
-        return buildPrivateKey(algorithm, publicKey, keySize);
+
+    /**
+     * SymmetryCipher构造器
+     *
+     * @param algorithms 算法
+     * @param keySpec    keySpec
+     */
+    public static SymmetryCipher getInstance(Algorithms algorithms, byte[] keySpec) {
+        SecretKey key = KeyTools.buildKey(algorithms, keySpec);
+        return new SymmetryCipher(algorithms, key);
     }
 
     @Override

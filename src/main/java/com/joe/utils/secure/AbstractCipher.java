@@ -26,68 +26,37 @@ public abstract class AbstractCipher implements CipherUtil {
     private static final Map<String, ObjectPool<CipherHolder>> CACHE = new HashMap<>();
     protected static final IBase64 BASE_64 = new IBase64();
     private String id;
+    private Algorithms algorithms;
+    private Key priKey;
+    private Key pubKey;
 
-    /**
-     * 非对称加密构造器
-     *
-     * @param algorithms 算法名称
-     * @param privateKey PKCS8格式的私钥
-     * @param publicKey  X509格式的公钥
-     */
-    protected AbstractCipher(Algorithms algorithms, String privateKey, String publicKey) {
-        this(algorithms, privateKey, publicKey, 0);
-    }
+    AbstractCipher(String id, Algorithms algorithms, Key priKey, Key pubKey) {
+        this.id = id.intern();
+        this.algorithms = algorithms;
+        this.priKey = priKey;
+        this.pubKey = pubKey;
 
-    /**
-     * 对称加密
-     *
-     * @param algorithms 算法名称
-     * @param password   密码，用来作为随机数种子
-     * @param keySize    keySize
-     */
-    protected AbstractCipher(Algorithms algorithms, String password, int keySize) {
-        this(algorithms, password, password, keySize);
-    }
 
-    private AbstractCipher(Algorithms algorithms, String privateKey, String publicKey, int keySize) {
-        if (privateKey.equals(publicKey) && algorithms != Algorithms.DES && algorithms != Algorithms.AES) {
-            throw new SecureException("只有DES和AES支持对称加密");
-        }
-
-        if (keySize < 0) {
-            if (algorithms == Algorithms.AES) {
-                keySize = 256;
-            } else if (algorithms == Algorithms.DES) {
-                keySize = 56;
-            }
-        }
-        int size = keySize;
-
-        this.id = (privateKey + ":" + publicKey + ":" + size).intern();
-        if (CACHE.get(id) == null) {
-            synchronized (id) {
-                if (CACHE.get(id) == null) {
-                    CACHE.put(id, new ObjectPool<>(() -> build(algorithms, privateKey, publicKey, size)));
+        if (CACHE.get(this.id) == null) {
+            synchronized (this.id) {
+                if (CACHE.get(this.id) == null) {
+                    CACHE.put(this.id, new ObjectPool<>(this::build));
                 }
             }
         }
         //调用验证
-        CACHE.get(id).get().close();
+        CACHE.get(this.id).get().close();
     }
 
     /**
      * 根据指定信息构建CipherHolder
      *
-     * @param algorithms 算法名
-     * @param privateKey 私钥
-     * @param publicKey  公钥
-     * @param keySize    key大小
      * @return CipherHolder
      */
-    private CipherHolder build(Algorithms algorithms, String privateKey, String publicKey, int keySize) {
-        log.debug("使用公钥[{}]、私钥[{}]构建算法[{}]对应的加密器，keySize为：[{}]", publicKey, privateKey, algorithms, keySize);
-        Key priKey = buildPrivateKey(algorithms, privateKey, keySize);
-        Key pubKey = buildPublicKey(algorithms, publicKey, keySize);
+    private CipherHolder build() {
+        Algorithms algorithms = getAlgorithms();
+        Key priKey = getPrivateKey();
+        Key pubKey = getPublicKey();
         log.debug("构建key成功，开始构建Cipher");
         try {
             Cipher encrypt = Cipher.getInstance(algorithms.toString());
@@ -110,26 +79,6 @@ public abstract class AbstractCipher implements CipherUtil {
      * @return 加密后的数据（有可能会对结果编码）
      */
     protected abstract byte[] encrypt(CipherHolder holder, byte[] data);
-
-    /**
-     * 构建私钥
-     *
-     * @param algorithm  算法
-     * @param privateKey 私钥
-     * @param keySize    keySize
-     * @return 私钥对象
-     */
-    protected abstract Key buildPrivateKey(Algorithms algorithm, String privateKey, int keySize);
-
-    /**
-     * 构建公钥
-     *
-     * @param algorithm 算法
-     * @param publicKey 公钥
-     * @param keySize   keySize
-     * @return 公钥对象
-     */
-    protected abstract Key buildPublicKey(Algorithms algorithm, String publicKey, int keySize);
 
     /**
      * 解密指定数组
@@ -164,11 +113,24 @@ public abstract class AbstractCipher implements CipherUtil {
         }
     }
 
-    /**
-     * 算法列表
-     */
-    enum Algorithms {
-        RSA, AES, DES
+    @Override
+    public Key getPrivateKey() {
+        return priKey;
+    }
+
+    @Override
+    public Key getPublicKey() {
+        return pubKey;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public Algorithms getAlgorithms() {
+        return algorithms;
     }
 
     /**

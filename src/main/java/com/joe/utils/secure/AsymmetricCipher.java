@@ -10,6 +10,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -21,6 +23,9 @@ import java.security.interfaces.RSAPublicKey;
  */
 @Slf4j
 public class AsymmetricCipher extends AbstractCipher {
+    private AsymmetricCipher(String id, Algorithms algorithms, PrivateKey privateKey, PublicKey publicKey) {
+        super(id, algorithms, privateKey, publicKey);
+    }
 
     /**
      * 非对称加密构造器
@@ -28,29 +33,32 @@ public class AsymmetricCipher extends AbstractCipher {
      * @param privateKey PKCS8格式的私钥
      * @param publicKey  X509格式的公钥
      */
-    public AsymmetricCipher(String privateKey, String publicKey) {
-        super(Algorithms.RSA, privateKey, publicKey);
+    public static AsymmetricCipher getInstance(String privateKey, String publicKey) {
+        return getInstance(privateKey.getBytes(), publicKey.getBytes());
+    }
+
+    /**
+     * 非对称加密构造器
+     *
+     * @param privateKey PKCS8格式的私钥
+     * @param publicKey  X509格式的公钥
+     */
+    public static AsymmetricCipher getInstance(byte[] privateKey, byte[] publicKey) {
+        PrivateKey priKey = KeyTools.getPrivateKeyFromPKCS8(Algorithms.RSA.name(), new ByteArrayInputStream
+                (privateKey));
+        PublicKey pubKey = KeyTools.getPublicKeyFromX509(Algorithms.RSA.name(), new ByteArrayInputStream(publicKey));
+        return new AsymmetricCipher(new String(privateKey) + ":" + new String(publicKey), Algorithms.RSA, priKey,
+                pubKey);
     }
 
     @Override
     protected byte[] encrypt(CipherHolder holder, byte[] data) {
-        return BASE_64.encrypt(doCipher(holder.getEncrypt() , holder.getPublicKey() , data));
+        return BASE_64.encrypt(doCipher(holder.getEncrypt(), holder.getPublicKey(), data));
     }
 
     @Override
     protected byte[] decrypt(CipherHolder holder, byte[] data) {
-        return doCipher(holder.getDecrypt() , holder.getPrivateKey() , BASE_64.decrypt(data));
-    }
-
-
-    @Override
-    protected Key buildPrivateKey(Algorithms algorithm, String privateKey, int keySize) {
-        return KeyTools.getPrivateKeyFromPKCS8(algorithm.toString(), new ByteArrayInputStream(privateKey.getBytes()));
-    }
-
-    @Override
-    protected Key buildPublicKey(Algorithms algorithm, String publicKey, int keySize) {
-        return KeyTools.getPublicKeyFromX509(algorithm.toString(), new ByteArrayInputStream(publicKey.getBytes()));
+        return doCipher(holder.getDecrypt(), holder.getPrivateKey(), BASE_64.decrypt(data));
     }
 
     /**

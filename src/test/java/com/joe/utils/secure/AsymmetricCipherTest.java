@@ -43,7 +43,7 @@ public class AsymmetricCipherTest {
                 "Al2r/xabdsEm8WbnumeYKO1HOXhZQfDGpdlYozRo+snQO+NYL5avJkYLzgoL1t8qKgL4ZyQ4eq2lLHBI4Gp2ec5qdBoe2qn3wIDA" +
                 "" + "QAB";
 
-        cipher = new AsymmetricCipher(privateKey, publicKey);
+        cipher = AsymmetricCipher.getInstance(privateKey, publicKey);
     }
 
     @Test

@@ -44,11 +44,6 @@ public class RSATest {
     }
 
     @Test
-    public void doCipher() {
-        Assert.assertTrue(data.equals(sha1Rsa.decrypt(sha1Rsa.encrypt(data))));
-    }
-
-    @Test
     public void doSign() {
         Assert.assertTrue(sha1Rsa.checkSign(data, sha1Rsa.sign(data)));
         Assert.assertTrue(sha2Rsa.checkSign(data, sha2Rsa.sign(data)));

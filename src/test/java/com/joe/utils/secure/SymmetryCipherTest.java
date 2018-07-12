@@ -13,8 +13,8 @@ public class SymmetryCipherTest {
 
     @Before
     public void init() {
-        desCipher = new SymmetryCipher(AbstractCipher.Algorithms.DES, "123123123123123123");
-        aesCipher = new SymmetryCipher(AbstractCipher.Algorithms.AES, "123123123123123123" , 128);
+        desCipher = SymmetryCipher.getInstance(AbstractCipher.Algorithms.DES, "123123123123123123", 56);
+        aesCipher = SymmetryCipher.getInstance(AbstractCipher.Algorithms.AES, "123123123123123123", 128);
     }
 
     @Test

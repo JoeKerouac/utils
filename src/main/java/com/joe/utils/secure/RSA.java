@@ -32,7 +32,7 @@ import java.util.Map;
  * @version 2018.06.28 15:52
  */
 @Slf4j
-public class RSA implements CipherUtil {
+public class RSA {
     private static final IBase64 BASE_64 = new IBase64();
     private static final Map<String, ObjectPool<RSAComponentHolder<?>>> CACHE = new HashMap<>();
     /**
@@ -73,68 +73,6 @@ public class RSA implements CipherUtil {
                     publicPool = new ObjectPool<>(() -> buildPublicSignature(publicKey, rsaSignType));
                     CACHE.put(publicId, publicPool);
                 }
-            }
-        }
-    }
-
-    @Override
-    public String encrypt(String content) {
-        return new String(encrypt(content.getBytes()));
-    }
-
-    @Override
-    public byte[] encrypt(byte[] content) {
-        return BASE_64.encrypt(doCipher(publicId, content));
-    }
-
-    @Override
-    public String decrypt(String content) {
-        return new String(decrypt(content.getBytes()));
-    }
-
-    @Override
-    public byte[] decrypt(byte[] content) {
-        return doCipher(privateId, BASE_64.decrypt(content));
-    }
-
-    /**
-     * 加/解密数据
-     *
-     * @param id    key id（可以是privateKey或者publicKey）
-     * @param datas 要加/解密的数据（BASE64 encode过的数据）
-     * @return 加/解密结果
-     */
-    private byte[] doCipher(String id, byte[] datas) {
-        try (ObjectPool.PoolObjectHolder<RSAComponentHolder<?>> poolObjectHolder = CACHE.get(id).get()) {
-            RSAComponentHolder<?> holder = poolObjectHolder.get();
-            Cipher cipher = holder.getCipher();
-            RSAKey key = (RSAKey)holder.getKey();
-
-            //计算block大小
-            int maxBlock = key.getModulus().bitLength() / 8;
-            //加密时需要减11
-            if (key instanceof RSAPublicKey) {
-                maxBlock = maxBlock - 11;
-            }
-
-            log.debug("当前block大小为：[{}]", maxBlock);
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            try {
-                for (int i = 0, offset = 0; datas.length > offset; i++, offset = maxBlock * i) {
-                    if (datas.length - offset > maxBlock) {
-                        out.write(cipher.doFinal(datas, offset, maxBlock));
-                    } else {
-                        out.write(cipher.doFinal(datas, offset, datas.length - offset));
-                    }
-                }
-
-                byte[] result = out.toByteArray();
-                IOUtils.closeQuietly(out);
-                return result;
-            } catch (IOException | IllegalBlockSizeException | BadPaddingException e) {
-                log.warn("RSA加/解密失败", e);
-                throw new SecureException(e);
             }
         }
     }
@@ -203,7 +141,7 @@ public class RSA implements CipherUtil {
     public static RSAComponentHolder<RSAPrivateKey> buildPrivateSignature(String privateKey, RSASignType rsaSignType) {
         log.debug("构建私钥加密器");
         try {
-            RSAPrivateKey priKey = (RSAPrivateKey) getPrivateKeyFromPKCS8("RSA", new ByteArrayInputStream(privateKey
+            RSAPrivateKey priKey = (RSAPrivateKey) KeyTools.getPrivateKeyFromPKCS8("RSA", new ByteArrayInputStream(privateKey
                     .getBytes()));
             Signature signature = Signature.getInstance(rsaSignType.toString());
             signature.initSign(priKey);
@@ -227,7 +165,7 @@ public class RSA implements CipherUtil {
     public static RSAComponentHolder<RSAPublicKey> buildPublicSignature(String publicKey, RSASignType rsaSignType) {
         log.debug("构建公钥验证器");
         try {
-            RSAPublicKey pubKey = (RSAPublicKey) getPublicKeyFromX509("RSA", new ByteArrayInputStream(publicKey
+            RSAPublicKey pubKey = (RSAPublicKey) KeyTools.getPublicKeyFromX509("RSA", new ByteArrayInputStream(publicKey
                     .getBytes()));
             Signature signature = Signature.getInstance(rsaSignType.toString());
             signature.initVerify(pubKey);
@@ -240,42 +178,6 @@ public class RSA implements CipherUtil {
             //不会发生这种情况
             throw new SecureException("创建RSA加密器失败", e);
         }
-    }
-
-    /**
-     * 从PKCS8格式的文件中获取私钥
-     *
-     * @param algorithm 加密算法名称
-     * @param ins       PKCS8文件的输入流
-     * @return 私钥
-     * @throws Exception Exception
-     */
-    public static PrivateKey getPrivateKeyFromPKCS8(String algorithm, InputStream ins) throws Exception {
-        if (ins == null || StringUtils.isEmpty(algorithm)) {
-            return null;
-        }
-        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-        byte[] encodedKey = IOUtils.read(ins);
-        encodedKey = BASE_64.decrypt(encodedKey);
-        return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
-    }
-
-    /**
-     * 从X509格式的文件中获取public key
-     *
-     * @param algorithm 加密算法名称
-     * @param ins       X509格式的public key文件的输入流
-     * @return 公钥
-     * @throws Exception Exception
-     */
-    public static PublicKey getPublicKeyFromX509(String algorithm, InputStream ins) throws Exception {
-        if (ins == null || StringUtils.isEmpty(algorithm)) {
-            return null;
-        }
-        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
-        byte[] encodedKey = IOUtils.read(ins);
-        encodedKey = BASE_64.decrypt(encodedKey);
-        return keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
     }
 
     @Override
