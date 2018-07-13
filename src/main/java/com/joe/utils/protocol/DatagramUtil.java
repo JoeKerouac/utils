@@ -2,12 +2,14 @@ package com.joe.utils.protocol;
 
 import com.joe.utils.collection.ByteArray;
 import com.joe.utils.common.Tools;
+import com.joe.utils.pool.ObjectPool;
 import com.joe.utils.protocol.exception.DataOutOfMemory;
 import com.joe.utils.protocol.exception.IllegalDataException;
 import com.joe.utils.protocol.exception.IllegalRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
 /**
@@ -17,6 +19,10 @@ import java.nio.charset.Charset;
  */
 public class DatagramUtil {
     private static final Logger logger = LoggerFactory.getLogger(DatagramUtil.class);
+    /**
+     * 对象缓存池
+     */
+    private static final ObjectPool<ByteArray> POOL = new ObjectPool<>(() -> new ByteArray(512));
     /**
      * 数据报数据除去请求头的最大长度
      */
@@ -47,47 +53,50 @@ public class DatagramUtil {
             logger.error("数据报数据长度超过最大值：{}", MAX_LENGTH);
             throw new DataOutOfMemory(String.format("数据长度超过最大值%d", MAX_LENGTH));
         }
-        // 缓存
-        ByteArray buffer = new ByteArray(Datagram.HEADER_LEN + dataLen);
-        // 一个字节的版本号
-        buffer.append(version);
-        // 四个字节的body长度
-        buffer.append(convert(dataLen));
-        // 一个字节的数据类型
-        buffer.append(type);
-        // 十个字节的字符集，字符集为当前系统默认字符集不可更改，不足十个字节的用0填充
-        String charset = Charset.defaultCharset().name();
-        ByteArray charsetBuffer = new ByteArray(10);
-        charsetBuffer.append(charset.getBytes());
-        if (charsetBuffer.size() > 10) {
-            throw new DataOutOfMemory("数据报字符集长度最大为10byte，当前系统默认字符集超过该长度");
+
+        try (ObjectPool.PoolObjectHolder<ByteArray> holder = POOL.get()) {
+            // 缓存
+            ByteArray buffer = holder.get();
+            // 一个字节的版本号
+            buffer.append(version);
+            // 四个字节的body长度
+            buffer.append(convert(dataLen));
+            // 一个字节的数据类型
+            buffer.append(type);
+            // 十个字节的字符集，字符集为当前系统默认字符集不可更改，不足十个字节的用0填充
+            String charset = Charset.defaultCharset().name();
+            ByteArray charsetBuffer = new ByteArray(10);
+            charsetBuffer.append(charset.getBytes());
+            if (charsetBuffer.size() > 10) {
+                throw new DataOutOfMemory("数据报字符集长度最大为10byte，当前系统默认字符集超过该长度");
+            }
+
+            // 字符集不足10位的补0
+            while (charsetBuffer.size() < 10) {
+                charsetBuffer.append((byte) 0);
+            }
+            buffer.append(charsetBuffer.getData());
+
+
+            //添加ID字段
+            String id = Tools.createUUID();
+            ByteArray idByte = new ByteArray(40);
+            idByte.append(id.getBytes());
+            for (int i = 0; i < 40 - id.getBytes().length; i++) {
+                idByte.append((byte) 0);
+            }
+            byte[] ids = idByte.getData();
+            buffer.append(ids);
+
+            if (dataLen != 0) {
+                // 填充数据
+                buffer.append(body);
+            }
+
+            Datagram datagram = new Datagram(buffer.getData(), dataLen, body, version, charset, type, ids);
+            logger.debug("转换后的数据报是：{}", datagram);
+            return datagram;
         }
-
-        // 字符集不足10位的补0
-        while (charsetBuffer.size() < 10) {
-            charsetBuffer.append((byte) 0);
-        }
-        buffer.append(charsetBuffer.getData());
-
-
-        //添加ID字段
-        String id = Tools.createUUID();
-        ByteArray idByte = new ByteArray(40);
-        idByte.append(id.getBytes());
-        for (int i = 0; i < 40 - id.getBytes().length; i++) {
-            idByte.append((byte) 0);
-        }
-        byte[] ids = idByte.getData();
-        buffer.append(ids);
-
-        if (dataLen != 0) {
-            // 填充数据
-            buffer.append(body);
-        }
-
-        Datagram datagram = new Datagram(buffer.getData(), dataLen, body, version, charset, type, ids);
-        logger.debug("转换后的数据报是：{}", datagram);
-        return datagram;
     }
 
     /**
