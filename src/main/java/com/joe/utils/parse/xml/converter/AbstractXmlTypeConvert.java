@@ -1,19 +1,19 @@
 package com.joe.utils.parse.xml.converter;
 
-import com.joe.utils.parse.xml.XmlTypeConvert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.joe.utils.parse.xml.XmlTypeConvert;
 
 /**
  * @author joe
  * @version 2018.02.01 10:02
  */
 public abstract class AbstractXmlTypeConvert<T> implements XmlTypeConvert<T> {
-    private Class<T> type;
+    private Class<T>              type;
     protected static final Logger logger = LoggerFactory.getLogger(AbstractXmlTypeConvert.class);
 
     @SuppressWarnings("unchecked")

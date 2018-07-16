@@ -1,11 +1,10 @@
 package com.joe.utils.collection;
 
-
-import com.joe.utils.math.MathUtil;
-
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.BiFunction;
+
+import com.joe.utils.math.MathUtil;
 
 /**
  * 集合工具类
@@ -76,7 +75,8 @@ public final class CollectionUtil {
 
         //检查大小
         if (newSize < 0) {
-            throw new OutOfMemoryError("buffer原大小为：" + buffer.capacity() + "；要扩容的大小为：" + size + "；大于int最大值，请调整size");
+            throw new OutOfMemoryError(
+                "buffer原大小为：" + buffer.capacity() + "；要扩容的大小为：" + size + "；大于int最大值，请调整size");
         }
 
         //申请新ByteBuffer，类型和原来的一致，原来是direct就还申请direct类型的，原来是heap就还申请heap类型的
@@ -156,7 +156,8 @@ public final class CollectionUtil {
      * @param <T>      数据类型
      * @return 连接结果
      */
-    public static <T> List<List<T>> innerJoin(List<T> l1, List<T> l2, BiFunction<T, T, T> function) {
+    public static <T> List<List<T>> innerJoin(List<T> l1, List<T> l2,
+                                              BiFunction<T, T, T> function) {
         if (l1 == null || l2 == null) {
             throw new NullPointerException("inner join arrays must not be null");
         }

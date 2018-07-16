@@ -74,15 +74,10 @@ public class FormDataBuilder {
     public String data(boolean useUrlencode, String charset) {
         StringBuilder sb = new StringBuilder();
         if (useUrlencode) {
-            datas.forEach((k, v) -> sb.append("&")
-                    .append(k)
-                    .append("=")
-                    .append(urlencode(String.valueOf(v), charset)));
+            datas.forEach((k, v) -> sb.append("&").append(k).append("=")
+                .append(urlencode(String.valueOf(v), charset)));
         } else {
-            datas.forEach((k, v) -> sb.append("&")
-                    .append(k)
-                    .append("=")
-                    .append(String.valueOf(v)));
+            datas.forEach((k, v) -> sb.append("&").append(k).append("=").append(String.valueOf(v)));
         }
         return sb.toString().substring(1);
     }

@@ -1,12 +1,13 @@
 package com.joe.utils.log;
 
-import ch.qos.logback.classic.Logger;
-import lombok.extern.slf4j.Slf4j;
+import java.io.InputStream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.InputStream;
+import ch.qos.logback.classic.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author joe

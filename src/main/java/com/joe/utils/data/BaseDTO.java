@@ -1,10 +1,10 @@
 package com.joe.utils.data;
 
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.Data;
 
 /**
  * DTO原型
@@ -14,8 +14,8 @@ import java.util.Map;
  */
 @Data
 public class BaseDTO<T> implements Serializable {
-    private static final long serialVersionUID = 5075924626508128661L;
-    private static final Map<String, String> MSG = new HashMap<>();
+    private static final long                serialVersionUID = 5075924626508128661L;
+    private static final Map<String, String> MSG              = new HashMap<>();
 
     static {
         // 成功
@@ -35,7 +35,7 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 数据
      */
-    private T data;
+    private T      data;
 
     /**
      * 默认成功构造器

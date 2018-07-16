@@ -1,11 +1,12 @@
 package com.joe.utils.img;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+
+import javax.imageio.ImageIO;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 图片工具类
@@ -38,7 +39,8 @@ public class ImgUtil {
      * @param filter  alpha filter
      * @throws IOException IOException
      */
-    public static void changeAlpha(String oldPath, String newPath, byte alpha, AlphaFilter filter) throws IOException {
+    public static void changeAlpha(String oldPath, String newPath, byte alpha,
+                                   AlphaFilter filter) throws IOException {
         changeAlpha(new FileInputStream(oldPath), new FileOutputStream(newPath), alpha, filter);
     }
 
@@ -50,7 +52,8 @@ public class ImgUtil {
      * @param alpha      要设置的alpha值
      * @throws IOException IOException
      */
-    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha) throws IOException {
+    public static void changeAlpha(InputStream srcInput, OutputStream destOutput,
+                                   byte alpha) throws IOException {
         changeAlpha(srcInput, destOutput, alpha, null);
     }
 
@@ -63,15 +66,16 @@ public class ImgUtil {
      * @param filter     alpha filter
      * @throws IOException IOException
      */
-    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha, AlphaFilter filter)
-            throws IOException {
+    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha,
+                                   AlphaFilter filter) throws IOException {
         //加载图片
         log.debug("开始加载图片");
         BufferedImage old = ImageIO.read(srcInput);
         log.debug("图片加载完毕，开始改变图片的alpha值");
 
         //使用32位深带alpha通道模式
-        BufferedImage bufferedImage = new BufferedImage(old.getWidth(), old.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+        BufferedImage bufferedImage = new BufferedImage(old.getWidth(), old.getHeight(),
+            BufferedImage.TYPE_4BYTE_ABGR);
 
         if (filter == null) {
             filter = (x, y, rgb) -> true;
@@ -93,37 +97,37 @@ public class ImgUtil {
         ImageIO.write(bufferedImage, "png", destOutput);
     }
 
-//    public static BufferedImage spin(BufferedImage image, double angle) {
-//        int width = image.getWidth();
-//        int height = image.getHeight();
-//        BufferedImage bufferedImage = new BufferedImage(height, width, image.getType());
-//
-//        int x = width >> 1;
-//        int y = height >> 1;
-//
-//        for (int i = 0; i < width; i++) {
-//            for (int j = 0; j < height; j++) {
-//                int rgb = image.getRGB(i, j);
-//                Point point = MathUtil.spin(new Point(i - x, j - y), angle);
-//                int newX = (int)Math.round(point.getX()) + x;
-//                int newY = (int) Math.round(point.getY()) + y;
-//                try {
-//
-//                    bufferedImage.setRGB(newX, newY, rgb);
-//                } catch (Exception e) {
-//
-//                }
-//            }
-//        }
-//
-//        return bufferedImage;
-//    }
+    //    public static BufferedImage spin(BufferedImage image, double angle) {
+    //        int width = image.getWidth();
+    //        int height = image.getHeight();
+    //        BufferedImage bufferedImage = new BufferedImage(height, width, image.getType());
+    //
+    //        int x = width >> 1;
+    //        int y = height >> 1;
+    //
+    //        for (int i = 0; i < width; i++) {
+    //            for (int j = 0; j < height; j++) {
+    //                int rgb = image.getRGB(i, j);
+    //                Point point = MathUtil.spin(new Point(i - x, j - y), angle);
+    //                int newX = (int)Math.round(point.getX()) + x;
+    //                int newY = (int) Math.round(point.getY()) + y;
+    //                try {
+    //
+    //                    bufferedImage.setRGB(newX, newY, rgb);
+    //                } catch (Exception e) {
+    //
+    //                }
+    //            }
+    //        }
+    //
+    //        return bufferedImage;
+    //    }
 
-//    public static void main(String[] args) throws IOException{
-//        BufferedImage old = ImageIO.read(new FileInputStream("D:\\2.jpg"));
-//        BufferedImage image = spin(old, MathUtil.ANGLE_90);
-//        ImageIO.write(image, "jpg", new FileOutputStream("D:\\3.jpg"));
-//    }
+    //    public static void main(String[] args) throws IOException{
+    //        BufferedImage old = ImageIO.read(new FileInputStream("D:\\2.jpg"));
+    //        BufferedImage image = spin(old, MathUtil.ANGLE_90);
+    //        ImageIO.write(image, "jpg", new FileOutputStream("D:\\3.jpg"));
+    //    }
 
     /**
      * 获取图片的说明
@@ -195,7 +199,8 @@ public class ImgUtil {
      * @return 复制后的image，与原图一模一样
      */
     public static BufferedImage copy(BufferedImage image) {
-        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(),
+            image.getType());
         return copy(image, newImage);
     }
 
@@ -234,19 +239,19 @@ public class ImgUtil {
         /**
          * 图片宽
          */
-        private int width;
+        private int     width;
         /**
          * 图片高
          */
-        private int height;
+        private int     height;
         /**
          * 图片文件名
          */
-        private String name;
+        private String  name;
         /**
          * 图片位深
          */
-        private int pixelSize;
+        private int     pixelSize;
         /**
          * 是否有alpha通道
          */

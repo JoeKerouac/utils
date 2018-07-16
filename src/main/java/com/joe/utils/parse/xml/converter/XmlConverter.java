@@ -1,12 +1,13 @@
 package com.joe.utils.parse.xml.converter;
 
+import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.parse.xml.XmlParser;
 import com.joe.utils.parse.xml.XmlTypeConvert;
 import com.joe.utils.type.ReflectUtil;
-import org.dom4j.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * xml解析器，只需要实现该类并且实现{@link #resolve()}方法即可解析pojo类型的字段
@@ -15,13 +16,14 @@ import org.slf4j.LoggerFactory;
  * @version 2018.02.01 10:12
  */
 public interface XmlConverter<T> extends XmlTypeConvert<T> {
-    Logger logger = LoggerFactory.getLogger(XmlConverter.class);
+    Logger    logger = LoggerFactory.getLogger(XmlConverter.class);
     XmlParser PARSER = XmlParser.buildInstance();
 
     @SuppressWarnings("unchecked")
     @Override
     default T read(Element element, String attrName) {
-        String data = StringUtils.isEmpty(attrName) ? element.asXML() : element.attributeValue(attrName);
+        String data = StringUtils.isEmpty(attrName) ? element.asXML()
+            : element.attributeValue(attrName);
         Class<T> clazz = resolve();
         if (String.class.equals(clazz)) {
             logger.info("xml转换器确定的字段类型为String，转到String转换器");

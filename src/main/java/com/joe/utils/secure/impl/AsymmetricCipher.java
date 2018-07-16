@@ -1,14 +1,5 @@
 package com.joe.utils.secure.impl;
 
-import com.joe.utils.common.IOUtils;
-import com.joe.utils.secure.CipherUtil;
-import com.joe.utils.secure.KeyTools;
-import com.joe.utils.secure.exception.SecureException;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -18,6 +9,17 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPublicKey;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+
+import com.joe.utils.common.IOUtils;
+import com.joe.utils.secure.CipherUtil;
+import com.joe.utils.secure.KeyTools;
+import com.joe.utils.secure.exception.SecureException;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 非对称加密（SignatureUtilImpl）
  *
@@ -26,7 +28,8 @@ import java.security.interfaces.RSAPublicKey;
  */
 @Slf4j
 public class AsymmetricCipher extends AbstractCipher {
-    private AsymmetricCipher(String id, Algorithms algorithms, PrivateKey privateKey, PublicKey publicKey) {
+    private AsymmetricCipher(String id, Algorithms algorithms, PrivateKey privateKey,
+                             PublicKey publicKey) {
         super(id, algorithms, privateKey, publicKey);
     }
 
@@ -47,9 +50,10 @@ public class AsymmetricCipher extends AbstractCipher {
      * @param publicKey  X509格式的公钥（BASE64 encode过的）
      */
     public static CipherUtil buildInstance(byte[] privateKey, byte[] publicKey) {
-        PrivateKey priKey = KeyTools.getPrivateKeyFromPKCS8(Algorithms.RSA.name(), new ByteArrayInputStream
-                (privateKey));
-        PublicKey pubKey = KeyTools.getPublicKeyFromX509(Algorithms.RSA.name(), new ByteArrayInputStream(publicKey));
+        PrivateKey priKey = KeyTools.getPrivateKeyFromPKCS8(Algorithms.RSA.name(),
+            new ByteArrayInputStream(privateKey));
+        PublicKey pubKey = KeyTools.getPublicKeyFromX509(Algorithms.RSA.name(),
+            new ByteArrayInputStream(publicKey));
         return buildInstance(priKey, pubKey);
     }
 
@@ -60,8 +64,9 @@ public class AsymmetricCipher extends AbstractCipher {
      * @param publicKey  X509格式的公钥
      */
     public static CipherUtil buildInstance(PrivateKey privateKey, PublicKey publicKey) {
-        return new AsymmetricCipher(new String(BASE_64.encrypt(privateKey.getEncoded())) + ":" + new String
-                (BASE_64.encrypt(publicKey.getEncoded())), Algorithms.RSA, privateKey, publicKey);
+        return new AsymmetricCipher(new String(BASE_64.encrypt(privateKey.getEncoded())) + ":"
+                                    + new String(BASE_64.encrypt(publicKey.getEncoded())),
+            Algorithms.RSA, privateKey, publicKey);
     }
 
     @Override

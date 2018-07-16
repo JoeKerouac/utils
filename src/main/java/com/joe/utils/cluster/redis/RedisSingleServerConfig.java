@@ -15,33 +15,33 @@ public class RedisSingleServerConfig extends RedisBaseConfig {
      * Redis server address，format：host:port
      *
      */
-    private String address;
+    private String  address;
 
     /**
      * Minimum idle subscription connection amount
      */
-    private int subscriptionConnectionMinimumIdleSize = 1;
+    private int     subscriptionConnectionMinimumIdleSize = 1;
 
     /**
      * Redis subscription connection maximum pool size
      *
      */
-    private int subscriptionConnectionPoolSize = 50;
+    private int     subscriptionConnectionPoolSize        = 50;
 
     /**
      * Minimum idle Redis connection amount
      */
-    private int connectionMinimumIdleSize = 10;
+    private int     connectionMinimumIdleSize             = 10;
 
     /**
      * Redis connection maximum pool size
      */
-    private int connectionPoolSize = 64;
+    private int     connectionPoolSize                    = 64;
 
     /**
      * Database index used for Redis connection
      */
-    private int database = 0;
+    private int     database                              = 0;
 
     /**
      * Should the server address be monitored for changes in DNS? Useful for
@@ -50,10 +50,10 @@ public class RedisSingleServerConfig extends RedisBaseConfig {
      * <em>NB: applications must ensure the JVM DNS cache TTL is low enough to support this.</em>
      * e.g., http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/java-dg-jvm-ttl.html
      */
-    private boolean dnsMonitoring = false;
+    private boolean dnsMonitoring                         = false;
 
     /**
      * Interval in milliseconds to checkSign DNS
      */
-    private long dnsMonitoringInterval = 5000;
+    private long    dnsMonitoringInterval                 = 5000;
 }

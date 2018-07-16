@@ -1,23 +1,25 @@
 package com.joe.utils.secure;
 
-import com.joe.utils.codec.IBase64;
-import com.joe.utils.common.IOUtils;
-import com.joe.utils.common.StringUtils;
-import com.joe.utils.secure.exception.SecureException;
-import com.joe.utils.secure.impl.AbstractCipher;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import com.joe.utils.codec.IBase64;
+import com.joe.utils.common.IOUtils;
+import com.joe.utils.common.StringUtils;
+import com.joe.utils.secure.exception.SecureException;
+import com.joe.utils.secure.impl.AbstractCipher;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Key工具
@@ -100,7 +102,8 @@ public class KeyTools {
      * @param keySize   keySize
      * @return 对称加密的key
      */
-    public static SecretKey buildKey(AbstractCipher.Algorithms algorithm, String seed, int keySize) {
+    public static SecretKey buildKey(AbstractCipher.Algorithms algorithm, String seed,
+                                     int keySize) {
         log.debug("开始构建对称加密[{}]的Key，Keysize为：[{}]", algorithm, keySize);
         String name = algorithm.name();
         try {
@@ -128,6 +131,6 @@ public class KeyTools {
     @AllArgsConstructor
     public static class KeyHolder {
         private PrivateKey privateKey;
-        private PublicKey publicKey;
+        private PublicKey  publicKey;
     }
 }

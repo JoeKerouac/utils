@@ -1,12 +1,12 @@
 package com.joe.utils.collection;
 
-import com.joe.utils.common.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.joe.utils.common.StringUtils;
 
 /**
  * 树结构，非线程安全
@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Tree<T> {
     private static final String ROOT = "root";
-    private final Node<T> root;
+    private final Node<T>       root;
 
     public Tree() {
         this.root = new Node<>(ROOT, null);
@@ -118,25 +118,24 @@ public class Tree<T> {
         root.getChilds().clear();
     }
 
-
     public static class Node<T> {
-        private static final String SYMBOL = "/";
+        private static final String        SYMBOL = "/";
         /**
          * 本节点名字
          */
-        private final String name;
+        private final String               name;
         /**
          * 本节点名字前缀，例如/abc/，如果是根节点那么该值为/
          */
-        private final String prex;
+        private final String               prex;
         /**
          * 父节点
          */
-        private final Node<T> parent;
+        private final Node<T>              parent;
         /**
          * 本节点数据
          */
-        private T data;
+        private T                          data;
         /**
          * 子节点
          */
@@ -325,7 +324,8 @@ public class Tree<T> {
             }
 
             if (!recursion && node.hasChilds()) {
-                throw new IllegalStateException("node[" + name + "] hava child node , can't be delete");
+                throw new IllegalStateException(
+                    "node[" + name + "] hava child node , can't be delete");
             }
 
             node.deleteSelf();

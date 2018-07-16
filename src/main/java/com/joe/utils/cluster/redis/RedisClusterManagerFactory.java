@@ -1,13 +1,14 @@
 package com.joe.utils.cluster.redis;
 
-import com.joe.utils.common.BeanUtils;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.joe.utils.common.BeanUtils;
 
 /**
  * RedisClusterManager工厂
@@ -18,8 +19,7 @@ import java.util.Map;
 public class RedisClusterManagerFactory {
     // 管理redis连接
     private static final Map<RedisBaseConfig, RedisClusterManager> CACHE = new HashMap<>();
-    private static final Object lock = new Object();
-
+    private static final Object                                    lock  = new Object();
 
     /**
      * 从缓存获取redis实现的分布式管理器

@@ -1,12 +1,13 @@
 package com.joe.utils.common;
 
-import com.joe.utils.annotation.Nullable;
-import com.joe.utils.pattern.PatternUtils;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.joe.utils.annotation.Nullable;
+import com.joe.utils.pattern.PatternUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 字符串的常用操作
@@ -90,7 +91,7 @@ public class StringUtils {
         }
         StringBuilder sb = new StringBuilder(capacity);
 
-        int pos = 0;  // our position in the old string
+        int pos = 0; // our position in the old string
         int patLen = oldPattern.length();
         while (index >= 0) {
             sb.append(inString.substring(pos, index));

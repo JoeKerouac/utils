@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * @version 2018.06.14 14:24
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target({ ElementType.FIELD })
 @Documented
 public @interface ExcelColumn {
     /**

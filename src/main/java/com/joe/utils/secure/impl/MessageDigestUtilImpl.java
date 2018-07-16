@@ -1,15 +1,14 @@
 package com.joe.utils.secure.impl;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.joe.utils.codec.Hex;
 import com.joe.utils.pool.ObjectPool;
 import com.joe.utils.secure.MessageDigestUtil;
 import com.joe.utils.secure.exception.SecureException;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 消息摘要工具类
@@ -19,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MessageDigestUtilImpl implements MessageDigestUtil {
     private static final Map<String, ObjectPool<MessageDigest>> CACHE = new ConcurrentHashMap<>();
-    private Algorithms algorithms;
+    private Algorithms                                          algorithms;
 
     private MessageDigestUtilImpl(Algorithms algorithms) {
         this.algorithms = algorithms;
@@ -73,7 +72,8 @@ public class MessageDigestUtilImpl implements MessageDigestUtil {
      * @return 对应的摘要
      */
     public byte[] digest(byte[] data) {
-        try (ObjectPool.PoolObjectHolder<MessageDigest> holder = CACHE.get(algorithms.name()).get()) {
+        try (ObjectPool.PoolObjectHolder<MessageDigest> holder = CACHE.get(algorithms.name())
+            .get()) {
             byte[] result = holder.get().digest(data);
             return result;
         }

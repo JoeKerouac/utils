@@ -43,7 +43,8 @@ public class ClassUtils {
      * @return class
      * @throws ClassNotFoundException class不存在时返回该异常
      */
-    public static <T> Class<T> loadClass(String className, ClassLoader loader) throws ClassNotFoundException {
+    public static <T> Class<T> loadClass(String className,
+                                         ClassLoader loader) throws ClassNotFoundException {
         return (Class<T>) loader.loadClass(className);
     }
 }

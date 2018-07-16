@@ -1,9 +1,9 @@
 package com.joe.utils.pattern;
 
-import com.joe.utils.common.StringUtils;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.joe.utils.common.StringUtils;
 
 /**
  * 正则工具类
@@ -15,7 +15,8 @@ public class PatternUtils {
     /**
      * IP正则
      */
-    private static final Pattern IP_PATTERN = Pattern.compile("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}");
+    private static final Pattern IP_PATTERN    = Pattern
+        .compile("[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}");
     /**
      * 手机号正则
      */
@@ -23,7 +24,7 @@ public class PatternUtils {
     /**
      * 匹配数字正则（开头不能是0，末尾可以是0）
      */
-    private static Pattern NUMBER_PARTER = Pattern.compile("-?(((1-9)\\d*)|(\\d))(\\.\\d*)");
+    private static Pattern       NUMBER_PARTER = Pattern.compile("-?(((1-9)\\d*)|(\\d))(\\.\\d*)");
 
     /**
      * 判断字符串是否是IP格式的字符串

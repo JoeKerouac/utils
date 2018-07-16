@@ -1,15 +1,5 @@
 package com.joe.utils.secure.impl;
 
-import com.joe.utils.codec.IBase64;
-import com.joe.utils.pool.ObjectPool;
-import com.joe.utils.secure.KeyTools;
-import com.joe.utils.secure.SignatureUtil;
-import com.joe.utils.secure.exception.SecureException;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.ByteArrayInputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +10,17 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.joe.utils.codec.IBase64;
+import com.joe.utils.pool.ObjectPool;
+import com.joe.utils.secure.KeyTools;
+import com.joe.utils.secure.SignatureUtil;
+import com.joe.utils.secure.exception.SecureException;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * 签名工具
  *
@@ -28,12 +29,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 public class SignatureUtilImpl implements SignatureUtil {
-    private static final IBase64 BASE_64 = new IBase64();
-    private static final Map<String, ObjectPool<SignatureHolder>> CACHE = new ConcurrentHashMap<>();
+    private static final IBase64                                  BASE_64 = new IBase64();
+    private static final Map<String, ObjectPool<SignatureHolder>> CACHE   = new ConcurrentHashMap<>();
     /**
      * ID
      */
-    private final String id;
+    private final String                                          id;
 
     /**
      * 默认构造器
@@ -46,8 +47,8 @@ public class SignatureUtilImpl implements SignatureUtil {
         this.id = (privateKey + ":" + publicKey + ":" + algorithms.toString()).intern();
 
         CACHE.computeIfAbsent(this.id, id -> {
-            ObjectPool<SignatureHolder> pool = new ObjectPool<>(() -> buildSignatureHolder(privateKey, publicKey,
-                    algorithms));
+            ObjectPool<SignatureHolder> pool = new ObjectPool<>(
+                () -> buildSignatureHolder(privateKey, publicKey, algorithms));
             //快速验证
             pool.get().close();
             return pool;
@@ -62,7 +63,8 @@ public class SignatureUtilImpl implements SignatureUtil {
      * @param algorithms RSA加密类型
      * @return SignatureUtil
      */
-    public static SignatureUtil buildInstance(String privateKey, String publicKey, Algorithms algorithms) {
+    public static SignatureUtil buildInstance(String privateKey, String publicKey,
+                                              Algorithms algorithms) {
         return new SignatureUtilImpl(privateKey, publicKey, algorithms);
     }
 
@@ -132,18 +134,19 @@ public class SignatureUtilImpl implements SignatureUtil {
      * @param algorithms RSA加密类型
      * @return RSA验证器
      */
-    private static SignatureHolder buildSignatureHolder(String privateKey, String publicKey, Algorithms algorithms) {
+    private static SignatureHolder buildSignatureHolder(String privateKey, String publicKey,
+                                                        Algorithms algorithms) {
         log.debug("构建SignatureHolder");
         try {
             log.debug("构建公钥以及验签器");
-            RSAPublicKey pubKey = (RSAPublicKey) KeyTools.getPublicKeyFromX509("RSA", new ByteArrayInputStream(publicKey
-                    .getBytes()));
+            RSAPublicKey pubKey = (RSAPublicKey) KeyTools.getPublicKeyFromX509("RSA",
+                new ByteArrayInputStream(publicKey.getBytes()));
             Signature verify = Signature.getInstance(algorithms.toString());
             verify.initVerify(pubKey);
 
             log.debug("构建私钥以及签名器");
-            RSAPrivateKey priKey = (RSAPrivateKey) KeyTools.getPrivateKeyFromPKCS8("RSA", new ByteArrayInputStream
-                    (privateKey.getBytes()));
+            RSAPrivateKey priKey = (RSAPrivateKey) KeyTools.getPrivateKeyFromPKCS8("RSA",
+                new ByteArrayInputStream(privateKey.getBytes()));
             Signature sign = Signature.getInstance(algorithms.toString());
             sign.initSign(priKey);
 
@@ -178,9 +181,9 @@ public class SignatureUtilImpl implements SignatureUtil {
     @AllArgsConstructor
     @NoArgsConstructor
     private static class SignatureHolder {
-        private Signature sign;
-        private Signature verify;
+        private Signature     sign;
+        private Signature     verify;
         private RSAPrivateKey signKey;
-        private PublicKey verifyKey;
+        private PublicKey     verifyKey;
     }
 }

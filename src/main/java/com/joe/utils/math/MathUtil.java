@@ -14,19 +14,19 @@ public class MathUtil {
     /**
      * 30度角的近似弧度值
      */
-    public static final double ANGLE_30 = Math.PI / 6;
+    public static final double ANGLE_30  = Math.PI / 6;
     /**
      * 45度角的近似弧度值
      */
-    public static final double ANGLE_45 = Math.PI / 4;
+    public static final double ANGLE_45  = Math.PI / 4;
     /**
      * 60度角的近似弧度值
      */
-    public static final double ANGLE_60 = Math.PI / 3;
+    public static final double ANGLE_60  = Math.PI / 3;
     /**
      * 90度角的近似弧度值
      */
-    public static final double ANGLE_90 = Math.PI / 2;
+    public static final double ANGLE_90  = Math.PI / 2;
     /**
      * 120度角的近似弧度值
      */
@@ -55,84 +55,84 @@ public class MathUtil {
     /**
      * 30度角的近似sin值
      */
-    public static final double SIN_30 = 0.5;
+    public static final double SIN_30    = 0.5;
     /**
      * 45度角的近似sin值
      */
-    public static final double SIN_45 = Math.sqrt(2) / 2;
+    public static final double SIN_45    = Math.sqrt(2) / 2;
     /**
      * 60度角的近似sin值
      */
-    public static final double SIN_60 = Math.sqrt(3) / 2;
+    public static final double SIN_60    = Math.sqrt(3) / 2;
     /**
      * 90度角的近似sin值
      */
-    public static final double SIN_90 = 1;
+    public static final double SIN_90    = 1;
     /**
      * 120度角的近似sin值
      */
-    public static final double SIN_120 = SIN_60;
+    public static final double SIN_120   = SIN_60;
     /**
      * 135度角的近似sin值
      */
-    public static final double SIN_135 = SIN_45;
+    public static final double SIN_135   = SIN_45;
     /**
      * 150度角的近似sin值
      */
-    public static final double SIN_150 = SIN_30;
+    public static final double SIN_150   = SIN_30;
     /**
      * 180度角的近似sin值
      */
-    public static final double SIN_180 = 0;
+    public static final double SIN_180   = 0;
     /**
      * 270度角的近似sin值
      */
-    public static final double SIN_270 = -1;
+    public static final double SIN_270   = -1;
     /**
      * 360度角的近似sin值
      */
-    public static final double SIN_360 = SIN_180;
+    public static final double SIN_360   = SIN_180;
 
     /**
      * 30度角的近似COS值
      */
-    public static final double COS_30 = Math.sqrt(3) / 2;
+    public static final double COS_30    = Math.sqrt(3) / 2;
     /**
      * 45度角的近似COS值
      */
-    public static final double COS_45 = Math.sqrt(2) / 2;
+    public static final double COS_45    = Math.sqrt(2) / 2;
     /**
      * 60度角的近似COS值
      */
-    public static final double COS_60 = 1 / 2;
+    public static final double COS_60    = 1 / 2;
     /**
      * 90度角的近似COS值
      */
-    public static final double COS_90 = 0;
+    public static final double COS_90    = 0;
     /**
      * 120度角的近似COS值
      */
-    public static final double COS_120 = -COS_60;
+    public static final double COS_120   = -COS_60;
     /**
      * 135度角的近似COS值
      */
-    public static final double COS_135 = -COS_45;
+    public static final double COS_135   = -COS_45;
     /**
      * 150度角的近似COS值
      */
-    public static final double COS_150 = -COS_30;
+    public static final double COS_150   = -COS_30;
     /**
      * 180度角的近似COS值
      */
-    public static final double COS_180 = -1;
+    public static final double COS_180   = -1;
     /**
      * 270度角的近似COS值
      */
-    public static final double COS_270 = 0;
+    public static final double COS_270   = 0;
     /**
      * 360度角的近似COS值
      */
-    public static final double COS_360 = -COS_180;
+    public static final double COS_360   = -COS_180;
 
     /**
      * 将坐标以原点为中心旋转

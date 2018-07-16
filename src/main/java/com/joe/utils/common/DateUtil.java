@@ -1,8 +1,5 @@
 package com.joe.utils.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -14,6 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 日期工具类
  * 该版本升级使用JDK8的全新日期API，同时年的格式化必须为小写y，也就是可以是yyyy，不能为YYYY（大写Y）
@@ -21,7 +21,8 @@ import java.util.Map;
  * @author joe
  */
 public class DateUtil {
-    private final static Logger logger = LoggerFactory.getLogger(DateUtil.class);
+    private final static Logger                         logger          = LoggerFactory
+        .getLogger(DateUtil.class);
     /**
      * formatter缓存
      */
@@ -29,16 +30,15 @@ public class DateUtil {
     /**
      * 常用格式化yyyy-MM-dd HH:mm:ss
      */
-    public final static String BASE = "yyyy-MM-dd HH:mm:ss";
+    public final static String                          BASE            = "yyyy-MM-dd HH:mm:ss";
     /**
      * 常用格式化yyyy-MM-dd
      */
-    public final static String SHORT = "yyyy-MM-dd";
+    public final static String                          SHORT           = "yyyy-MM-dd";
     /**
      * 常用格式化HH:mm:ss
      */
-    public final static String TIME = "HH:mm:ss";
-
+    public final static String                          TIME            = "HH:mm:ss";
 
     private DateUtil() {
     }
@@ -99,7 +99,8 @@ public class DateUtil {
         LocalDateTime time;
 
         //判断日期类型，新版日期类将时间分为年月日（LocalDate）、时分秒（LocalTime）、年月日时分秒（LocalDateTime）三种类型
-        if (accessor.isSupported(ChronoField.DAY_OF_YEAR) && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
+        if (accessor.isSupported(ChronoField.DAY_OF_YEAR)
+            && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
             time = LocalDateTime.from(accessor);
         } else if (accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
             LocalTime localTime = LocalTime.from(accessor);
@@ -138,8 +139,8 @@ public class DateUtil {
      */
     public static long calc(String arg0, String arg1, String format, DateUnit dateUnit) {
         try {
-            return calc(LocalDateTime.parse(arg0, DateTimeFormatter.ofPattern(format)), LocalDateTime.parse(arg1,
-                    DateTimeFormatter.ofPattern(format)), dateUnit);
+            return calc(LocalDateTime.parse(arg0, DateTimeFormatter.ofPattern(format)),
+                LocalDateTime.parse(arg1, DateTimeFormatter.ofPattern(format)), dateUnit);
         } catch (Exception e) {
             logger.error("日期计算出错", e);
             return -1;
@@ -156,7 +157,8 @@ public class DateUtil {
      * @return 增加后的日期
      */
     public static Date add(DateUnit dateUnit, int amount, String date, String format) {
-        LocalDateTime localDateTime = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
+        LocalDateTime localDateTime = LocalDateTime.parse(date,
+            DateTimeFormatter.ofPattern(format));
         localDateTime = localDateTime.plus(amount, create(dateUnit));
         return Date.from(localDateTime.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
     }
@@ -226,7 +228,8 @@ public class DateUtil {
      */
     public static String getFormatDate(String format, Date date, String zoneId) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format);
-        return dateTimeFormatter.format(date.toInstant().atZone(ZoneId.of(zoneId)).toLocalDateTime());
+        return dateTimeFormatter
+            .format(date.toInstant().atZone(ZoneId.of(zoneId)).toLocalDateTime());
     }
 
     /**
@@ -278,7 +281,7 @@ public class DateUtil {
     }
 
     public enum DateUnit {
-        YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
+                          YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
     }
 
     static class DateUtilException extends RuntimeException {

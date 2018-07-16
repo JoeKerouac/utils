@@ -39,7 +39,8 @@ public class Algorithm {
      * @param <T>        数组中数据的实际类型
      * @return 两个序列的公共子序列
      */
-    private static <T> List<T> lcs(List<T> arg0, List<T> arg1, Comparator<T> comparator, int i, int j) {
+    private static <T> List<T> lcs(List<T> arg0, List<T> arg1, Comparator<T> comparator, int i,
+                                   int j) {
         if (arg0.size() == i || arg1.size() == j) {
             return new ArrayList<>(Math.min(arg0.size(), arg1.size()));
         }

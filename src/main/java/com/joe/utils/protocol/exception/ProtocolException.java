@@ -22,8 +22,7 @@ public class ProtocolException extends RuntimeException {
         super(cause);
     }
 
-    protected ProtocolException(String message, Throwable cause,
-                                boolean enableSuppression,
+    protected ProtocolException(String message, Throwable cause, boolean enableSuppression,
                                 boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }

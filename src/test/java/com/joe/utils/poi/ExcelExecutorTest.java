@@ -1,14 +1,5 @@
 package com.joe.utils.poi;
 
-import com.joe.utils.poi.data.StringDataWriter;
-import lombok.Data;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +7,17 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.joe.utils.poi.data.StringDataWriter;
+
+import lombok.Data;
 
 /**
  * @author joe
@@ -97,7 +99,8 @@ public class ExcelExecutorTest {
                         //将第一行加粗设置字号为20并且颜色设置为红色
                         if (cell.getRowIndex() == 0) {
                             CellStyleAccesser accesser = CellStyleAccesser.build(cell);
-                            accesser.bold(true).setFontSize((short) 20).color(HSSFColor.HSSFColorPredefined.RED);
+                            accesser.bold(true).setFontSize((short) 20)
+                                .color(HSSFColor.HSSFColorPredefined.RED);
                         }
                         cell.setCellValue(data);
                     }
@@ -124,7 +127,7 @@ public class ExcelExecutorTest {
         @ExcelColumn("姓名")
         private String name;
         @ExcelColumn("年龄")
-        private int age;
+        private int    age;
     }
 
     @Data

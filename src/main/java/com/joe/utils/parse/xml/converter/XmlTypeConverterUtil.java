@@ -1,14 +1,15 @@
 package com.joe.utils.parse.xml.converter;
 
-import com.joe.utils.common.BeanUtils;
-import com.joe.utils.parse.xml.XmlNode;
-import com.joe.utils.parse.xml.XmlTypeConvert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.joe.utils.common.BeanUtils;
+import com.joe.utils.parse.xml.XmlNode;
+import com.joe.utils.parse.xml.XmlTypeConvert;
 
 /**
  * XmlTypeConverter工具
@@ -17,10 +18,10 @@ import java.util.Map;
  * @version 2018.02.01 10:57
  */
 public class XmlTypeConverterUtil {
-    private static final Logger logger = LoggerFactory.getLogger(XmlTypeConverterUtil.class);
+    private static final Logger                     logger            = LoggerFactory
+        .getLogger(XmlTypeConverterUtil.class);
     public static final Map<String, XmlTypeConvert> converters;
-    public static final XmlTypeConvert DEFAULT_CONVERTER = new StringConverter();
-
+    public static final XmlTypeConvert              DEFAULT_CONVERTER = new StringConverter();
 
     static {
         converters = new HashMap<>();
@@ -50,7 +51,8 @@ public class XmlTypeConverterUtil {
      * @param filed       字段说明
      * @return 字段对应的converter
      */
-    public static XmlTypeConvert resolve(XmlNode attrXmlNode, BeanUtils.CustomPropertyDescriptor filed) {
+    public static XmlTypeConvert resolve(XmlNode attrXmlNode,
+                                         BeanUtils.CustomPropertyDescriptor filed) {
         XmlTypeConvert convert;
         if (attrXmlNode != null) {
             Class<? extends XmlTypeConvert> fieldConverterClass;
@@ -65,7 +67,7 @@ public class XmlTypeConverterUtil {
                 } catch (Exception e) {
                     convert = resolve(filed);
                     logger.warn("指定的xml转换器[{}]无法实例化，请为该转换器增加公共无参数构造器，当前将使用默认转换器[{}]",
-                            fieldConverterClass, convert.getClass(), e);
+                        fieldConverterClass, convert.getClass(), e);
                 }
             }
         } else {
@@ -102,6 +104,5 @@ public class XmlTypeConverterUtil {
         }
         return convert;
     }
-
 
 }

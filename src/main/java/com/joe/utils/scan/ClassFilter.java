@@ -5,6 +5,6 @@ package com.joe.utils.scan;
  * @author joe
  *
  */
-public interface ClassFilter extends Filter<Class<?>>{
+public interface ClassFilter extends Filter<Class<?>> {
 
 }

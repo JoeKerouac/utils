@@ -6,26 +6,26 @@ package com.joe.utils.collection;
  *
  */
 public class CollectionException extends RuntimeException {
-	private static final long serialVersionUID = -1110595984530739346L;
+    private static final long serialVersionUID = -1110595984530739346L;
 
-	public CollectionException() {
-		super();
-	}
+    public CollectionException() {
+        super();
+    }
 
-	public CollectionException(String message) {
-		super(message);
-	}
+    public CollectionException(String message) {
+        super(message);
+    }
 
-	public CollectionException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CollectionException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public CollectionException(Throwable cause) {
-		super(cause);
-	}
+    public CollectionException(Throwable cause) {
+        super(cause);
+    }
 
-	protected CollectionException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
-		super(message, cause, enableSuppression, writableStackTrace);
-	}
+    protected CollectionException(String message, Throwable cause, boolean enableSuppression,
+                                  boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 }

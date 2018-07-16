@@ -1,12 +1,12 @@
 package com.joe.utils.concurrent;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 线程操作类
@@ -14,9 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author joe
  */
 public class ThreadUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ThreadUtil.class);
-    private static final Map<PoolType, ExecutorService> cache = new HashMap<>();
-
+    private static final Logger                         logger = LoggerFactory
+        .getLogger(ThreadUtil.class);
+    private static final Map<PoolType, ExecutorService> cache  = new HashMap<>();
 
     /**
      * 当前线程睡眠一段时间，当线程被中断时会抛出RuntimeException而不是InterruptedException，如果
@@ -84,14 +84,16 @@ public class ThreadUtil {
                             service = Executors.newSingleThreadExecutor(factory);
                             break;
                         case IO:
-                            service = new ThreadPoolExecutor(30, 100, 30, TimeUnit.SECONDS, new LinkedBlockingQueue<>
-                                    (), factory);
+                            service = new ThreadPoolExecutor(30, 100, 30, TimeUnit.SECONDS,
+                                new LinkedBlockingQueue<>(), factory);
                             break;
                         case Calc:
-                            service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), factory);
+                            service = Executors.newFixedThreadPool(
+                                Runtime.getRuntime().availableProcessors(), factory);
                             break;
                         default:
-                            throw new IllegalArgumentException(String.format("当前参数为：%s；请使用正确的参数", type.toString()));
+                            throw new IllegalArgumentException(
+                                String.format("当前参数为：%s；请使用正确的参数", type.toString()));
                     }
                 }
                 cache.put(type, service);
@@ -134,20 +136,23 @@ public class ThreadUtil {
                 service = Executors.newSingleThreadExecutor(factory);
                 break;
             case IO:
-                service = new ThreadPoolExecutor(Math.max(Runtime.getRuntime().availableProcessors() * 50, 80),
-                        Math.max(Runtime.getRuntime().availableProcessors() * 150, 260), 30, TimeUnit.SECONDS,
-                        new LinkedBlockingQueue<>(), factory);
+                service = new ThreadPoolExecutor(
+                    Math.max(Runtime.getRuntime().availableProcessors() * 50, 80),
+                    Math.max(Runtime.getRuntime().availableProcessors() * 150, 260), 30,
+                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(), factory);
                 break;
             case Calc:
-                service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), factory);
+                service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
+                    factory);
                 break;
             default:
-                throw new IllegalArgumentException(String.format("当前参数为：%s；请使用正确的参数", type.toString()));
+                throw new IllegalArgumentException(
+                    String.format("当前参数为：%s；请使用正确的参数", type.toString()));
         }
         return service;
     }
 
     public enum PoolType {
-        Singleton, IO, Calc
+                          Singleton, IO, Calc
     }
 }

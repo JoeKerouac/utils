@@ -1,11 +1,14 @@
 package com.joe.utils.validator;
 
-
-import javax.validation.*;
-import javax.validation.executable.ExecutableValidator;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import javax.validation.executable.ExecutableValidator;
 
 /**
  * bean校验工具，不符合规则的会抛出异常
@@ -17,7 +20,7 @@ public class ValidatorUtil {
     /**
      * bean验证器
      */
-    private static final Validator validator;
+    private static final Validator           validator;
     /**
      * 构造器、方法参数、方法响应验证器
      */
@@ -47,8 +50,8 @@ public class ValidatorUtil {
      * @param params   参数
      */
     public static void validateParameters(Object instance, Method method, Object[] params) {
-        Set<ConstraintViolation<Object>> constraintViolations = executableValidator.validateParameters(instance,
-                method, params);
+        Set<ConstraintViolation<Object>> constraintViolations = executableValidator
+            .validateParameters(instance, method, params);
         check(constraintViolations);
     }
 

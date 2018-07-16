@@ -1,8 +1,5 @@
 package com.joe.utils.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Map;
@@ -10,24 +7,29 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class IDCard {
-    private static final Logger logger = LoggerFactory.getLogger(IDCard.class);
+    private static final Logger        logger  = LoggerFactory.getLogger(IDCard.class);
     /**
      * 地区表
      */
-    private static Map<String, String> AREA = new TreeMap<>((o1, o2) -> {
-        Integer i1 = Integer.parseInt(o1);
-        Integer i2 = Integer.parseInt(o2);
-        return i1 - i2;
-    });
+    private static Map<String, String> AREA    = new TreeMap<>((o1, o2) -> {
+                                                   Integer i1 = Integer.parseInt(o1);
+                                                   Integer i2 = Integer.parseInt(o2);
+                                                   return i1 - i2;
+                                               });
     /**
      * 加权表
      */
-    private static int[] POWER = new int[]{7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
+    private static int[]               POWER   = new int[] { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9,
+                                                             10, 5, 8, 4, 2 };
     /**
      * 加权因子
      */
-    private static char[] DIVISOR = new char[]{'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};
+    private static char[]              DIVISOR = new char[] { '1', '0', 'X', '9', '8', '7', '6',
+                                                              '5', '4', '3', '2' };
 
     static {
         // 初始化地区
@@ -151,7 +153,7 @@ public class IDCard {
 
         // 判断是否输入台湾省和特别行政区
         if (idCard.substring(0, 6).equals("710000") || idCard.substring(0, 6).equals("810000")
-                || idCard.substring(0, 6).equals("820000")) {
+            || idCard.substring(0, 6).equals("820000")) {
             // 台湾省和特别行政区
             area = AREA.get(idCard.substring(0, 6) + "0000");
         } else {

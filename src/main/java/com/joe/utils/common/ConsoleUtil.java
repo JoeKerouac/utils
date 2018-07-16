@@ -27,7 +27,8 @@ public class ConsoleUtil {
                 reader = console::readLine;
             } else {
                 System.out.println("Console对象不存在，使用Reader");
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(System.in));
                 reader = bufferedReader::readLine;
             }
             work(reader, consumer);

@@ -1,8 +1,8 @@
 package com.joe.utils.data;
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 /**
  * @author joe
@@ -17,19 +17,19 @@ public class PageData<T> {
     /**
      * 当前页数，从0开始
      */
-    private int currentPage;
+    private int     currentPage;
     /**
      * 每页最多显示多少数据
      */
-    private int limit;
+    private int     limit;
     /**
      * 总数据量
      */
-    private int total;
+    private int     total;
     /**
      * 总页数
      */
-    private int totalPage;
+    private int     totalPage;
     /**
      * 是否有下一页，true表示有下一页
      */

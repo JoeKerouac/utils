@@ -12,7 +12,7 @@ import java.util.List;
  * @author joe
  */
 public class MethodScanner implements Scanner<Method, MethodFilter> {
-    private static final Object lock = new Object();
+    private static final Object           lock = new Object();
     private static volatile MethodScanner methodScanner;
 
     private MethodScanner() {

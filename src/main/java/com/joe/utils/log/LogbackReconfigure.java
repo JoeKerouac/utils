@@ -1,5 +1,12 @@
 package com.joe.utils.log;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -9,24 +16,18 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import ch.qos.logback.core.status.StatusUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.ILoggerFactory;
-import org.slf4j.LoggerFactory;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 用于在logback加载完毕后重新配置logback
  */
 @Slf4j
 public class LogbackReconfigure {
-    private static final String RE_REGISTERING_PREVIOUS_SAFE_CONFIGURATION = "Re-registering previous fallback " +
-            "configuration once more as a fallback configuration point";
-    private static final String FALLING_BACK_TO_SAFE_CONFIGURATION = "Given previous errors, falling back to " +
-            "previously registered safe configuration.";
-    private final long birthdate = System.currentTimeMillis();
+    private static final String        RE_REGISTERING_PREVIOUS_SAFE_CONFIGURATION = "Re-registering previous fallback "
+                                                                                    + "configuration once more as a fallback configuration point";
+    private static final String        FALLING_BACK_TO_SAFE_CONFIGURATION         = "Given previous errors, falling back to "
+                                                                                    + "previously registered safe configuration.";
+    private final long                 birthdate                                  = System
+        .currentTimeMillis();
 
     private final static LoggerContext CONTEXT;
 
@@ -84,14 +85,16 @@ public class LogbackReconfigure {
         return sanitizedEvents;
     }
 
-    private static void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList, URL mainURL) {
+    private static void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList,
+                                              URL mainURL) {
         // failsafe events are used only in case of errors. Therefore, we must *not*
         // invoke file inclusion since the included files may be the cause of the error.
 
         List<SaxEvent> failsafeEvents = removeIncludeEvents(eventList);
         JoranConfigurator joranConfigurator = new JoranConfigurator();
         joranConfigurator.setContext(CONTEXT);
-        ConfigurationWatchList oldCWL = ConfigurationWatchListUtil.getConfigurationWatchList(CONTEXT);
+        ConfigurationWatchList oldCWL = ConfigurationWatchListUtil
+            .getConfigurationWatchList(CONTEXT);
         ConfigurationWatchList newCWL = oldCWL.buildClone();
 
         if (failsafeEvents == null || failsafeEvents.isEmpty()) {
@@ -117,4 +120,3 @@ public class LogbackReconfigure {
         return "LogbackReconfigure(born:" + birthdate + ")";
     }
 }
-

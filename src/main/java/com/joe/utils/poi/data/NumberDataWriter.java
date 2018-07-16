@@ -1,8 +1,9 @@
 package com.joe.utils.poi.data;
 
+import org.apache.poi.ss.usermodel.Cell;
+
 import com.joe.utils.poi.ExcelDataWriter;
 import com.joe.utils.type.ReflectUtil;
-import org.apache.poi.ss.usermodel.Cell;
 
 /**
  * number数据
@@ -23,8 +24,8 @@ public final class NumberDataWriter implements ExcelDataWriter<Number> {
 
     @Override
     public boolean writeable(Class<?> type) {
-        if (type != null && (Number.class.isAssignableFrom(type) || (ReflectUtil.isGeneralType(type) && !boolean
-                .class.equals(type)))) {
+        if (type != null && (Number.class.isAssignableFrom(type)
+                             || (ReflectUtil.isGeneralType(type) && !boolean.class.equals(type)))) {
             return true;
         }
         return false;

@@ -1,10 +1,11 @@
 package com.joe.utils.img;
 
-import org.junit.Test;
-import reactor.core.support.Assert;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+
+import org.junit.Test;
+
+import reactor.core.support.Assert;
 
 /**
  * 二维码工具类测试

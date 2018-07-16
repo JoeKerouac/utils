@@ -14,7 +14,7 @@ public class WorkBookAccesser {
     /**
      * 当前工作sheet
      */
-    private volatile int sheetIndex;
+    private volatile int   sheetIndex;
 
     public WorkBookAccesser(Workbook workbook) {
         this(workbook, 0);
@@ -78,7 +78,6 @@ public class WorkBookAccesser {
         mergedRegion(firstRow, lastRow, column, column);
     }
 
-
     /**
      * 合并指定sheet指定区域的单元格
      *
@@ -100,7 +99,8 @@ public class WorkBookAccesser {
      * @param firstCol  要合并的第一列
      * @param lastCol   要合并的最后一列
      */
-    public void mergedRegion(String sheetName, int firstRow, int lastRow, int firstCol, int lastCol) {
+    public void mergedRegion(String sheetName, int firstRow, int lastRow, int firstCol,
+                             int lastCol) {
         mergedRegion(workbook.getSheet(sheetName), firstRow, lastRow, firstCol, lastCol);
     }
 

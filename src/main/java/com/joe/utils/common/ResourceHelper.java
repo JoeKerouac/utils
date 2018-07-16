@@ -1,12 +1,13 @@
 package com.joe.utils.common;
 
-import com.joe.utils.common.exception.ResourceNotFoundException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
+
+import com.joe.utils.common.exception.ResourceNotFoundException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 资源辅助类
@@ -31,13 +32,17 @@ public class ResourceHelper {
         log.debug("获取资源[{}]", location);
         try {
             if (location.startsWith(ResourceProtocol.FILE.protocol)) {
-                return new FileInputStream(new File(location.substring(ResourceProtocol.FILE.protocol.length())));
+                return new FileInputStream(
+                    new File(location.substring(ResourceProtocol.FILE.protocol.length())));
             } else if (location.startsWith(ResourceProtocol.URL.protocol)) {
-                return new URL(location.substring(ResourceProtocol.URL.protocol.length())).openStream();
+                return new URL(location.substring(ResourceProtocol.URL.protocol.length()))
+                    .openStream();
             } else if (location.startsWith(ResourceProtocol.HTTP.protocol)) {
-                return new URL(location.substring(ResourceProtocol.HTTP.protocol.length())).openStream();
+                return new URL(location.substring(ResourceProtocol.HTTP.protocol.length()))
+                    .openStream();
             } else if (location.startsWith(ResourceProtocol.HTTPS.protocol)) {
-                return new URL(location.substring(ResourceProtocol.HTTPS.protocol.length())).openStream();
+                return new URL(location.substring(ResourceProtocol.HTTPS.protocol.length()))
+                    .openStream();
             } else {
                 if (location.startsWith(ResourceProtocol.CLASSPATH.protocol)) {
                     location = location.substring(ResourceProtocol.CLASSPATH.protocol.length());
@@ -50,16 +55,11 @@ public class ResourceHelper {
         }
     }
 
-
     /**
      * 协议
      */
     public enum ResourceProtocol {
-        FILE("file://"),
-        URL("url://"),
-        CLASSPATH("classpath://"),
-        HTTP("http://"),
-        HTTPS("https://");
+                                  FILE("file://"), URL("url://"), CLASSPATH("classpath://"), HTTP("http://"), HTTPS("https://");
         /**
          * 协议前缀
          */

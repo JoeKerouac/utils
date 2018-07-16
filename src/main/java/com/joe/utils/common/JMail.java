@@ -1,9 +1,9 @@
 package com.joe.utils.common;
 
-import com.joe.utils.concurrent.ThreadUtil;
-import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.util.Properties;
+import java.util.concurrent.*;
 
 import javax.mail.*;
 import javax.mail.Message.RecipientType;
@@ -11,10 +11,13 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.Properties;
-import java.util.concurrent.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.joe.utils.concurrent.ThreadUtil;
+
+import lombok.Data;
 
 /**
  * jmail工具
@@ -22,48 +25,51 @@ import java.util.concurrent.*;
  * @author joe
  */
 public class JMail {
-    private static final Logger logger = LoggerFactory.getLogger(JMail.class);
-    private static final Future<Boolean> ERROR = new Future<Boolean>() {
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return false;
-        }
+    private static final Logger          logger = LoggerFactory.getLogger(JMail.class);
+    private static final Future<Boolean> ERROR  = new Future<Boolean>() {
+                                                    @Override
+                                                    public boolean cancel(boolean mayInterruptIfRunning) {
+                                                        return false;
+                                                    }
 
-        @Override
-        public boolean isCancelled() {
-            return false;
-        }
+                                                    @Override
+                                                    public boolean isCancelled() {
+                                                        return false;
+                                                    }
 
-        @Override
-        public boolean isDone() {
-            return true;
-        }
+                                                    @Override
+                                                    public boolean isDone() {
+                                                        return true;
+                                                    }
 
-        @Override
-        public Boolean get() throws InterruptedException, ExecutionException {
-            return false;
-        }
+                                                    @Override
+                                                    public Boolean get() throws InterruptedException,
+                                                                         ExecutionException {
+                                                        return false;
+                                                    }
 
-        @Override
-        public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException,
-                TimeoutException {
-            return false;
-        }
-    };
-    private Session mailSession;
+                                                    @Override
+                                                    public Boolean get(long timeout,
+                                                                       TimeUnit unit) throws InterruptedException,
+                                                                                      ExecutionException,
+                                                                                      TimeoutException {
+                                                        return false;
+                                                    }
+                                                };
+    private Session                      mailSession;
     // 用户名
-    private String username;
+    private String                       username;
     // 邮箱host
-    private String host;
+    private String                       host;
     //邮箱协议
-    private String protocol;
+    private String                       protocol;
     // 邮箱密码
-    private String password;
-    private Transport transport;
+    private String                       password;
+    private Transport                    transport;
     /**
      * 邮件发送线程池
      */
-    private ExecutorService executor;
+    private ExecutorService              executor;
 
     /**
      * 默认构造器
@@ -114,10 +120,10 @@ public class JMail {
      * @param callback 回调函数，邮件发送完毕后会执行
      * @return 如果发送成功则返回<code>true</code>
      */
-    public Future<Boolean> sendEmail(EmailBody body, String to, String title, JMailCallback callback) {
+    public Future<Boolean> sendEmail(EmailBody body, String to, String title,
+                                     JMailCallback callback) {
         return sendEmail(body, to, title, null, callback);
     }
-
 
     /**
      * 发送带附件的邮件
@@ -128,7 +134,8 @@ public class JMail {
      * @param fileParts 邮件附件
      * @return 如果发送成功则返回<code>true</code>
      */
-    public Future<Boolean> sendEmail(EmailBody body, String to, String title, FilePart[] fileParts) {
+    public Future<Boolean> sendEmail(EmailBody body, String to, String title,
+                                     FilePart[] fileParts) {
         return sendEmail(body, to, title, fileParts, null);
     }
 
@@ -142,8 +149,8 @@ public class JMail {
      * @param callback  回调函数，邮件发送完毕后会执行
      * @return 如果发送成功则返回<code>true</code>
      */
-    public Future<Boolean> sendEmail(EmailBody body, String to, String title, FilePart[] fileParts, JMailCallback
-            callback) {
+    public Future<Boolean> sendEmail(EmailBody body, String to, String title, FilePart[] fileParts,
+                                     JMailCallback callback) {
         if (StringUtils.isEmpty(to) || (body == null && fileParts == null)) {
             logger.debug("邮件没有设置接收人或者没有正文");
             execCallback(false, body, to, title, fileParts, null, this, callback);
@@ -153,7 +160,6 @@ public class JMail {
         EmailTask task = new EmailTask(body, to, title, fileParts, callback);
         return executor.submit(task);
     }
-
 
     /**
      * 执行回调函数，如果函数为null则不执行
@@ -167,8 +173,9 @@ public class JMail {
      * @param mail      邮箱客户端
      * @param callback  回调函数
      */
-    private void execCallback(boolean result, EmailBody body, String to, String title, FilePart[] fileParts,
-                              Throwable error, JMail mail, JMailCallback callback) {
+    private void execCallback(boolean result, EmailBody body, String to, String title,
+                              FilePart[] fileParts, Throwable error, JMail mail,
+                              JMailCallback callback) {
         if (callback != null) {
             callback.call(result, body, to, title, fileParts, error, mail);
         }
@@ -245,7 +252,7 @@ public class JMail {
     @Data
     public static class FilePart {
         // 附件文件
-        private File file;
+        private File   file;
         // 附件名称
         private String name;
 
@@ -270,7 +277,7 @@ public class JMail {
     @Data
     public static class EmailBody {
         //内容
-        private String body;
+        private String  body;
         //是否是html
         private boolean html = false;
 
@@ -295,18 +302,18 @@ public class JMail {
          * @param error     如果发送失败并且异常，那么会有该值
          * @param mail      本次邮件的客户端
          */
-        void call(boolean result, EmailBody body, String to, String title, FilePart[] fileParts, Throwable error,
-                  JMail mail);
+        void call(boolean result, EmailBody body, String to, String title, FilePart[] fileParts,
+                  Throwable error, JMail mail);
     }
 
     /**
      * 邮件发送任务
      */
     private class EmailTask implements Callable<Boolean> {
-        private EmailBody body;
-        private String to;
-        private String title;
-        private FilePart[] fileParts;
+        private EmailBody     body;
+        private String        to;
+        private String        title;
+        private FilePart[]    fileParts;
         private JMailCallback callback;
 
         /**
@@ -318,7 +325,8 @@ public class JMail {
          * @param fileParts 邮件附件
          * @param callback  邮件执行完毕回调
          */
-        public EmailTask(EmailBody body, String to, String title, FilePart[] fileParts, JMailCallback callback) {
+        public EmailTask(EmailBody body, String to, String title, FilePart[] fileParts,
+                         JMailCallback callback) {
             this.body = body;
             this.to = to;
             this.title = title;
@@ -343,15 +351,15 @@ public class JMail {
                 Multipart msgPart = new MimeMultipart("mixed");
                 msg.setContent(msgPart);
 
-			    /* 正文 */
+                /* 正文 */
                 MimeBodyPart bodyPart = new MimeBodyPart(); // 表示正文
-                bodyPart.setContent(body.body, (body.html ? "text/html" : "text/plain") + ";charset=" + Charset
-                        .defaultCharset().name());
+                bodyPart.setContent(body.body, (body.html ? "text/html" : "text/plain")
+                                               + ";charset=" + Charset.defaultCharset().name());
                 msgPart.addBodyPart(bodyPart);
 
                 logger.debug("正文设置完毕，开始添加附件");
 
-			    /* 下面为设置附件 */
+                /* 下面为设置附件 */
                 if (fileParts != null && fileParts.length != 0) {
                     for (FilePart filePart : fileParts) {
                         MimeBodyPart attach = new MimeBodyPart();

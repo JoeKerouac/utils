@@ -1,7 +1,5 @@
 package com.joe.utils.ext;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -9,6 +7,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.CodeSource;
 import java.util.Arrays;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * DocumentRootHelper，帮助查找doc-root，spring自带的在IDEA中运行时有问题，不能正确找到doc-root，扩展spring
@@ -21,14 +21,14 @@ public class DocumentRootHelper {
     /**
      * classpath下的doc-root
      */
-    private static final String DEFAULT_DOC_ROOT = Thread.currentThread().getContextClassLoader().getResource("")
-            .getFile();
+    private static final String   DEFAULT_DOC_ROOT = Thread.currentThread().getContextClassLoader()
+        .getResource("").getFile();
     /**
      * 本地工作空间的doc-root
      */
-    private static final String LOCAL_DOC_ROOT = DEFAULT_DOC_ROOT.replace("target/classes", "src/main/webapp");
-    private static final String[] COMMON_DOC_ROOTS = {"src/main/webapp", "public", "static"};
-
+    private static final String   LOCAL_DOC_ROOT   = DEFAULT_DOC_ROOT.replace("target/classes",
+        "src/main/webapp");
+    private static final String[] COMMON_DOC_ROOTS = { "src/main/webapp", "public", "static" };
 
     /**
      * 获取当前系统的doc-root
@@ -44,7 +44,7 @@ public class DocumentRootHelper {
         file = file != null ? file : getExplodedWarFileDocumentRoot();
         if (file == null) {
             log.debug("None of the document roots " + Arrays.asList(COMMON_DOC_ROOTS)
-                    + " point to a directory and will be ignored.");
+                      + " point to a directory and will be ignored.");
         } else {
             log.debug("Document root: " + file);
         }
@@ -92,7 +92,7 @@ public class DocumentRootHelper {
         File file = getCodeSourceArchive();
         log.debug("Code archive: " + file);
         if (file != null && file.exists() && !file.isDirectory()
-                && file.getName().toLowerCase().endsWith(extension)) {
+            && file.getName().toLowerCase().endsWith(extension)) {
             return file.getAbsoluteFile();
         }
         return null;

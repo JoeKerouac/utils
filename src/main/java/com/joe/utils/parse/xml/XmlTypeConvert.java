@@ -19,14 +19,14 @@ public interface XmlTypeConvert<T> {
      */
     T read(Element element, String attrName);
 
-//    /**
-//     * 数据转换，将字段的值转换为xml中的内容
-//     *
-//     * @param obj
-//     *
-//     * @return
-//     */
-//    String write(Object obj);
+    //    /**
+    //     * 数据转换，将字段的值转换为xml中的内容
+    //     *
+    //     * @param obj
+    //     *
+    //     * @return
+    //     */
+    //    String write(Object obj);
 
     /**
      * 确定转换后的类型

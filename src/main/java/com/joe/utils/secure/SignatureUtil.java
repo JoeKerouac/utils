@@ -41,11 +41,10 @@ public interface SignatureUtil {
      */
     boolean checkSign(byte[] content, byte[] data);
 
-
     /**
      * 签名算法
      */
     enum Algorithms {
-        SHA1withRSA, SHA224withRSA, SHA256withRSA, SHA384withRSA, SHA512withRSA,
+                     SHA1withRSA, SHA224withRSA, SHA256withRSA, SHA384withRSA, SHA512withRSA,
     }
 }

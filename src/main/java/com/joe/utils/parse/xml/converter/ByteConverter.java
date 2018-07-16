@@ -1,7 +1,8 @@
 package com.joe.utils.parse.xml.converter;
 
-import com.joe.utils.common.StringUtils;
 import org.dom4j.Element;
+
+import com.joe.utils.common.StringUtils;
 
 /**
  * Byte转换器
@@ -12,7 +13,8 @@ import org.dom4j.Element;
 public class ByteConverter extends AbstractXmlTypeConvert<Byte> {
     @Override
     public Byte read(Element element, String attrName) {
-        String data = StringUtils.isEmpty(attrName) ? element.getText() : element.attributeValue(attrName);
+        String data = StringUtils.isEmpty(attrName) ? element.getText()
+            : element.attributeValue(attrName);
         if (StringUtils.isEmpty(data)) {
             return 0;
         } else {

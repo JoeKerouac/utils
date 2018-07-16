@@ -1,15 +1,17 @@
 package com.joe.utils.secure.impl;
 
-import com.joe.utils.secure.CipherUtil;
-import com.joe.utils.secure.KeyTools;
-import com.joe.utils.secure.exception.SecureException;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
-import java.util.HashMap;
-import java.util.Map;
+
+import com.joe.utils.secure.CipherUtil;
+import com.joe.utils.secure.KeyTools;
+import com.joe.utils.secure.exception.SecureException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 对称加密工具
@@ -73,7 +75,6 @@ public class SymmetryCipher extends AbstractCipher {
         }
         return buildInstance(algorithms, key.getEncoded());
     }
-
 
     /**
      * SymmetryCipher构造器

@@ -21,8 +21,8 @@ public class ValidationException extends RuntimeException {
         super(cause);
     }
 
-    protected ValidationException(String message, Throwable cause, boolean enableSuppression, boolean
-            writableStackTrace) {
+    protected ValidationException(String message, Throwable cause, boolean enableSuppression,
+                                  boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

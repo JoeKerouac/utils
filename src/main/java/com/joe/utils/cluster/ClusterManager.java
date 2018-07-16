@@ -1,9 +1,5 @@
 package com.joe.utils.cluster;
 
-import com.joe.utils.cluster.redis.RedisBaseConfig;
-import com.joe.utils.cluster.redis.RedisClusterManager;
-import com.joe.utils.cluster.redis.RedisClusterManagerFactory;
-
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +9,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+
+import com.joe.utils.cluster.redis.RedisBaseConfig;
+import com.joe.utils.cluster.redis.RedisClusterManager;
+import com.joe.utils.cluster.redis.RedisClusterManagerFactory;
 
 /**
  * 分布式管理器
@@ -130,7 +130,8 @@ public interface ClusterManager {
      * @return redis实现的分布式锁管理器
      * @throws MalformedURLException MalformedURLException
      */
-    static RedisClusterManager getInstance(String host, int port, String password) throws MalformedURLException {
+    static RedisClusterManager getInstance(String host, int port,
+                                           String password) throws MalformedURLException {
         return RedisClusterManagerFactory.getInstance(host, port, password);
     }
 

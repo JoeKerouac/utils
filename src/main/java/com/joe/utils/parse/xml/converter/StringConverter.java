@@ -1,8 +1,8 @@
 package com.joe.utils.parse.xml.converter;
 
+import org.dom4j.Element;
 
 import com.joe.utils.common.StringUtils;
-import org.dom4j.Element;
 
 /**
  * String类型转换器

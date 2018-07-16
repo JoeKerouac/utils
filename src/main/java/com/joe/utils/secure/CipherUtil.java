@@ -70,6 +70,6 @@ public interface CipherUtil {
      * 加密算法
      */
     enum Algorithms {
-        RSA, AES, DES
+                     RSA, AES, DES
     }
 }

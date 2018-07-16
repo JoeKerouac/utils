@@ -13,10 +13,10 @@ import org.apache.poi.ss.usermodel.Workbook;
  * @version 2018.06.15 16:22
  */
 public class CellStyleAccesser {
-    private Cell cell;
-    private Workbook workbook;
+    private Cell      cell;
+    private Workbook  workbook;
     private CellStyle style;
-    private Font font;
+    private Font      font;
 
     private CellStyleAccesser(Cell cell) {
         this.cell = cell;

@@ -1,9 +1,5 @@
 package com.joe.utils.scan;
 
-import com.joe.utils.common.ClassUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
@@ -16,6 +12,10 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.joe.utils.common.ClassUtils;
 
 /**
  * Class类扫描
@@ -23,13 +23,14 @@ import java.util.stream.Collectors;
  * @author joe
  */
 public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
-    private static final Logger logger = LoggerFactory.getLogger(ClassScanner.class);
+    private static final Logger                   logger          = LoggerFactory
+        .getLogger(ClassScanner.class);
     private static Map<ClassLoader, ClassScanner> classScannerMap = new ConcurrentHashMap<>();
 
     /**
      * 用于加载class
      */
-    private ClassLoader classLoader;
+    private ClassLoader                           classLoader;
 
     private ClassScanner() {
     }
@@ -88,7 +89,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * @throws ScannerException 扫描异常
      */
     @Override
-    public List<Class<?>> scan(List<ClassFilter> excludeFilters, Object... args) throws ScannerException {
+    public List<Class<?>> scan(List<ClassFilter> excludeFilters,
+                               Object... args) throws ScannerException {
         logger.debug("搜索扫描所有的类，过滤器为：{}，参数为：{}", excludeFilters, args);
 
         if (args == null || args.length == 0) {
@@ -146,12 +148,14 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                 if ("file".equals(protocol)) {
                     logger.debug("file类型扫描");
                     // 获取包的物理路径
-                    String filePath = URLDecoder.decode(url.getFile(), Charset.defaultCharset().name());
+                    String filePath = URLDecoder.decode(url.getFile(),
+                        Charset.defaultCharset().name());
                     // 以文件的方式扫描整个包下的文件 并添加到集合中
                     classes.addAll(findAndAddClassesInPackageByFile(pack, filePath, true));
                 } else if ("jar".equals(protocol)) {
                     JarFile jar = ((JarURLConnection) url.openConnection()).getJarFile();
-                    classes.addAll(findAndAddClassesInPackageByFile(jar, packageDirName, pack, true));
+                    classes
+                        .addAll(findAndAddClassesInPackageByFile(jar, packageDirName, pack, true));
                 }
             } catch (Throwable e) {
                 logger.debug("扫描{}时出错", pack, e);
@@ -160,13 +164,13 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
 
         if (!filters.isEmpty()) {
             logger.debug("扫描完毕，扫描出来的Class集合为：{}，发现过滤器，使用过滤器过滤", classes);
-            classes = classes.stream().filter(clazz -> filter(clazz, filters)).collect(Collectors.toList());
+            classes = classes.stream().filter(clazz -> filter(clazz, filters))
+                .collect(Collectors.toList());
             logger.debug("过滤后的Class为：{}", classes);
         }
 
         return classes;
     }
-
 
     /**
      * 根据包名扫描类
@@ -178,7 +182,6 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
         return scan(packageName, Collections.emptyList());
     }
 
-
     /**
      * 从jar文件中扫描指定的包
      *
@@ -188,8 +191,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * @param recursive      是否递归查找
      * @return jar文件中指定包名下的所有class
      */
-    public Set<Class<?>> findAndAddClassesInPackageByFile(JarFile jar, String packageDirName, String packageName,
-                                                          boolean recursive) {
+    public Set<Class<?>> findAndAddClassesInPackageByFile(JarFile jar, String packageDirName,
+                                                          String packageName, boolean recursive) {
         logger.debug("尝试扫描jar文件{}");
         Set<Class<?>> classes = new LinkedHashSet<>();
         logger.debug("jar类型的扫描");
@@ -219,7 +222,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                     // 如果是一个.class文件 而且不是目录
                     if (name.endsWith(".class") && !entry.isDirectory()) {
                         // 去掉后面的".class" 获取真正的类名
-                        String className = name.substring(packageName.length() + 1, name.length() - 6);
+                        String className = name.substring(packageName.length() + 1,
+                            name.length() - 6);
                         className = packageName + "." + className;
                         try {
                             logger.debug("尝试构建class：{}", className);
@@ -262,8 +266,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * @param recursive   是否递归查找
      * @return 指定目录下的所有class
      */
-    public Set<Class<?>> findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean
-            recursive) {
+    public Set<Class<?>> findAndAddClassesInPackageByFile(String packageName, String packagePath,
+                                                          final boolean recursive) {
         logger.debug("扫描包{}下、目录{}下的所有class", packageName, packagePath);
         Set<Class<?>> classes = new LinkedHashSet<>();
         // 获取此包的目录 建立一个File
@@ -274,8 +278,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
             return Collections.emptySet();
         }
         // 如果存在 就获取包下的所有文件 包括目录
-        File[] dirfiles = dir.listFiles(file -> (recursive && file.isDirectory()) || (file.getName().endsWith("" + ""
-                + ".class")));
+        File[] dirfiles = dir.listFiles(file -> (recursive && file.isDirectory())
+                                                || (file.getName().endsWith("" + "" + ".class")));
 
         if (dirfiles == null || dirfiles.length == 0) {
             return Collections.emptySet();
@@ -285,8 +289,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
         for (File file : dirfiles) {
             // 如果是目录 则继续扫描
             if (file.isDirectory()) {
-                classes.addAll(findAndAddClassesInPackageByFile(packageName + "/" + file.getName(), file
-                        .getAbsolutePath(), recursive));
+                classes.addAll(findAndAddClassesInPackageByFile(packageName + "/" + file.getName(),
+                    file.getAbsolutePath(), recursive));
             } else {
                 // 如果是java类文件 去掉后面的.class 只留下类名
                 String className = file.getName().substring(0, file.getName().length() - 6);

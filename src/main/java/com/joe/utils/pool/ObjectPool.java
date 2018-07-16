@@ -1,10 +1,10 @@
 package com.joe.utils.pool;
 
-import com.joe.utils.function.GetObjectFunction;
-import com.joe.utils.secure.impl.SignatureUtilImpl;
-
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
+
+import com.joe.utils.function.GetObjectFunction;
+import com.joe.utils.secure.impl.SignatureUtilImpl;
 
 /**
  * Object池，从Object池中获取到的数据使用完后应该调用close关闭归还池
@@ -16,7 +16,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class ObjectPool<T> {
     private Deque<PoolObjectHolder<T>> pool;
-    private GetObjectFunction<T> function;
+    private GetObjectFunction<T>       function;
 
     /**
      * Object池
@@ -77,9 +77,9 @@ public class ObjectPool<T> {
      * @param <T> 池元素持有的实际数据类型
      */
     public static class PoolObjectHolder<T> implements AutoCloseable {
-        private T data;
+        private T             data;
         private ObjectPool<T> pool;
-        private boolean closed;
+        private boolean       closed;
 
         private PoolObjectHolder(T data, ObjectPool<T> pool) {
             this.closed = false;

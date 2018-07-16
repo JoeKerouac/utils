@@ -1,17 +1,19 @@
 package com.joe.utils.img;
 
-import com.google.zxing.*;
-import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
-import com.google.zxing.common.HybridBinarizer;
-import com.joe.utils.common.IOUtils;
-import net.glxn.qrgen.QRCode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URL;
+
+import javax.imageio.ImageIO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
+
+import net.glxn.qrgen.QRCode;
 
 /**
  * 二维码工具类
@@ -34,8 +36,8 @@ public class IQRCode {
      * @param height   图片的高
      * @throws IOException 找不到指定文件
      */
-    public static void create(String data, String fileName, int width, int height) throws
-            IOException {
+    public static void create(String data, String fileName, int width,
+                              int height) throws IOException {
         create(data, new FileOutputStream(fileName), width, height);
         logger.debug("二维码保存位置为：{}", fileName);
     }
@@ -49,7 +51,8 @@ public class IQRCode {
      * @param height 图片的高
      * @throws IOException IO异常
      */
-    public static void create(String data, OutputStream out, int width, int height) throws IOException {
+    public static void create(String data, OutputStream out, int width,
+                              int height) throws IOException {
         logger.debug("生成二维码，要生成的图片的宽为{}，高为{}", width, height);
         QRCode code = createQRCode(data, width, height);
         code.writeTo(out);
@@ -100,7 +103,6 @@ public class IQRCode {
         return read(image);
     }
 
-
     /**
      * 从流中读取二维码内容
      *
@@ -113,7 +115,6 @@ public class IQRCode {
         BufferedImage image = ImageIO.read(input);
         return read(image);
     }
-
 
     /**
      * 将指定数据生成二维码
@@ -131,7 +132,6 @@ public class IQRCode {
         logger.debug("二维码生成成功");
         return code;
     }
-
 
     /**
      * 从二维码图片读取二维码信息

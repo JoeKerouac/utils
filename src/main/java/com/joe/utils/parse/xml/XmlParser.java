@@ -1,14 +1,9 @@
 package com.joe.utils.parse.xml;
 
-import com.joe.utils.collection.CollectionUtil;
-import com.joe.utils.common.BeanUtils;
-import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
-import com.joe.utils.common.StringUtils;
-import com.joe.utils.parse.xml.converter.XmlTypeConverterUtil;
-import com.joe.utils.type.ReflectUtil;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import java.io.StringReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -17,9 +12,16 @@ import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.StringReader;
-import java.util.*;
-import java.util.stream.Collectors;
+import com.joe.utils.collection.CollectionUtil;
+import com.joe.utils.common.BeanUtils;
+import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
+import com.joe.utils.common.StringUtils;
+import com.joe.utils.parse.xml.converter.XmlTypeConverterUtil;
+import com.joe.utils.type.ReflectUtil;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * XML解析（反向解析为java对象时不区分大小写），该解析器由于大量使用反射，所以在第一次解析
@@ -31,9 +33,9 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public class XmlParser {
-    private static final XmlParser DEFAULT = new XmlParser();
-    private static final String DEFAULT_ROOT = "root";
-    private SAXReader reader;
+    private static final XmlParser DEFAULT      = new XmlParser();
+    private static final String    DEFAULT_ROOT = "root";
+    private SAXReader              reader;
 
     private XmlParser() {
         this.reader = new SAXReader();
@@ -254,7 +256,8 @@ public class XmlParser {
                     //如果节点是属性值，那么需要同时设置节点名和属性名，原则上如果是属性的话必须设置节点名，但是为了防止
                     //用户忘记设置，在用户没有设置的时候使用字段名
                     if (StringUtils.isEmpty(xmlNode.attributeName())) {
-                        log.warn("字段[{}]是属性值，但是未设置属性名（attributeName字段），将采用字段名作为属性名", descript.getName());
+                        log.warn("字段[{}]是属性值，但是未设置属性名（attributeName字段），将采用字段名作为属性名",
+                            descript.getName());
                         attributeName = fieldName;
                     } else {
                         attributeName = xmlNode.attributeName();
@@ -272,8 +275,9 @@ public class XmlParser {
 
             if (!ignore) {
                 //获取指定节点名的element
-                List<Element> nodes = (!StringUtils.isEmpty(attributeName) && isParent) ? Collections.singletonList
-                        (root) : root.elements(nodeName);
+                List<Element> nodes = (!StringUtils.isEmpty(attributeName) && isParent)
+                    ? Collections.singletonList(root)
+                    : root.elements(nodeName);
                 //判断是否为空
                 if (nodes.isEmpty()) {
                     //如果为空那么将首字母大写后重新获取
@@ -364,17 +368,19 @@ public class XmlParser {
                     if (ignoreNull && v == null) {
                         log.debug("当前配置为忽略空值，[{}]的值为空，忽略", k);
                     } else {
-                        map.put(String.valueOf(k), new XmlData(null, v, v == null ? null : v.getClass()));
+                        map.put(String.valueOf(k),
+                            new XmlData(null, v, v == null ? null : v.getClass()));
                     }
                 }
             });
         } else {
-            CustomPropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(clazz == null ? pojo
-                    .getClass() : clazz);
+            CustomPropertyDescriptor[] propertyDescriptors = BeanUtils
+                .getPropertyDescriptors(clazz == null ? pojo.getClass() : clazz);
             for (CustomPropertyDescriptor descriptor : propertyDescriptors) {
                 XmlNode xmlNode = descriptor.getAnnotation(XmlNode.class);
                 //字段值
-                Object valueObj = pojo == null ? null : BeanUtils.getProperty(pojo, descriptor.getName());
+                Object valueObj = pojo == null ? null
+                    : BeanUtils.getProperty(pojo, descriptor.getName());
                 //判断是否忽略
                 if ((ignoreNull && valueObj == null) || (xmlNode != null && xmlNode.ignore())) {
                     log.debug("忽略空节点或者节点被注解忽略");
@@ -382,8 +388,9 @@ public class XmlParser {
                 }
 
                 //节点名
-                String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name())) ? descriptor.getName() :
-                        xmlNode.name();
+                String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name()))
+                    ? descriptor.getName()
+                    : xmlNode.name();
                 map.put(nodeName, new XmlData(xmlNode, valueObj, descriptor.getRealType()));
             }
         }
@@ -395,8 +402,9 @@ public class XmlParser {
             //节点名
             String nodeName = k;
             //属性名
-            String attrName = (xmlNode == null || StringUtils.isEmpty(xmlNode.attributeName())) ? nodeName : xmlNode
-                    .attributeName();
+            String attrName = (xmlNode == null || StringUtils.isEmpty(xmlNode.attributeName()))
+                ? nodeName
+                : xmlNode.attributeName();
             //是否是cdata
             boolean isCDATA = xmlNode != null && xmlNode.isCDATA();
             //数据类型
@@ -477,7 +485,8 @@ public class XmlParser {
      */
     private Class<?> resolveRealType(Class<?> fieldType, XmlNode xmlNode) {
         //猜测字段类型（防止字段的声明是一个接口，优先采用xmlnode中申明的类型）
-        Class<?> type = (xmlNode == null || xmlNode.general() == null) ? fieldType : xmlNode.general();
+        Class<?> type = (xmlNode == null || xmlNode.general() == null) ? fieldType
+            : xmlNode.general();
 
         if (!fieldType.isAssignableFrom(type)) {
             type = fieldType;
@@ -531,7 +540,8 @@ public class XmlParser {
      * @param pojo     pojo
      * @param field    字段说明
      */
-    private void setValue(Element element, String attrName, Object pojo, CustomPropertyDescriptor field) {
+    private void setValue(Element element, String attrName, Object pojo,
+                          CustomPropertyDescriptor field) {
         XmlNode attrXmlNode = field.getAnnotation(XmlNode.class);
         log.debug("要赋值的fieldName为{}", field.getName());
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
@@ -549,14 +559,14 @@ public class XmlParser {
      * @param field    字段说明
      */
     @SuppressWarnings("unchecked")
-    private void setValue(List<Element> elements, String attrName, Object pojo, CustomPropertyDescriptor field) {
+    private void setValue(List<Element> elements, String attrName, Object pojo,
+                          CustomPropertyDescriptor field) {
         XmlNode attrXmlNode = field.getAnnotation(XmlNode.class);
         log.debug("要赋值的fieldName为{}", field.getName());
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
 
         Class<? extends Collection> collectionClass;
         Class<? extends Collection> real = (Class<? extends Collection>) field.getRealType();
-
 
         if (attrXmlNode != null) {
             collectionClass = attrXmlNode.arrayType();
@@ -573,7 +583,8 @@ public class XmlParser {
         }
 
         //将数据转换为用户指定数据
-        List<?> list = elements.stream().map(d -> convert.read(d, attrName)).collect(Collectors.toList());
+        List<?> list = elements.stream().map(d -> convert.read(d, attrName))
+            .collect(Collectors.toList());
 
         if (!trySetValue(list, pojo, field, collectionClass)) {
             //使用注解标记的类型赋值失败并且注解的集合类型与实际字段类型不符时尝试使用字段实际类型赋值
@@ -582,7 +593,6 @@ public class XmlParser {
             }
         }
     }
-
 
     /**
      * 尝试为list类型的字段赋值
@@ -594,8 +604,8 @@ public class XmlParser {
      * @return 返回true表示赋值成功，返回false表示赋值失败
      */
     @SuppressWarnings("unchecked")
-    private boolean trySetValue(List<?> datas, Object pojo, CustomPropertyDescriptor field, Class<? extends
-            Collection> clazz) {
+    private boolean trySetValue(List<?> datas, Object pojo, CustomPropertyDescriptor field,
+                                Class<? extends Collection> clazz) {
         log.debug("要赋值的fieldName为{}", field.getName());
 
         Collection collection = tryBuildCollection(clazz);
@@ -652,11 +662,11 @@ public class XmlParser {
         /**
          * 节点注解，可以为空
          */
-        private XmlNode xmlNode;
+        private XmlNode  xmlNode;
         /**
          * 节点数据
          */
-        private Object data;
+        private Object   data;
         /**
          * 节点数据的实际类型，可以为空
          */

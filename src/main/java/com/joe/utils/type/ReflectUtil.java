@@ -1,13 +1,5 @@
 package com.joe.utils.type;
 
-import com.joe.utils.common.BeanUtils;
-import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
-import com.joe.utils.scan.ClassScanner;
-import com.joe.utils.scan.MethodScanner;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
@@ -16,6 +8,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.joe.utils.common.BeanUtils;
+import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
+import com.joe.utils.scan.ClassScanner;
+import com.joe.utils.scan.MethodScanner;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * java类型相关工具类
  *
@@ -23,10 +25,10 @@ import java.util.stream.Stream;
  */
 @Slf4j
 public class ReflectUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ReflectUtil.class);
-    private static final Pattern superPattern = Pattern.compile("(.*) super.*");
-    private static final Pattern extendsPattern = Pattern.compile("(.*) extends.*");
-    private static final ClassScanner CLASS_SCANNER = ClassScanner.getInstance();
+    private static final Logger        logger         = LoggerFactory.getLogger(ReflectUtil.class);
+    private static final Pattern       superPattern   = Pattern.compile("(.*) super.*");
+    private static final Pattern       extendsPattern = Pattern.compile("(.*) extends.*");
+    private static final ClassScanner  CLASS_SCANNER  = ClassScanner.getInstance();
     private static final MethodScanner METHOD_SCANNER = MethodScanner.getInstance();
 
     private ReflectUtil() {
@@ -39,8 +41,8 @@ public class ReflectUtil {
      * @param packages   包集合
      * @return 包集合中所有带指定注解的类
      */
-    public static List<Class<?>> getAllAnnotationPresentClass(Class<? extends Annotation> annotation, String...
-            packages) {
+    public static List<Class<?>> getAllAnnotationPresentClass(Class<? extends Annotation> annotation,
+                                                              String... packages) {
         if (packages == null || packages.length == 0) {
             return Collections.emptyList();
         }
@@ -59,14 +61,15 @@ public class ReflectUtil {
      * @param annotation 指定注解
      * @return 带有指定注解的方法集合
      */
-    public static List<Method> getAllAnnotationPresentMethod(Class<?> type, Class<? extends Annotation> annotation) {
+    public static List<Method> getAllAnnotationPresentMethod(Class<?> type,
+                                                             Class<? extends Annotation> annotation) {
         Method[] methods = type.getDeclaredMethods();
         if (methods.length == 0) {
             return Collections.emptyList();
         }
-        return Stream.of(methods).filter(method -> method.isAnnotationPresent(annotation)).collect(Collectors.toList());
+        return Stream.of(methods).filter(method -> method.isAnnotationPresent(annotation))
+            .collect(Collectors.toList());
     }
-
 
     /**
      * 获取指定对象中指定字段名对应的字段的值
@@ -77,7 +80,8 @@ public class ReflectUtil {
      * @return 指定对象中指定字段名对应字段的值
      * @throws NoSuchFieldException 当给定对象不存在指定字段的时候抛出该异常
      */
-    public static <T extends Object> T getFieldValue(Object obj, String fieldName) throws NoSuchFieldException {
+    public static <T extends Object> T getFieldValue(Object obj,
+                                                     String fieldName) throws NoSuchFieldException {
         Field field = obj.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         try {
@@ -100,13 +104,14 @@ public class ReflectUtil {
      * @param <M> map的实际类型
      * @return 对应的JavaType
      */
-    public static <K, V, M extends Map<K, V>> JavaType createMapType(Class<M> m, Class<K> k, Class<V> v) {
+    public static <K, V, M extends Map<K, V>> JavaType createMapType(Class<M> m, Class<K> k,
+                                                                     Class<V> v) {
         BaseType mapType = new BaseType();
         BaseType keyType = new BaseType();
         BaseType valueType = new BaseType();
         keyType.setType(k);
         valueType.setType(v);
-        JavaType[] generics = {keyType, valueType};
+        JavaType[] generics = { keyType, valueType };
         mapType.setType(m);
         mapType.setGenerics(generics);
         return mapType;
@@ -121,11 +126,12 @@ public class ReflectUtil {
      * @param <K> 集合的实际类型
      * @return 带泛型的集合类型
      */
-    public static <T, K extends Collection<T>> JavaType createCollectionType(Class<K> k, Class<T> t) {
+    public static <T, K extends Collection<T>> JavaType createCollectionType(Class<K> k,
+                                                                             Class<T> t) {
         BaseType collectionType = new BaseType();
         BaseType genericType = new BaseType();
         genericType.setType(t);
-        JavaType[] generics = {genericType};
+        JavaType[] generics = { genericType };
         collectionType.setType(k);
         collectionType.setGenerics(generics);
         return collectionType;
@@ -245,7 +251,8 @@ public class ReflectUtil {
                 // 是自定义类型，对自定义类型的各个属性进行描述
                 Map<String, JavaType> params = new TreeMap<>();
                 // 获取该自定义类型的各个属性
-                CustomPropertyDescriptor[] props = BeanUtils.getPropertyDescriptors(baseType.getType());
+                CustomPropertyDescriptor[] props = BeanUtils
+                    .getPropertyDescriptors(baseType.getType());
                 for (CustomPropertyDescriptor prop : props) {
                     if ("class".equals(prop.getName())) {
                         continue;
@@ -258,15 +265,19 @@ public class ReflectUtil {
                         // 获取属性字段上的注解
                         Field field = baseType.getType().getField(prop.getName());
                         Annotation[] fieldAnnotations = field.getAnnotations();
-                        annotations = new Annotation[methodAnnotations.length + fieldAnnotations.length];
-                        System.arraycopy(methodAnnotations, 0, annotations, 0, methodAnnotations.length);
+                        annotations = new Annotation[methodAnnotations.length
+                                                     + fieldAnnotations.length];
+                        System.arraycopy(methodAnnotations, 0, annotations, 0,
+                            methodAnnotations.length);
                         System.arraycopy(fieldAnnotations, 0, annotations, methodAnnotations.length,
-                                fieldAnnotations.length);
+                            fieldAnnotations.length);
                     } catch (Exception e) {
                         annotations = new Annotation[methodAnnotations.length];
-                        System.arraycopy(methodAnnotations, 0, annotations, 0, methodAnnotations.length);
+                        System.arraycopy(methodAnnotations, 0, annotations, 0,
+                            methodAnnotations.length);
                     }
-                    JavaType filedType = createJavaType(prop.getReadMethod().getGenericReturnType());
+                    JavaType filedType = createJavaType(
+                        prop.getReadMethod().getGenericReturnType());
                     filedType.setAnnotations(annotations);
                     params.put(prop.getName(), filedType);
                 }
@@ -290,13 +301,13 @@ public class ReflectUtil {
             throw new NullPointerException("Class不能为null");
         else
             return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
-                    || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-                    || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
-                    || Enum.class.isAssignableFrom(clazz) || boolean.class.isAssignableFrom(clazz) || char.class
-                    .isAssignableFrom(clazz) || byte.class.isAssignableFrom(clazz) || short.class.isAssignableFrom
-                    (clazz)
-                    || int.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz) || double.class
-                    .isAssignableFrom(clazz) || float.class.isAssignableFrom(clazz);
+                   || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
+                   || String.class.isAssignableFrom(clazz)
+                   || Collection.class.isAssignableFrom(clazz) || Enum.class.isAssignableFrom(clazz)
+                   || boolean.class.isAssignableFrom(clazz) || char.class.isAssignableFrom(clazz)
+                   || byte.class.isAssignableFrom(clazz) || short.class.isAssignableFrom(clazz)
+                   || int.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz)
+                   || double.class.isAssignableFrom(clazz) || float.class.isAssignableFrom(clazz);
     }
 
     /**
@@ -310,10 +321,10 @@ public class ReflectUtil {
         if (clazz == null)
             throw new NullPointerException("Class不能为null");
         else
-            return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz) || Byte.class
-                    .isAssignableFrom(clazz) || Short.class.isAssignableFrom(clazz) || Integer.class.isAssignableFrom
-                    (clazz) || Long.class.isAssignableFrom(clazz) || Double.class.isAssignableFrom(clazz) || Float.class
-                    .isAssignableFrom(clazz);
+            return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
+                   || Byte.class.isAssignableFrom(clazz) || Short.class.isAssignableFrom(clazz)
+                   || Integer.class.isAssignableFrom(clazz) || Long.class.isAssignableFrom(clazz)
+                   || Double.class.isAssignableFrom(clazz) || Float.class.isAssignableFrom(clazz);
     }
 
     /**
@@ -370,9 +381,9 @@ public class ReflectUtil {
      * @return 如果是基本类型则返回<code>true</code>
      */
     public static boolean isGeneralArrayType(String name) {
-        return "byte[]".equals(name) || "short[]".equals(name) || "int[]".equals(name) || "long[]".equals(name)
-                || "double[]".equals(name) || "float[]".equals(name) || "boolean[]".equals(name)
-                || "char[]".equals(name);
+        return "byte[]".equals(name) || "short[]".equals(name) || "int[]".equals(name)
+               || "long[]".equals(name) || "double[]".equals(name) || "float[]".equals(name)
+               || "boolean[]".equals(name) || "char[]".equals(name);
     }
 
     /**

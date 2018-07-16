@@ -1,7 +1,8 @@
 package com.joe.utils.parse.xml.converter;
 
-import com.joe.utils.common.StringUtils;
 import org.dom4j.Element;
+
+import com.joe.utils.common.StringUtils;
 
 /**
  * Boolean转换器
@@ -12,7 +13,8 @@ import org.dom4j.Element;
 public class BooleanConverter extends AbstractXmlTypeConvert<Boolean> {
     @Override
     public Boolean read(Element element, String attrName) {
-        String data = StringUtils.isEmpty(attrName) ? element.getText() : element.attributeValue(attrName);
+        String data = StringUtils.isEmpty(attrName) ? element.getText()
+            : element.attributeValue(attrName);
         if (StringUtils.isEmpty(data)) {
             return false;
         } else {

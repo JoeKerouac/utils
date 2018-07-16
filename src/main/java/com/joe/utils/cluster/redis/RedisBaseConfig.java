@@ -1,8 +1,8 @@
 package com.joe.utils.cluster.redis;
 
-import lombok.Data;
-
 import java.io.Serializable;
+
+import lombok.Data;
 
 /**
  * RedisBaseConfig
@@ -18,29 +18,29 @@ public abstract class RedisBaseConfig implements Serializable {
      * then it will closed and removed from pool.
      * Value in milliseconds.
      */
-    private int idleConnectionTimeout = 10000;
+    private int    idleConnectionTimeout      = 10000;
 
     /**
      * Ping timeout used in Node.ping and Node.pingAll operation.
      * Value in milliseconds.
      */
-    private int pingTimeout = 1000;
+    private int    pingTimeout                = 1000;
 
     /**
      * Timeout during connecting to any Redis server.
      * Value in milliseconds.
      */
-    private int connectTimeout = 10000;
+    private int    connectTimeout             = 10000;
 
     /**
      * Redis server response timeout. Starts to countdown when Redis command was succesfully sent.
      * Value in milliseconds.
      */
-    private int timeout = 3000;
+    private int    timeout                    = 3000;
 
-    private int retryAttempts = 3;
+    private int    retryAttempts              = 3;
 
-    private int retryInterval = 1500;
+    private int    retryInterval              = 1500;
 
     /**
      * Reconnection attempt timeout to Redis server then
@@ -51,14 +51,14 @@ public abstract class RedisBaseConfig implements Serializable {
      *
      * @see #failedAttempts
      */
-    private int reconnectionTimeout = 3000;
+    private int    reconnectionTimeout        = 3000;
 
     /**
      * Redis server will be excluded from the list of available nodes
      * when sequential unsuccessful execution attempts of any Redis command
      * reaches failedAttempts.
      */
-    private int failedAttempts = 3;
+    private int    failedAttempts             = 3;
 
     /**
      * Password for Redis authentication. Should be null if not needed
@@ -68,7 +68,7 @@ public abstract class RedisBaseConfig implements Serializable {
     /**
      * Subscriptions per Redis connection limit
      */
-    private int subscriptionsPerConnection = 5;
+    private int    subscriptionsPerConnection = 5;
 
     /**
      * Name of client connection

@@ -1,22 +1,23 @@
 package com.joe.utils.secure.impl;
 
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+
 import com.joe.utils.codec.IBase64;
 import com.joe.utils.pool.ObjectPool;
 import com.joe.utils.secure.CipherUtil;
 import com.joe.utils.secure.exception.SecureException;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 加密工具辅助类
@@ -26,12 +27,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 public abstract class AbstractCipher implements CipherUtil {
-    private static final Map<String, ObjectPool<CipherHolder>> CACHE = new ConcurrentHashMap<>();
-    protected static final IBase64 BASE_64 = new IBase64();
-    private String id;
-    private Algorithms algorithms;
-    private Key priKey;
-    private Key pubKey;
+    private static final Map<String, ObjectPool<CipherHolder>> CACHE   = new ConcurrentHashMap<>();
+    protected static final IBase64                             BASE_64 = new IBase64();
+    private String                                             id;
+    private Algorithms                                         algorithms;
+    private Key                                                priKey;
+    private Key                                                pubKey;
 
     AbstractCipher(String id, Algorithms algorithms, Key priKey, Key pubKey) {
         this.id = id.intern();
@@ -39,7 +40,7 @@ public abstract class AbstractCipher implements CipherUtil {
         this.priKey = priKey;
         this.pubKey = pubKey;
 
-        CACHE.computeIfAbsent(this.id , key -> {
+        CACHE.computeIfAbsent(this.id, key -> {
             ObjectPool<CipherHolder> pool = new ObjectPool<>(this::build);
             //快速验证
             pool.get().close();
@@ -146,18 +147,18 @@ public abstract class AbstractCipher implements CipherUtil {
         /**
          * 加密器
          */
-        private Cipher encrypt;
+        private Cipher     encrypt;
         /**
          * 解密器
          */
-        private Cipher decrypt;
+        private Cipher     decrypt;
         /**
          * 公钥（对称加密中公钥私钥相同）
          */
-        private Key publicKey;
+        private Key        publicKey;
         /**
          * 私钥（对称加密中公钥私钥相同）
          */
-        private Key privateKey;
+        private Key        privateKey;
     }
 }

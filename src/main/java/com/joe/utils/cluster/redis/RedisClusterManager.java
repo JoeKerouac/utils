@@ -1,10 +1,5 @@
 package com.joe.utils.cluster.redis;
 
-import com.joe.utils.cluster.ClusterManager;
-import com.joe.utils.cluster.Topic;
-import com.joe.utils.cluster.redis.RedisTopic;
-import org.redisson.api.RedissonClient;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +8,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+
+import org.redisson.api.RedissonClient;
+
+import com.joe.utils.cluster.ClusterManager;
+import com.joe.utils.cluster.Topic;
 
 /**
  * redis实现的分布式锁管理器

@@ -1,20 +1,22 @@
 package com.joe.utils.common;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.joe.utils.collection.LRUCacheMap;
-import com.joe.utils.common.exception.BeanException;
-import com.joe.utils.parse.xml.XmlNode;
-import com.joe.utils.type.ReflectUtil;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
-
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import org.apache.poi.ss.formula.functions.T;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.joe.utils.collection.LRUCacheMap;
+import com.joe.utils.common.exception.BeanException;
+import com.joe.utils.parse.xml.XmlNode;
+import com.joe.utils.type.ReflectUtil;
+
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Bean常用操作
@@ -23,8 +25,8 @@ import java.util.*;
  */
 @Slf4j
 public class BeanUtils {
-    private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> cache = new LRUCacheMap<>();
-    private static final LRUCacheMap<Class<?>, Field[]> fieldCache = new LRUCacheMap<>();
+    private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> cache               = new LRUCacheMap<>();
+    private static final LRUCacheMap<Class<?>, Field[]>                    fieldCache          = new LRUCacheMap<>();
     private static final LRUCacheMap<FieldCache, CustomPropertyDescriptor> fieldDescriporCache = new LRUCacheMap<>();
 
     /**
@@ -46,15 +48,16 @@ public class BeanUtils {
      * @param hasNull        是否包含null值，true表示包含
      * @return map，当pojo为null时返回空map
      */
-    public static <T> Map<String, T> convert(Object pojo, Class<? extends Annotation> annotationType, boolean
-            hasNull) {
+    public static <T> Map<String, T> convert(Object pojo,
+                                             Class<? extends Annotation> annotationType,
+                                             boolean hasNull) {
         log.debug("获取[{}]的字段映射，使用注解[{}]的值作为别名", pojo, annotationType);
         if (pojo == null) {
             return Collections.emptyMap();
         }
 
-        if (annotationType != null && !JsonProperty.class.isAssignableFrom(annotationType) && !XmlNode.class
-                .isAssignableFrom(annotationType)) {
+        if (annotationType != null && !JsonProperty.class.isAssignableFrom(annotationType)
+            && !XmlNode.class.isAssignableFrom(annotationType)) {
             throw new IllegalArgumentException("不支持的注解类型：" + annotationType);
         }
 
@@ -236,8 +239,10 @@ public class BeanUtils {
                     log.debug("源{}中不存在字段[{}]的read方法", sourceName, field.getName());
                 } else {
                     // 调用反射复制
-                    propertyDescriptor.getWriteMethod().invoke(dest, descriptor.getReadMethod().invoke(source));
-                    log.info("copy {}.{} to {}.{}", source.getClass().getName(), name, targetClassName, name);
+                    propertyDescriptor.getWriteMethod().invoke(dest,
+                        descriptor.getReadMethod().invoke(source));
+                    log.info("copy {}.{} to {}.{}", source.getClass().getName(), name,
+                        targetClassName, name);
                 }
             } catch (Exception e) {
                 log.warn("copy中复制{}时发生错误，忽略该字段", name, e);
@@ -392,7 +397,8 @@ public class BeanUtils {
                 customPropertyDescriptor = tryBuildFinal(field, clazz);
             } else {
                 log.debug("字段不是final类型，开始构建字段{}的说明", name);
-                customPropertyDescriptor = convert(field, new PropertyDescriptor(name, clazz), clazz);
+                customPropertyDescriptor = convert(field, new PropertyDescriptor(name, clazz),
+                    clazz);
             }
         } catch (IntrospectionException e) {
             //挣扎一下，尝试自己构建（针对继承方法有效）
@@ -415,8 +421,8 @@ public class BeanUtils {
             } else {
                 log.info("自定义构建PropertyDescriptor成功");
                 try {
-                    customPropertyDescriptor = convert(field, new PropertyDescriptor(name, readMethod, writeMethod),
-                            clazz);
+                    customPropertyDescriptor = convert(field,
+                        new PropertyDescriptor(name, readMethod, writeMethod), clazz);
                 } catch (IntrospectionException e1) {
                     log.info("构建失败，忽略字段[{}]", field.getName(), e1);
                 }
@@ -473,7 +479,8 @@ public class BeanUtils {
      * @return final类型字段的说明，该值不会为null，构建失败时会抛出异常
      * @throws IntrospectionException 构建失败抛出异常，不会返回null
      */
-    private static CustomPropertyDescriptor tryBuildFinal(Field field, Class<?> clazz) throws IntrospectionException {
+    private static CustomPropertyDescriptor tryBuildFinal(Field field,
+                                                          Class<?> clazz) throws IntrospectionException {
         String name = field.getName();
         String readMethodName;
         log.debug("尝试为final类型的字段{}创建字段说明", name);
@@ -501,16 +508,17 @@ public class BeanUtils {
      * @param clazz      字段所属的class
      * @return 自定义字段说明
      */
-    private static CustomPropertyDescriptor convert(Field field, PropertyDescriptor descriptor, Class<?> clazz) {
+    private static CustomPropertyDescriptor convert(Field field, PropertyDescriptor descriptor,
+                                                    Class<?> clazz) {
         if (descriptor == null) {
             return null;
         }
         return new CustomPropertyDescriptor(descriptor.getName(), descriptor.getReadMethod(),
-                descriptor.getWriteMethod(), clazz, field);
+            descriptor.getWriteMethod(), clazz, field);
     }
 
     private final static class FieldCache {
-        private final Field field;
+        private final Field    field;
         private final Class<?> clazz;
 
         /**
@@ -549,24 +557,24 @@ public class BeanUtils {
     public final static class CustomPropertyDescriptor {
         // 字段名称
         @Getter
-        private final String name;
+        private final String   name;
         // 字段的写方法
         @Getter
-        private final Method writeMethod;
+        private final Method   writeMethod;
         // 字段的读方法
         @Getter
-        private final Method readMethod;
+        private final Method   readMethod;
         // 字段所属的class（字段所在类的Class，不是字段本身的Class！！）
         @Getter
         private final Class<?> clazz;
         // 字段
         @Getter
-        private final Field field;
+        private final Field    field;
         //字段的类型
-        private Class<?> type;
+        private Class<?>       type;
 
-        public CustomPropertyDescriptor(String name, Method readMethod, Method writeMethod, Class<?> clazz,
-                                        Field field) {
+        public CustomPropertyDescriptor(String name, Method readMethod, Method writeMethod,
+                                        Class<?> clazz, Field field) {
             this.name = name;
             this.readMethod = readMethod;
             this.writeMethod = writeMethod;

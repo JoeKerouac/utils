@@ -23,8 +23,8 @@ public class ResourceNotFoundException extends RuntimeException {
         super(cause);
     }
 
-    protected ResourceNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean
-            writableStackTrace) {
+    protected ResourceNotFoundException(String message, Throwable cause, boolean enableSuppression,
+                                        boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

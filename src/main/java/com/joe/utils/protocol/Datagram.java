@@ -1,6 +1,5 @@
 package com.joe.utils.protocol;
 
-
 /**
  * 数据报，用户不能直接构建，可以通过DatagramUtil构建
  * socket通讯发送的数据，该数据为最小数据，不能再分
@@ -24,87 +23,86 @@ package com.joe.utils.protocol;
  */
 @lombok.Data
 public class Datagram {
-    private static final byte[] EMPTY_DATA = new byte[0];
+    private static final byte[] EMPTY_DATA    = new byte[0];
     /**
      * 心跳包类型
      */
-    public static final byte HEARTBEAT = 0;
+    public static final byte    HEARTBEAT     = 0;
     /**
      * MVC数据类型
      */
-    public static final byte MVC = 1;
+    public static final byte    MVC           = 1;
     /**
      * 文件上传数据类型
      */
-    public static final byte FILE = 2;
+    public static final byte    FILE          = 2;
     /**
      * ACK数据类型
      */
-    public static final byte ACK = 3;
+    public static final byte    ACK           = 3;
     /**
      * BACK数据类型
      */
-    public static final byte BACK = 4;
+    public static final byte    BACK          = 4;
     /**
      * 需要ACK的数据类型
      */
-    private static final byte[] ACKS = {MVC, FILE, BACK};
+    private static final byte[] ACKS          = { MVC, FILE, BACK };
     /**
      * 数据报的报头长度
      */
-    public static final int HEADER_LEN = 56;
+    public static final int     HEADER_LEN    = 56;
     /**
      * 版本号字段的位置
      */
-    public static final int VERSION_INDEX = 0;
+    public static final int     VERSION_INDEX = 0;
     /**
      * 请求头中长度字段起始位置
      */
-    public static final int LEN_OFFSET = 1;
+    public static final int     LEN_OFFSET    = 1;
     /**
      * 请求头中长度字段的长度
      */
-    public static final int LEN_LIMIT = 4;
+    public static final int     LEN_LIMIT     = 4;
     /**
      * 数据报类型字段的位置
      */
-    public static final int TYPE_INDEX = 5;
+    public static final int     TYPE_INDEX    = 5;
     /**
      * 数据报的最大长度，包含请求头和请求体
      */
-    public static final int MAX_LENGTH = Integer.MAX_VALUE;
-
+    public static final int     MAX_LENGTH    = Integer.MAX_VALUE;
 
     /**
      * 存放数据报数据，包含头信息，只读信息，只要创建出来后就无法更改
      */
-    private final byte[] data;
+    private final byte[]        data;
     /**
      * 该长度不包含头信息的长度，只有body的长度
      */
-    private final int size;
+    private final int           size;
     /**
      * 数据报版本
      */
-    private final byte version;
+    private final byte          version;
     /**
      * 数据报body的编码
      */
-    private final String charset;
+    private final String        charset;
     /**
      * 数据报body
      */
-    private final byte[] body;
+    private final byte[]        body;
     /**
      * 数据报数据类型（0：心跳包；1：内置MVC数据处理器数据类型；2：文件传输；3：ACK；4：后端主动发往前端的数据；
      * <p>
      * 除了0、1、2、3、4外可以自己定义数据类型）
      */
-    private final byte type;
+    private final byte          type;
     /**
      * 数据报的ID
      */
-    private final byte[] id;
+    private final byte[]        id;
 
     /**
      * 初始化数据报
@@ -117,7 +115,8 @@ public class Datagram {
      * @param type    数据报数据类型（1：接口请求）
      * @param id      数据报的ID
      */
-    public Datagram(byte[] data, int size, byte[] body, byte version, String charset, byte type, byte[] id) {
+    public Datagram(byte[] data, int size, byte[] body, byte version, String charset, byte type,
+                    byte[] id) {
         if (data == null) {
             this.data = EMPTY_DATA;
         } else {

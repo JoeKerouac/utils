@@ -1,10 +1,11 @@
 package com.joe.utils.cluster.redis;
 
-import com.joe.utils.cluster.Topic;
-import com.joe.utils.cluster.TopicMessageListener;
+import java.util.List;
+
 import org.redisson.api.RTopic;
 
-import java.util.List;
+import com.joe.utils.cluster.Topic;
+import com.joe.utils.cluster.TopicMessageListener;
 
 /**
  * @author joe
@@ -12,6 +13,7 @@ import java.util.List;
  */
 public class RedisTopic<M> implements Topic<M> {
     private final RTopic<M> topic;
+
     public RedisTopic(RTopic<M> topic) {
         this.topic = topic;
     }

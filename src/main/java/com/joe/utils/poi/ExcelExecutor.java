@@ -1,23 +1,25 @@
 package com.joe.utils.poi;
 
-import com.joe.utils.collection.CollectionUtil;
-import com.joe.utils.common.BeanUtils;
-import com.joe.utils.common.StringUtils;
-import com.joe.utils.poi.data.*;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+
+import com.joe.utils.collection.CollectionUtil;
+import com.joe.utils.common.BeanUtils;
+import com.joe.utils.common.StringUtils;
+import com.joe.utils.poi.data.*;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Excel执行器，将数据写入excel，用户可以注册自己的excel单元格数据类型处理器{@link ExcelDataWriter ExcelDataWriter}来做
@@ -31,34 +33,39 @@ public class ExcelExecutor {
     /**
      * 默认内存中最多多好行单元格
      */
-    private static final int IN_MEMORY = 100;
+    private static final int                        IN_MEMORY  = 100;
     /**
      * 排序器
      */
-    private static final Comparator<Field> COMPARATOR = (f1, f2) -> {
-        ExcelColumn c1 = f1.getAnnotation(ExcelColumn.class);
-        ExcelColumn c2 = f2.getAnnotation(ExcelColumn.class);
-        if (c1 == null && c2 == null) {
-            return f1.getName().compareTo(f2.getName());
-        }
+    private static final Comparator<Field>          COMPARATOR = (f1, f2) -> {
+                                                                   ExcelColumn c1 = f1
+                                                                       .getAnnotation(
+                                                                           ExcelColumn.class);
+                                                                   ExcelColumn c2 = f2
+                                                                       .getAnnotation(
+                                                                           ExcelColumn.class);
+                                                                   if (c1 == null && c2 == null) {
+                                                                       return f1.getName()
+                                                                           .compareTo(f2.getName());
+                                                                   }
 
-        if (c1 == null) {
-            return 1;
-        }
+                                                                   if (c1 == null) {
+                                                                       return 1;
+                                                                   }
 
-        if (c2 == null) {
-            return -1;
-        }
-        return c1.sort() - c2.sort();
-    };
+                                                                   if (c2 == null) {
+                                                                       return -1;
+                                                                   }
+                                                                   return c1.sort() - c2.sort();
+                                                               };
     /**
      * 默认实例
      */
-    private static final ExcelExecutor UTILS = new ExcelExecutor();
+    private static final ExcelExecutor              UTILS      = new ExcelExecutor();
     /**
      * 所有的Excel单元格数据类型
      */
-    private final Map<Class<?>, ExcelDataWriter<?>> writers = new HashMap<>();
+    private final Map<Class<?>, ExcelDataWriter<?>> writers    = new HashMap<>();
 
     private ExcelExecutor() {
         init();
@@ -93,7 +100,6 @@ public class ExcelExecutor {
     public static ExcelExecutor buildInstance() {
         return new ExcelExecutor();
     }
-
 
     /**
      * 注册一个新的excel单元格DataWriter（如果原来存在那么将会覆盖原来的DataWriter）
@@ -130,7 +136,8 @@ public class ExcelExecutor {
      * @param path     excel本地路径
      * @throws IOException IO异常
      */
-    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path) throws IOException {
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
+                             String path) throws IOException {
         writeToExcel(datas, hasTitle, path, IN_MEMORY);
     }
 
@@ -143,8 +150,8 @@ public class ExcelExecutor {
      * @param inMemory 最多保留在内存中多少行
      * @throws IOException IO异常
      */
-    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path, int inMemory) throws
-            IOException {
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path,
+                             int inMemory) throws IOException {
         writeToExcel(datas, hasTitle, new FileOutputStream(path), inMemory);
     }
 
@@ -156,8 +163,8 @@ public class ExcelExecutor {
      * @param outputStream 输出流（该流不会关闭，需要用户手动关闭）
      * @throws IOException IO异常
      */
-    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, OutputStream outputStream) throws
-            IOException {
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
+                             OutputStream outputStream) throws IOException {
         writeToExcel(datas, hasTitle, outputStream, IN_MEMORY);
     }
 
@@ -170,8 +177,8 @@ public class ExcelExecutor {
      * @param inMemory     最多保留在内存中多少行
      * @throws IOException IO异常
      */
-    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, OutputStream outputStream, int
-            inMemory) throws IOException {
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
+                             OutputStream outputStream, int inMemory) throws IOException {
         log.info("准备将数据写入excel");
         //这里使用SXSSFWorkbook而不是XSSFWorkbook，这样将会节省内存，但是内存中仅仅存在inMemory行数据，如果超出那么会将
         //index最小的刷新到本地，后续不能通过getRow方法获取到该行
@@ -192,7 +199,8 @@ public class ExcelExecutor {
      * @param workbook 工作簿
      * @return 写入后的工作簿
      */
-    public Workbook writeToExcel(List<? extends Object> datas, boolean hasTitle, Workbook workbook) {
+    public Workbook writeToExcel(List<? extends Object> datas, boolean hasTitle,
+                                 Workbook workbook) {
         if (CollectionUtil.safeIsEmpty(datas)) {
             log.warn("给定数据集合为空");
             return workbook;
@@ -212,8 +220,8 @@ public class ExcelExecutor {
             log.debug("检查字段[{}]是否可以写入", name);
             Class<?> type = field.getType();
 
-            List<ExcelDataWriter<?>> data = writers.values().stream().filter(excelData -> excelData.writeable(type))
-                    .collect(Collectors.toList());
+            List<ExcelDataWriter<?>> data = writers.values().stream()
+                .filter(excelData -> excelData.writeable(type)).collect(Collectors.toList());
             if (data.isEmpty()) {
                 log.info("字段[{}]不能写入", name);
             } else {
@@ -284,8 +292,9 @@ public class ExcelExecutor {
      * @param workbook 工作簿
      * @return 写入数据后的工作簿
      */
-    private Workbook writeToExcel(List<? extends Writer<?>> titles, List<List<? extends Writer<?>>> datas, boolean
-            hasTitle, Workbook workbook) {
+    private Workbook writeToExcel(List<? extends Writer<?>> titles,
+                                  List<List<? extends Writer<?>>> datas, boolean hasTitle,
+                                  Workbook workbook) {
         if (CollectionUtil.safeIsEmpty(datas)) {
             log.warn("数据为空，不写入直接返回");
             return workbook;
@@ -330,8 +339,8 @@ public class ExcelExecutor {
      * @return 返回不为空表示能写入，并返回单元格数据，返回空表示无法写入
      */
     private Writer<?> build(Object data) {
-        List<ExcelDataWriter<?>> dataBuilder = writers.values().parallelStream().filter(excelData -> excelData
-                .writeable(data)).collect(Collectors.toList());
+        List<ExcelDataWriter<?>> dataBuilder = writers.values().parallelStream()
+            .filter(excelData -> excelData.writeable(data)).collect(Collectors.toList());
         if (dataBuilder.isEmpty()) {
             return null;
         } else {
@@ -342,7 +351,7 @@ public class ExcelExecutor {
     @AllArgsConstructor
     private class Writer<T> {
         private final ExcelDataWriter<T> writer;
-        private final T data;
+        private final T                  data;
 
         public void write(Cell cell) {
             writer.write(cell, data);

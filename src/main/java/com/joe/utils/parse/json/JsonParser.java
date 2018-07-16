@@ -1,14 +1,15 @@
 package com.joe.utils.parse.json;
 
+import java.util.Collection;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.MapType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
-import java.util.Map;
 
 /**
  * json解析工具
@@ -18,8 +19,8 @@ import java.util.Map;
 public class JsonParser {
     private static final ObjectMapper MAPPER_IGNORE_NULL;
     private static final ObjectMapper MAPPER;
-    private static final Logger logger = LoggerFactory.getLogger(JsonParser.class);
-    private static JsonParser jsonParser;
+    private static final Logger       logger = LoggerFactory.getLogger(JsonParser.class);
+    private static JsonParser         jsonParser;
 
     private JsonParser() {
     }
@@ -83,7 +84,6 @@ public class JsonParser {
         }
     }
 
-
     /**
      * 解析json
      *
@@ -144,8 +144,8 @@ public class JsonParser {
      * @param <V>       map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(String content, Class<? extends Map> mapType, Class<K>
-            keyType, Class<V> valueType) {
+    public <T extends Map<K, V>, K, V> T readAsMap(String content, Class<? extends Map> mapType,
+                                                   Class<K> keyType, Class<V> valueType) {
         try {
             MapType type = MAPPER.getTypeFactory().constructMapType(mapType, keyType, valueType);
             return MAPPER.readValue(content, type);
@@ -167,8 +167,8 @@ public class JsonParser {
      * @param <V>       map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content, Class<? extends Map> mapType, Class<K>
-            keyType, Class<V> valueType) {
+    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content, Class<? extends Map> mapType,
+                                                   Class<K> keyType, Class<V> valueType) {
         return readAsMap(new String(content), mapType, keyType, valueType);
     }
 
@@ -182,10 +182,12 @@ public class JsonParser {
      * @param <V>            list的泛型
      * @return 解析结果
      */
-    public <T extends Collection<V>, V> T readAsCollection(String content, Class<? extends Collection>
-            collectionType, Class<V> elementsType) {
+    public <T extends Collection<V>, V> T readAsCollection(String content,
+                                                           Class<? extends Collection> collectionType,
+                                                           Class<V> elementsType) {
         try {
-            CollectionLikeType type = MAPPER.getTypeFactory().constructCollectionLikeType(collectionType, elementsType);
+            CollectionLikeType type = MAPPER.getTypeFactory()
+                .constructCollectionLikeType(collectionType, elementsType);
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
             logger.error("json解析失败，失败原因：", e);
@@ -203,8 +205,9 @@ public class JsonParser {
      * @param <V>            list的泛型
      * @return 解析结果
      */
-    public <T extends Collection<V>, V> T readAsCollection(byte[] content, Class<? extends Collection>
-            collectionType, Class<V> elementsType) {
+    public <T extends Collection<V>, V> T readAsCollection(byte[] content,
+                                                           Class<? extends Collection> collectionType,
+                                                           Class<V> elementsType) {
         return readAsCollection(new String(content), collectionType, elementsType);
     }
 }
