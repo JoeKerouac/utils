@@ -5,6 +5,8 @@ import com.joe.utils.common.IOUtils;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.secure.exception.SecureException;
 import com.joe.utils.secure.impl.AbstractCipher;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.crypto.KeyGenerator;
@@ -26,6 +28,25 @@ import java.security.spec.X509EncodedKeySpec;
 @Slf4j
 public class KeyTools {
     private static final IBase64 BASE_64 = new IBase64();
+
+    /**
+     * 构建RSA密钥对
+     *
+     * @param keySize keySize（必须大于等于512）
+     * @return RSA密钥对
+     */
+    public static KeyHolder buildRSAKey(int keySize) {
+        try {
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            generator.initialize(keySize);
+            KeyPair keyPair = generator.generateKeyPair();
+            PrivateKey privateKey = keyPair.getPrivate();
+            PublicKey publicKey = keyPair.getPublic();
+            return new KeyHolder(privateKey, publicKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new SecureException("当前系统没有提供生成RSA密钥对的算法", e);
+        }
+    }
 
     /**
      * 从PKCS8格式的文件中获取私钥
@@ -101,5 +122,12 @@ public class KeyTools {
     public static SecretKey buildKey(AbstractCipher.Algorithms algorithm, byte[] keySpec) {
         SecretKeySpec key = new SecretKeySpec(keySpec, algorithm.name());
         return key;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class KeyHolder {
+        private PrivateKey privateKey;
+        private PublicKey publicKey;
     }
 }

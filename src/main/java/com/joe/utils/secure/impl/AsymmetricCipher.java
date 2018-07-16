@@ -33,8 +33,8 @@ public class AsymmetricCipher extends AbstractCipher {
     /**
      * 非对称加密构造器
      *
-     * @param privateKey PKCS8格式的私钥
-     * @param publicKey  X509格式的公钥
+     * @param privateKey PKCS8格式的私钥（BASE64 encode过的）
+     * @param publicKey  X509格式的公钥（BASE64 encode过的）
      */
     public static CipherUtil buildInstance(String privateKey, String publicKey) {
         return buildInstance(privateKey.getBytes(), publicKey.getBytes());
@@ -43,15 +43,25 @@ public class AsymmetricCipher extends AbstractCipher {
     /**
      * 非对称加密构造器
      *
-     * @param privateKey PKCS8格式的私钥
-     * @param publicKey  X509格式的公钥
+     * @param privateKey PKCS8格式的私钥（BASE64 encode过的）
+     * @param publicKey  X509格式的公钥（BASE64 encode过的）
      */
     public static CipherUtil buildInstance(byte[] privateKey, byte[] publicKey) {
         PrivateKey priKey = KeyTools.getPrivateKeyFromPKCS8(Algorithms.RSA.name(), new ByteArrayInputStream
                 (privateKey));
         PublicKey pubKey = KeyTools.getPublicKeyFromX509(Algorithms.RSA.name(), new ByteArrayInputStream(publicKey));
-        return new AsymmetricCipher(new String(privateKey) + ":" + new String(publicKey), Algorithms.RSA, priKey,
-                pubKey);
+        return buildInstance(priKey, pubKey);
+    }
+
+    /**
+     * 非对称加密构造器
+     *
+     * @param privateKey PKCS8格式的私钥
+     * @param publicKey  X509格式的公钥
+     */
+    public static CipherUtil buildInstance(PrivateKey privateKey, PublicKey publicKey) {
+        return new AsymmetricCipher(new String(BASE_64.encrypt(privateKey.getEncoded())) + ":" + new String
+                (BASE_64.encrypt(publicKey.getEncoded())), Algorithms.RSA, privateKey, publicKey);
     }
 
     @Override
