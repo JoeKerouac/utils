@@ -8,6 +8,29 @@ public class Tools {
     protected static final DecimalFormat NUMFORMAT = new DecimalFormat("#.00");
 
     /**
+     * 判断指定数组dests中是否包含指定数据src
+     * @param src 数据
+     * @param dests 数组，不能为空
+     * @return 返回true表示dests中包含src
+     */
+    public static boolean contains(Object src, Object... dests) {
+        if (dests == null) {
+            throw new NullPointerException("dest must not be null");
+        }
+
+        if (src == null) {
+            return false;
+        }
+
+        for (Object dest : dests) {
+            if (src == dest || src.equals(dest)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 生成一个32位的UUID
      *
      * @return 32位的UUID
