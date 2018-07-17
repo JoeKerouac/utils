@@ -19,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 用于在logback加载完毕后重新配置logback
+ *
+ * @author joe
+ * @version 2018.07.11 21:19
  */
 @Slf4j
 public class LogbackReconfigure {
