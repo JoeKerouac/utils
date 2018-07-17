@@ -25,10 +25,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class BeanUtils {
-    private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> CACHE                 = new LRUCacheMap<>();
-    private static final LRUCacheMap<Class<?>, Field[]>                    FIELD_CACHE           = new LRUCacheMap<>();
-    private static final LRUCacheMap<Field, CustomPropertyDescriptor>      FIELD_DESCRIPOR_CACHE = new LRUCacheMap<>();
-    private static final String                                            BOOLEAN_GET_PRE       = "is";
+    private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> CACHE            = new LRUCacheMap<>();
+    private static final LRUCacheMap<Class<?>, Field[]>                    FIELD_CACHE      = new LRUCacheMap<>();
+    private static final LRUCacheMap<FieldCache, CustomPropertyDescriptor> FIELD_DESC_CACHE = new LRUCacheMap<>();
 
     /**
      * 将pojo的所有字段映射为map，默认包含null值
@@ -382,9 +381,11 @@ public class BeanUtils {
      * @return 该字段的说明，构建异常时返回null
      */
     private static CustomPropertyDescriptor buildDescriptor(Field field, Class<?> clazz) {
+        FieldCache fieldCache = new FieldCache(field, clazz);
+
         // 首先检查缓存
-        if (FIELD_DESCRIPOR_CACHE.containsKey(field)) {
-            return FIELD_DESCRIPOR_CACHE.get(field);
+        if (FIELD_DESC_CACHE.containsKey(fieldCache)) {
+            return FIELD_DESC_CACHE.get(fieldCache);
         }
 
         String name = field.getName();
@@ -428,7 +429,7 @@ public class BeanUtils {
             }
         }
 
-        FIELD_DESCRIPOR_CACHE.put(field, customPropertyDescriptor);
+        FIELD_DESC_CACHE.put(fieldCache, customPropertyDescriptor);
         return customPropertyDescriptor;
     }
 
@@ -486,7 +487,7 @@ public class BeanUtils {
 
         if (Boolean.class.isAssignableFrom(field.getType())) {
             log.debug("字段是boolean类型");
-            if (name.startsWith(BOOLEAN_GET_PRE)) {
+            if (name.startsWith("is")) {
                 readMethodName = name;
             } else {
                 readMethodName = "is" + StringUtils.toFirstUpperCase(name);
@@ -516,40 +517,60 @@ public class BeanUtils {
             descriptor.getWriteMethod(), clazz, field);
     }
 
+    private final static class FieldCache {
+        private final Field    field;
+        private final Class<?> clazz;
+
+        /**
+         * 构建fieldcache
+         *
+         * @param field 字段，不能为null
+         * @param clazz 字段对应的class，不能为null
+         */
+        public FieldCache(Field field, Class<?> clazz) {
+            if (field == null || clazz == null) {
+                throw new NullPointerException("字段和对应的class不能为null");
+            }
+            this.field = field;
+            this.clazz = clazz;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (obj instanceof FieldCache) {
+                FieldCache fieldCache = (FieldCache) obj;
+                return fieldCache.clazz.equals(this.clazz) && this.field.equals(fieldCache.field);
+            }
+            return false;
+        }
+
+    }
+
     /**
      * 自定义字段说明
      *
      * @author joe
      */
     public final static class CustomPropertyDescriptor {
-        /**
-         * 字段名称
-         */
+        // 字段名称
         @Getter
         private final String   name;
-        /**
-         * 字段的写方法
-         */
+        // 字段的写方法
         @Getter
         private final Method   writeMethod;
-        /**
-         * 字段的读方法
-         */
+        // 字段的读方法
         @Getter
         private final Method   readMethod;
-        /**
-         * 字段所属的class（字段所在类的Class，不是字段本身的Class！！）
-         */
+        // 字段所属的class（字段所在类的Class，不是字段本身的Class！！）
         @Getter
         private final Class<?> clazz;
-        /**
-         * 字段
-         */
+        // 字段
         @Getter
         private final Field    field;
-        /**
-         * 字段的类型
-         */
+        //字段的类型
         private Class<?>       type;
 
         public CustomPropertyDescriptor(String name, Method readMethod, Method writeMethod,
