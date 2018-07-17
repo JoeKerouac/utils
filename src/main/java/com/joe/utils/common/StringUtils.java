@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class StringUtils {
+
     /**
      * 替换指定结束位置之前的所有字符
      *
