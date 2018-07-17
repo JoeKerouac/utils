@@ -25,9 +25,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class BeanUtils {
-    private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> cache               = new LRUCacheMap<>();
-    private static final LRUCacheMap<Class<?>, Field[]>                    fieldCache          = new LRUCacheMap<>();
-    private static final LRUCacheMap<FieldCache, CustomPropertyDescriptor> fieldDescriporCache = new LRUCacheMap<>();
+    private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> CACHE                 = new LRUCacheMap<>();
+    private static final LRUCacheMap<Class<?>, Field[]>                    FIELD_CACHE           = new LRUCacheMap<>();
+    private static final LRUCacheMap<Field, CustomPropertyDescriptor>      FIELD_DESCRIPOR_CACHE = new LRUCacheMap<>();
+    private static final String                                            BOOLEAN_GET_PRE       = "is";
 
     /**
      * 将pojo的所有字段映射为map，默认包含null值
@@ -291,7 +292,7 @@ public class BeanUtils {
             throw new NullPointerException("clazz为null");
         }
         // 首先从缓存中检查
-        CustomPropertyDescriptor[] descriptors = cache.get(clazz);
+        CustomPropertyDescriptor[] descriptors = CACHE.get(clazz);
         if (descriptors != null) {
             log.debug("获取Class {} 的说明时发现缓存中有，取出缓存中的说明返回", clazz);
             return descriptors;
@@ -302,7 +303,7 @@ public class BeanUtils {
         descriptors = new CustomPropertyDescriptor[fields.length];
         if (fields.length == 0) {
             log.debug("源{}中不存在已经声明的字段", clazz.getName());
-            cache.put(clazz, descriptors);
+            CACHE.put(clazz, descriptors);
             return descriptors;
         }
 
@@ -318,11 +319,11 @@ public class BeanUtils {
             log.debug("构建构成中发生了异常，数组中有null，除去null");
             CustomPropertyDescriptor[] propertyDescriptor = new CustomPropertyDescriptor[j];
             System.arraycopy(descriptors, 0, propertyDescriptor, 0, j);
-            cache.put(clazz, propertyDescriptor);
+            CACHE.put(clazz, propertyDescriptor);
             return propertyDescriptor;
         } else {
             log.debug("构建没有异常，构建成功");
-            cache.put(clazz, descriptors);
+            CACHE.put(clazz, descriptors);
             return descriptors;
         }
     }
@@ -334,7 +335,7 @@ public class BeanUtils {
      * @return 指定类的所有字段
      */
     public static Field[] getAllFields(Class<?> clazz) {
-        Field[] result = fieldCache.get(clazz);
+        Field[] result = FIELD_CACHE.get(clazz);
         if (result != null) {
             return result;
         }
@@ -346,7 +347,7 @@ public class BeanUtils {
         }
         log.debug("类{}的字段为：{}", clazz, fields);
         result = fields.toArray(new Field[fields.size()]);
-        fieldCache.put(clazz, result);
+        FIELD_CACHE.put(clazz, result);
         for (Field field : result) {
             try {
                 field.setAccessible(true);
@@ -381,11 +382,9 @@ public class BeanUtils {
      * @return 该字段的说明，构建异常时返回null
      */
     private static CustomPropertyDescriptor buildDescriptor(Field field, Class<?> clazz) {
-        FieldCache fieldCache = new FieldCache(field, clazz);
-
         // 首先检查缓存
-        if (fieldDescriporCache.containsKey(fieldCache)) {
-            return fieldDescriporCache.get(fieldCache);
+        if (FIELD_DESCRIPOR_CACHE.containsKey(field)) {
+            return FIELD_DESCRIPOR_CACHE.get(field);
         }
 
         String name = field.getName();
@@ -429,7 +428,7 @@ public class BeanUtils {
             }
         }
 
-        fieldDescriporCache.put(fieldCache, customPropertyDescriptor);
+        FIELD_DESCRIPOR_CACHE.put(field, customPropertyDescriptor);
         return customPropertyDescriptor;
     }
 
@@ -487,7 +486,7 @@ public class BeanUtils {
 
         if (Boolean.class.isAssignableFrom(field.getType())) {
             log.debug("字段是boolean类型");
-            if (name.startsWith("is")) {
+            if (name.startsWith(BOOLEAN_GET_PRE)) {
                 readMethodName = name;
             } else {
                 readMethodName = "is" + StringUtils.toFirstUpperCase(name);
@@ -517,60 +516,40 @@ public class BeanUtils {
             descriptor.getWriteMethod(), clazz, field);
     }
 
-    private final static class FieldCache {
-        private final Field    field;
-        private final Class<?> clazz;
-
-        /**
-         * 构建fieldcache
-         *
-         * @param field 字段，不能为null
-         * @param clazz 字段对应的class，不能为null
-         */
-        public FieldCache(Field field, Class<?> clazz) {
-            if (field == null || clazz == null) {
-                throw new NullPointerException("字段和对应的class不能为null");
-            }
-            this.field = field;
-            this.clazz = clazz;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (obj instanceof FieldCache) {
-                FieldCache fieldCache = (FieldCache) obj;
-                return fieldCache.clazz.equals(this.clazz) && this.field.equals(fieldCache.field);
-            }
-            return false;
-        }
-
-    }
-
     /**
      * 自定义字段说明
      *
      * @author joe
      */
     public final static class CustomPropertyDescriptor {
-        // 字段名称
+        /**
+         * 字段名称
+         */
         @Getter
         private final String   name;
-        // 字段的写方法
+        /**
+         * 字段的写方法
+         */
         @Getter
         private final Method   writeMethod;
-        // 字段的读方法
+        /**
+         * 字段的读方法
+         */
         @Getter
         private final Method   readMethod;
-        // 字段所属的class（字段所在类的Class，不是字段本身的Class！！）
+        /**
+         * 字段所属的class（字段所在类的Class，不是字段本身的Class！！）
+         */
         @Getter
         private final Class<?> clazz;
-        // 字段
+        /**
+         * 字段
+         */
         @Getter
         private final Field    field;
-        //字段的类型
+        /**
+         * 字段的类型
+         */
         private Class<?>       type;
 
         public CustomPropertyDescriptor(String name, Method readMethod, Method writeMethod,
@@ -581,10 +560,12 @@ public class BeanUtils {
             this.clazz = clazz;
             this.field = field;
             this.type = field.getType();
-            if (readMethod != null)
+            if (readMethod != null) {
                 readMethod.setAccessible(true);
-            if (writeMethod != null)
+            }
+            if (writeMethod != null) {
                 writeMethod.setAccessible(true);
+            }
         }
 
         /**

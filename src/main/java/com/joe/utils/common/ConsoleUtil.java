@@ -42,7 +42,7 @@ public class ConsoleUtil {
     private static void work(CustomReader reader, Consumer<String> consumer) throws IOException {
         while (true) {
             String data = reader.readLine();
-            if (data.equals("exit")) {
+            if ("exit".equals(data)) {
                 System.out.println("系统即将退出");
                 System.exit(0);
             }

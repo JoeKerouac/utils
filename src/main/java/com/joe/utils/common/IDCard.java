@@ -11,25 +11,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IDCard {
-    private static final Logger        logger  = LoggerFactory.getLogger(IDCard.class);
+    private static final Logger        logger          = LoggerFactory.getLogger(IDCard.class);
     /**
      * 地区表
      */
-    private static Map<String, String> AREA    = new TreeMap<>((o1, o2) -> {
-                                                   Integer i1 = Integer.parseInt(o1);
-                                                   Integer i2 = Integer.parseInt(o2);
-                                                   return i1 - i2;
-                                               });
+    private static Map<String, String> AREA            = new TreeMap<>((o1, o2) -> {
+                                                           Integer i1 = Integer.parseInt(o1);
+                                                           Integer i2 = Integer.parseInt(o2);
+                                                           return i1 - i2;
+                                                       });
     /**
      * 加权表
      */
-    private static int[]               POWER   = new int[] { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9,
-                                                             10, 5, 8, 4, 2 };
+    private static int[]               POWER           = new int[] { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3,
+                                                                     7, 9, 10, 5, 8, 4, 2 };
     /**
      * 加权因子
      */
-    private static char[]              DIVISOR = new char[] { '1', '0', 'X', '9', '8', '7', '6',
-                                                              '5', '4', '3', '2' };
+    private static char[]              DIVISOR         = new char[] { '1', '0', 'X', '9', '8', '7',
+                                                                      '6', '5', '4', '3', '2' };
+    /**
+     * 香港及特别行政区的前缀
+     */
+    private static String[]            HK              = { "710000", "810000", "820000" };
+    /**
+     * 区域正则
+     */
+    private static final Pattern       AREA_PATTERN    = Pattern.compile("(.*)?市");
+    /**
+     * 身份证正则
+     */
+    private static final Pattern       ID_CARD_PATTERN = Pattern.compile("[0-9]{17}[0-9|x|X]");
 
     static {
         // 初始化地区
@@ -96,8 +108,8 @@ public class IDCard {
      */
     public static boolean check(String idCard) {
         // 验证身份证格式
-        Pattern pattern = Pattern.compile("[0-9]{17}[0-9|x|X]");
-        Matcher matcher = pattern.matcher(idCard);
+
+        Matcher matcher = ID_CARD_PATTERN.matcher(idCard);
         if (!matcher.matches()) {
             // 格式不对
             logger.error("身份证格式不对{}", idCard);
@@ -147,21 +159,22 @@ public class IDCard {
         String province;
         // 用户所属地区
         String area;
-        if (AREA.get(idCard.substring(0, 6)) == null) {
+        String pre = idCard.substring(0, 6);
+
+        if (AREA.get(pre) == null) {
             logger.warn("地区不存在或者地区已不在最新行政区划代码中");
         }
 
         // 判断是否输入台湾省和特别行政区
-        if (idCard.substring(0, 6).equals("710000") || idCard.substring(0, 6).equals("810000")
-            || idCard.substring(0, 6).equals("820000")) {
+        if (Tools.contains(pre, HK)) {
             // 台湾省和特别行政区
-            area = AREA.get(idCard.substring(0, 6) + "0000");
+            area = AREA.get(pre + "0000");
         } else {
             // 查询用户所属省份
             province = AREA.get(idCard.substring(0, 2) + "0000");
             // 判断用户所属地区是否是直辖市
-            Pattern areaP = Pattern.compile("(.*)?市");
-            Matcher areamM = areaP.matcher(province);
+
+            Matcher areamM = AREA_PATTERN.matcher(province);
             StringBuilder sb = new StringBuilder();
             if (!areamM.matches()) {
                 // 不是直辖市，加上用户所属市区名
@@ -197,14 +210,14 @@ public class IDCard {
         int age;
         // 计算用户年龄
         int year = Integer.parseInt(idCard.substring(6, 10));
-        int month_day = Integer.parseInt(idCard.substring(10, 14));
+        int monthDay = Integer.parseInt(idCard.substring(10, 14));
         Calendar calendar = Calendar.getInstance();
-        int now_year = calendar.get(Calendar.YEAR);
-        int now_month_day = calendar.get(Calendar.MONTH) * 100 + calendar.get(Calendar.DATE);
-        if (now_month_day > month_day) {
-            age = now_year - year;
+        int nowYear = calendar.get(Calendar.YEAR);
+        int nowMonthDay = calendar.get(Calendar.MONTH) * 100 + calendar.get(Calendar.DATE);
+        if (nowMonthDay > monthDay) {
+            age = nowYear - year;
         } else {
-            age = now_year - year - 1;
+            age = nowYear - year - 1;
 
         }
         if (age < 0) {
