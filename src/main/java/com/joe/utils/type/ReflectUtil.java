@@ -16,6 +16,9 @@ import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.scan.ClassScanner;
 import com.joe.utils.scan.MethodScanner;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,13 +28,72 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ReflectUtil {
-    private static final Logger        logger         = LoggerFactory.getLogger(ReflectUtil.class);
-    private static final Pattern       superPattern   = Pattern.compile("(.*) super.*");
-    private static final Pattern       extendsPattern = Pattern.compile("(.*) extends.*");
-    private static final ClassScanner  CLASS_SCANNER  = ClassScanner.getInstance();
-    private static final MethodScanner METHOD_SCANNER = MethodScanner.getInstance();
+    private static final Logger                 logger         = LoggerFactory
+        .getLogger(ReflectUtil.class);
+    private static final Pattern                superPattern   = Pattern.compile("(.*) super.*");
+    private static final Pattern                extendsPattern = Pattern.compile("(.*) extends.*");
+    private static final ClassScanner           CLASS_SCANNER  = ClassScanner.getInstance();
+    private static final MethodScanner          METHOD_SCANNER = MethodScanner.getInstance();
+    /**
+     * 方法缓存
+     */
+    private static final Map<MethodKey, Method> CACHE          = new HashMap<>();
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class MethodKey {
+        private String   methodName;
+        private Class<?> clazz;
+    }
 
     private ReflectUtil() {
+    }
+
+    /**
+     * 调用指定对象的指定方法
+     * @param obj 指定对象
+     * @param methodName 要调用的方法名
+     * @param args 参数
+     * @param <R> 结果类型
+     * @return 调用结果
+     */
+    public static <R> R invoke(Object obj, String methodName, Object... args) {
+        Method method = getMethod(obj.getClass(), methodName);
+        try {
+            return (R) method.invoke(obj, args);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new ReflectException("调用方法[" + methodName + "]失败", e);
+        }
+    }
+
+    /**
+     * 获取指定类型中指定的方法
+     * @param clazz 类型
+     * @param methodName 方法名
+     * @return 指定方法，获取不到时会抛出异常
+     */
+    public static Method getMethod(Class<?> clazz, String methodName) {
+        if (clazz == null || methodName == null) {
+            throw new NullPointerException("clazz和methodName不能为null");
+        }
+        MethodKey key = new MethodKey(methodName, clazz);
+        Method method = CACHE.get(key);
+        if (method != null) {
+            return method;
+        }
+        try {
+            method = clazz.getDeclaredMethod(methodName);
+        } catch (NoSuchMethodException e) {
+            throw new ReflectException("获取类型[" + clazz + "]的方法[" + methodName + "]失败", e);
+        }
+
+        try {
+            method.setAccessible(true);
+        } catch (SecurityException e) {
+            log.warn("无法更改方法[{}]的访问权限", method);
+        }
+        return method;
     }
 
     /**
