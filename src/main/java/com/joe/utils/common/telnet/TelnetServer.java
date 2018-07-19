@@ -38,6 +38,10 @@ public class TelnetServer {
     private ServerSocketChannel  acceptorSvr     = null;
 
     private String               host            = null;
+    /**
+     * kill命令hook
+     */
+    private Thread             shutdownHook;
 
     /**
      * 命令处理器
@@ -58,6 +62,7 @@ public class TelnetServer {
         this.host = host;
         this.port = port;
         this.handler = handler;
+        this.shutdownHook = new Thread(this::shutdown);
     }
 
     public static void main(String[] args) {
@@ -72,6 +77,7 @@ public class TelnetServer {
      */
     public void start() {
         if (shutdown.compareAndSet(true, false)) {
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
             try {
                 selector = Selector.open();
                 acceptorSvr = ServerSocketChannel.open();
@@ -129,6 +135,7 @@ public class TelnetServer {
      */
     public void shutdown() {
         if (shutdown.compareAndSet(false, true)) {
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
             try {
                 acceptorSvr.close();
                 selector.close();
