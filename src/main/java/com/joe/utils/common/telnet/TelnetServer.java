@@ -65,13 +65,6 @@ public class TelnetServer {
         this.shutdownHook = new Thread(this::shutdown);
     }
 
-    public static void main(String[] args) {
-        new TelnetServer(command -> {
-            System.out.println(command);
-            return command;
-        }).start();
-    }
-
     /**
      * 启动telnet服务端
      */
