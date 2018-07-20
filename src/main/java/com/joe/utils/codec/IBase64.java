@@ -5,14 +5,14 @@ import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
 
 public class IBase64 {
-    /*
+    /**
      * 编码器
      */
-    private static final Encoder encoder = Base64.getEncoder();
-    /*
+    private static final Encoder ENCODER = Base64.getEncoder();
+    /**
      * 解码器
      */
-    private static final Decoder decoder = Base64.getDecoder();
+    private static final Decoder DECODER = Base64.getDecoder();
 
     /**
      * base64编码
@@ -21,7 +21,7 @@ public class IBase64 {
      * @return 编码后的数据
      */
     public byte[] encrypt(byte[] input) {
-        return encoder.encode(input);
+        return ENCODER.encode(input);
     }
 
     /**
@@ -42,7 +42,7 @@ public class IBase64 {
      * @return 解码后（编码前）的数据
      */
     public byte[] decrypt(byte[] input) {
-        return decoder.decode(input);
+        return DECODER.decode(input);
     }
 
     /**
