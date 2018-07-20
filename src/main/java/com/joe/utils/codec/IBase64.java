@@ -4,6 +4,12 @@ import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
 
+/**
+ * BASE64编码
+ *
+ * @author joe
+ * @version 2018.07.20 18:18
+ */
 public class IBase64 {
     /**
      * 编码器
@@ -20,7 +26,7 @@ public class IBase64 {
      * @param input 要编码的数据
      * @return 编码后的数据
      */
-    public byte[] encrypt(byte[] input) {
+    public static byte[] encrypt(byte[] input) {
         return ENCODER.encode(input);
     }
 
@@ -30,7 +36,7 @@ public class IBase64 {
      * @param input 要编码的数据
      * @return 编码后的数据
      */
-    public String encrypt(String input) {
+    public static String encrypt(String input) {
         byte[] result = encrypt(input.getBytes());
         return new String(result);
     }
@@ -41,7 +47,7 @@ public class IBase64 {
      * @param input 编码后的数据
      * @return 解码后（编码前）的数据
      */
-    public byte[] decrypt(byte[] input) {
+    public static byte[] decrypt(byte[] input) {
         return DECODER.decode(input);
     }
 
@@ -51,7 +57,7 @@ public class IBase64 {
      * @param input 编码后的数据
      * @return 解码后（编码前）的数据
      */
-    public String decrypt(String input) {
+    public static String decrypt(String input) {
         byte[] result = decrypt(input.getBytes());
         return new String(result);
     }
