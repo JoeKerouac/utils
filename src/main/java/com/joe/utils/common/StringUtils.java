@@ -18,6 +18,22 @@ import lombok.extern.slf4j.Slf4j;
 public class StringUtils {
 
     /**
+     * 将字符串中的{}依次替换为指定数据
+     * @param templet 字符串模板
+     * @param args 变量
+     * @return 字符串
+     */
+    public static String format(String templet, Object... args) {
+        if (args == null || args.length == 0) {
+            return templet;
+        }
+        for (Object arg : args) {
+            templet = templet.replaceFirst("\\{}", String.valueOf(arg));
+        }
+        return templet;
+    }
+
+    /**
      * 替换指定结束位置之前的所有字符
      *
      * @param str 字符串
