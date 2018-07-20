@@ -16,6 +16,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.BeanUtils;
 import com.joe.utils.common.StringUtils;
+import com.joe.utils.exception.UtilsException;
 import com.joe.utils.poi.data.*;
 
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExcelExecutor {
     /**
-     * 默认内存中最多多好行单元格
+     * 默认内存中最多多少行单元格
      */
     private static final int                        IN_MEMORY  = 100;
     /**
@@ -138,7 +139,21 @@ public class ExcelExecutor {
      */
     public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
                              String path) throws IOException {
-        writeToExcel(datas, hasTitle, path, IN_MEMORY);
+        writeToExcel(datas, hasTitle, path, false);
+    }
+
+    /**
+     * 将pojo写入本地excel
+     *
+     * @param datas    pojo数据
+     * @param hasTitle 是否需要标题
+     * @param path     excel本地路径
+     * @param transverse 是否横向写入（一列对应一个pojo，标题在第一列），默认false（一行一个pojo，标题在第一行）
+     * @throws IOException IO异常
+     */
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path,
+                             boolean transverse) throws IOException {
+        writeToExcel(datas, hasTitle, path, IN_MEMORY, transverse);
     }
 
     /**
@@ -152,7 +167,22 @@ public class ExcelExecutor {
      */
     public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path,
                              int inMemory) throws IOException {
-        writeToExcel(datas, hasTitle, new FileOutputStream(path), inMemory);
+        writeToExcel(datas, hasTitle, path, inMemory, false);
+    }
+
+    /**
+     * 将pojo写入本地excel
+     *
+     * @param datas    pojo数据
+     * @param hasTitle 是否需要标题
+     * @param path     excel本地路径
+     * @param inMemory 最多保留在内存中多少行
+     * @param transverse 是否横向写入（一列对应一个pojo，标题在第一列），默认false（一行一个pojo，标题在第一行）
+     * @throws IOException IO异常
+     */
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle, String path,
+                             int inMemory, boolean transverse) throws IOException {
+        writeToExcel(datas, hasTitle, new FileOutputStream(path), inMemory, transverse);
     }
 
     /**
@@ -165,7 +195,21 @@ public class ExcelExecutor {
      */
     public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
                              OutputStream outputStream) throws IOException {
-        writeToExcel(datas, hasTitle, outputStream, IN_MEMORY);
+        writeToExcel(datas, hasTitle, outputStream, false);
+    }
+
+    /**
+     * 将数据写入excel
+     *
+     * @param datas        要写入excel的pojo数据
+     * @param hasTitle     是否需要标题
+     * @param outputStream 输出流（该流不会关闭，需要用户手动关闭）
+     * @param transverse 是否横向写入（一列对应一个pojo，标题在第一列），默认false（一行一个pojo，标题在第一行）
+     * @throws IOException IO异常
+     */
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
+                             OutputStream outputStream, boolean transverse) throws IOException {
+        writeToExcel(datas, hasTitle, outputStream, IN_MEMORY, transverse);
     }
 
     /**
@@ -179,11 +223,27 @@ public class ExcelExecutor {
      */
     public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
                              OutputStream outputStream, int inMemory) throws IOException {
+        writeToExcel(datas, hasTitle, outputStream, inMemory, false);
+    }
+
+    /**
+     * 将数据写入excel
+     *
+     * @param datas        要写入excel的pojo数据
+     * @param hasTitle     是否需要标题
+     * @param outputStream 输出流（该流不会关闭，需要用户手动关闭）
+     * @param inMemory     最多保留在内存中多少行
+     * @param transverse 是否横向写入（一列对应一个pojo，标题在第一列），默认false（一行一个pojo，标题在第一行）
+     * @throws IOException IO异常
+     */
+    public void writeToExcel(List<? extends Object> datas, boolean hasTitle,
+                             OutputStream outputStream, int inMemory,
+                             boolean transverse) throws IOException {
         log.info("准备将数据写入excel");
         //这里使用SXSSFWorkbook而不是XSSFWorkbook，这样将会节省内存，但是内存中仅仅存在inMemory行数据，如果超出那么会将
         //index最小的刷新到本地，后续不能通过getRow方法获取到该行
         SXSSFWorkbook wb = new SXSSFWorkbook(inMemory);
-        writeToExcel(datas, hasTitle, wb);
+        writeToExcel(datas, hasTitle, wb, transverse);
         log.info("数据写入excel完毕，准备写入本地文件");
         wb.write(outputStream);
         log.debug("删除临时文件，关闭Workbook");
@@ -201,6 +261,20 @@ public class ExcelExecutor {
      */
     public Workbook writeToExcel(List<? extends Object> datas, boolean hasTitle,
                                  Workbook workbook) {
+        return writeToExcel(datas, hasTitle, workbook, false);
+    }
+
+    /**
+     * 将pojo集合写入excel（处理数据，不写入）
+     *
+     * @param datas    pojo集合，空元素将被忽略
+     * @param hasTitle 是否需要title
+     * @param workbook 工作簿
+     * @param transverse 是否横向写入（一列对应一个pojo，标题在第一列），默认false（一行一个pojo，标题在第一行）
+     * @return 写入后的工作簿
+     */
+    public Workbook writeToExcel(List<? extends Object> datas, boolean hasTitle, Workbook workbook,
+                                 boolean transverse) {
         if (CollectionUtil.safeIsEmpty(datas)) {
             log.warn("给定数据集合为空");
             return workbook;
@@ -256,7 +330,7 @@ public class ExcelExecutor {
         }
 
         log.debug("构建单元格数据");
-        List<List<? extends Writer<?>>> writeDatas = new ArrayList<>(datas.size());
+        List<List<Writer<?>>> writeDatas = new ArrayList<>(datas.size());
         for (int i = 0; i < datas.size(); i++) {
             Object dataValue = datas.get(i);
             //构建一行数据
@@ -278,7 +352,7 @@ public class ExcelExecutor {
 
         log.debug("要写入的数据为：[{}]", writeDatas);
         log.info("准备写入数据");
-        writeToExcel(titles, writeDatas, hasTitle, workbook);
+        writeToExcel(titles, writeDatas, hasTitle, workbook, transverse);
         log.info("标题列表为：[{}]", titles);
         return workbook;
     }
@@ -290,11 +364,11 @@ public class ExcelExecutor {
      * @param datas    数据列表
      * @param hasTitle 是否需要标题
      * @param workbook 工作簿
+     * @param transverse 是否横向写入（一列对应一个pojo，标题在第一列），默认false（一行一个pojo，标题在第一行）
      * @return 写入数据后的工作簿
      */
-    private Workbook writeToExcel(List<? extends Writer<?>> titles,
-                                  List<List<? extends Writer<?>>> datas, boolean hasTitle,
-                                  Workbook workbook) {
+    private Workbook writeToExcel(List<Writer<?>> titles, List<List<Writer<?>>> datas,
+                                  boolean hasTitle, Workbook workbook, boolean transverse) {
         if (CollectionUtil.safeIsEmpty(datas)) {
             log.warn("数据为空，不写入直接返回");
             return workbook;
@@ -306,12 +380,14 @@ public class ExcelExecutor {
 
         if (hasTitle && !CollectionUtil.safeIsEmpty(titles)) {
             log.debug("需要标题，标题为：{}", titles);
-            Row row = sheet.createRow(rowNum++);
-            for (int i = 0; i < titles.size(); i++) {
-                Writer<?> data = titles.get(i);
-                log.debug("写入第[{}]列标题：[{}]", i, data.data);
-                data.write(row.createCell(i));
-            }
+            List<List<Writer<?>>> lists = new ArrayList<>(datas.size() + 1);
+            lists.add(titles);
+            lists.addAll(datas);
+            datas = lists;
+        }
+
+        if (transverse) {
+            datas = CollectionUtil.matrixTransform(datas);
         }
 
         for (int i = rowNum; i < (rowNum + datas.size()); i++) {
@@ -339,13 +415,12 @@ public class ExcelExecutor {
      * @return 返回不为空表示能写入，并返回单元格数据，返回空表示无法写入
      */
     private Writer<?> build(Object data) {
-        List<ExcelDataWriter<?>> dataBuilder = writers.values().parallelStream()
-            .filter(excelData -> excelData.writeable(data)).collect(Collectors.toList());
-        if (dataBuilder.isEmpty()) {
-            return null;
-        } else {
-            return new Writer(dataBuilder.get(0), data);
-        }
+        Optional<ExcelDataWriter<?>> dataBuilder = writers.values().parallelStream()
+            .filter(excelData -> excelData.writeable(data)).limit(1).findFirst();
+
+        ExcelDataWriter<?> writer = dataBuilder
+            .orElseThrow(() -> new UtilsException("数据[" + data + "]没有对应的ExcelDataWriter"));
+        return new Writer(writer, data);
     }
 
     @AllArgsConstructor
