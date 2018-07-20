@@ -12,6 +12,52 @@ import com.joe.utils.math.MathUtil;
  * @author joe
  */
 public final class CollectionUtil {
+    /**
+     * 矩阵转置（矩阵必须每行的列数都一样）（行变列，列变行）
+     * @param datas 要转置的数据
+     * @return 转置后的矩阵，例如[[01,02][11,12]]会变为[[01,11],[02,12]]
+     */
+    public static Object[][] matrixTransform(Object[][] datas) {
+        if (datas.length == 0 || datas[0].length == 0) {
+            return datas;
+        }
+        int column = datas.length;
+        int row = datas[0].length;
+
+        Object[][] newData = new Object[row][column];
+
+        for (int i = 0; i < row; i++) {
+            Object[] list = new Object[column];
+            for (int j = 0; j < column; j++) {
+                list[j] = datas[j][i];
+            }
+            newData[i] = list;
+        }
+        return newData;
+    }
+
+    /**
+     * 矩阵转置（矩阵必须每行的列数都一样）（行变列，列变行）
+     * @param datas 要转置的数据
+     * @param <T> 数据类型
+     * @return 转置后的矩阵，例如[[01,02][11,12]]会变为[[01,11],[02,12]]
+     */
+    public static <T> List<List<T>> matrixTransform(List<List<T>> datas) {
+        if (datas.size() == 0 || datas.get(0).size() == 0) {
+            return datas;
+        }
+        int column = datas.size();
+        int row = datas.get(0).size();
+        List<List<T>> newData = new ArrayList<>(row);
+        for (int i = 0; i < row; i++) {
+            List<T> list = new ArrayList<>(column);
+            for (int j = 0; j < column; j++) {
+                list.add(datas.get(j).get(i));
+            }
+            newData.add(list);
+        }
+        return newData;
+    }
 
     /**
      * 安全判断集合是否为空
