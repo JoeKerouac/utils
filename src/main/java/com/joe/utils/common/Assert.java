@@ -5,13 +5,28 @@ package com.joe.utils.common;
  * @version 2018.06.13 11:29
  */
 public class Assert {
+
+    /**
+     * 断言给定时间是一个正确的时间段（即开始时间小于结束时间）
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     * @param format 时间格式
+     */
+    public static void isTimeZone(String beginTime, String endTime, String format) {
+        DateUtil.parse(beginTime, format);
+        DateUtil.parse(endTime, format);
+        if (beginTime.compareTo(endTime) > 0) {
+            throw new IllegalArgumentException("开始时间必须小于结束时间");
+        }
+    }
+
     /**
      * 断言参数true
      *
      * @param flag 参数
      */
     public static void isTrue(boolean flag) {
-        isTrue(flag , null);
+        isTrue(flag, null);
     }
 
     /**
@@ -32,7 +47,7 @@ public class Assert {
      * @param flag 参数
      */
     public static void isFalse(boolean flag) {
-        isFalse(flag , null);
+        isFalse(flag, null);
     }
 
     /**
@@ -74,7 +89,7 @@ public class Assert {
      * @param objs 参数列表
      */
     public static void notNull(Object[] objs) {
-        notNull(objs , null);
+        notNull(objs, null);
     }
 
     /**
