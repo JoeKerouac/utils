@@ -10,15 +10,15 @@ public final class CronConst {
     /**
      * 每秒执行一次
      */
-    public static final String EVE_SECOND = "* * * * * ? *";
+    public static final String EVE_SECOND     = "* * * * * ? *";
     /**
      * 每分钟执行一次
      */
-    public static final String EVE_MINUTE = "0 * * * * ? *";
+    public static final String EVE_MINUTE     = "0 * * * * ? *";
     /**
      * 每小时执行一次
      */
-    public static final String EVE_HOURE = "0 0 * * * ? *";
+    public static final String EVE_HOURE      = "0 0 * * * ? *";
     /**
      * 每天0点执行一次
      */
@@ -26,6 +26,5 @@ public final class CronConst {
     /**
      * 每月一号执行一次
      */
-    public static final String EVE_FIRST_DAY = "0 0 0 1 * ? *";
-
+    public static final String EVE_FIRST_DAY  = "0 0 0 1 * ? *";
 }
