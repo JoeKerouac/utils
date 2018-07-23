@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.JoeKerouac</groupId>
     <artifactId>utils</artifactId>
-    <version>1.9.002</version>
+    <version>1.10.001</version>
     <name>utils</name>
     <packaging>jar</packaging>
     <description>常用工具类</description>
