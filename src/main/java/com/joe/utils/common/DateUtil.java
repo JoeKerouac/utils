@@ -88,30 +88,7 @@ public class DateUtil {
      * @throws DateUtilException 格式错误时返回该异常
      */
     public static Date parse(String date, String format) {
-        DateTimeFormatter formatter;
-        //优先从缓存取，取不到创建一个，不用加锁
-        if ((formatter = FORMATTER_CACHE.get(format)) == null) {
-            formatter = DateTimeFormatter.ofPattern(format);
-            FORMATTER_CACHE.put(format, formatter);
-        }
-
-        TemporalAccessor accessor = formatter.parse(date);
-        LocalDateTime time;
-
-        //判断日期类型，新版日期类将时间分为年月日（LocalDate）、时分秒（LocalTime）、年月日时分秒（LocalDateTime）三种类型
-        if (accessor.isSupported(ChronoField.DAY_OF_YEAR)
-            && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
-            time = LocalDateTime.from(accessor);
-        } else if (accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
-            LocalTime localTime = LocalTime.from(accessor);
-            time = localTime.atDate(LocalDate.now());
-        } else if (accessor.isSupported(ChronoField.DAY_OF_YEAR)) {
-            LocalDate localDate = LocalDate.from(accessor);
-            time = localDate.atTime(LocalTime.now());
-        } else {
-            throw new DateUtilException("日期类解析异常，时间为：" + date + "；格式为：" + format);
-        }
-
+        LocalDateTime time = getTime(format, date);
         //返回对应日期
         return Date.from(time.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
     }
@@ -139,8 +116,7 @@ public class DateUtil {
      */
     public static long calc(String arg0, String arg1, String format, DateUnit dateUnit) {
         try {
-            return calc(LocalDateTime.parse(arg0, DateTimeFormatter.ofPattern(format)),
-                LocalDateTime.parse(arg1, DateTimeFormatter.ofPattern(format)), dateUnit);
+            return calc(getTime(format, arg0), getTime(format, arg1), dateUnit);
         } catch (Exception e) {
             logger.error("日期计算出错", e);
             return -1;
@@ -157,8 +133,7 @@ public class DateUtil {
      * @return 增加后的日期
      */
     public static Date add(DateUnit dateUnit, int amount, String date, String format) {
-        LocalDateTime localDateTime = LocalDateTime.parse(date,
-            DateTimeFormatter.ofPattern(format));
+        LocalDateTime localDateTime = getTime(format, date);
         localDateTime = localDateTime.plus(amount, create(dateUnit));
         return Date.from(localDateTime.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
     }
@@ -278,6 +253,39 @@ public class DateUtil {
         String now = getFormatDate(SHORT);
         String target = getFormatDate(SHORT, time);
         return now.equals(target);
+    }
+
+    /**
+     * 从指定日期字符串获取LocalDateTime对象
+     * @param format 日期字符串格式
+     * @param date 日期字符串
+     * @return LocalDateTime对象
+     */
+    private static LocalDateTime getTime(String format, String date) {
+        DateTimeFormatter formatter;
+        //优先从缓存取，取不到创建一个，不用加锁
+        if ((formatter = FORMATTER_CACHE.get(format)) == null) {
+            formatter = DateTimeFormatter.ofPattern(format);
+            FORMATTER_CACHE.put(format, formatter);
+        }
+
+        TemporalAccessor accessor = formatter.parse(date);
+        LocalDateTime time;
+
+        //判断日期类型，新版日期类将时间分为年月日（LocalDate）、时分秒（LocalTime）、年月日时分秒（LocalDateTime）三种类型
+        if (accessor.isSupported(ChronoField.DAY_OF_YEAR)
+            && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
+            time = LocalDateTime.from(accessor);
+        } else if (accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
+            LocalTime localTime = LocalTime.from(accessor);
+            time = localTime.atDate(LocalDate.now());
+        } else if (accessor.isSupported(ChronoField.DAY_OF_YEAR)) {
+            LocalDate localDate = LocalDate.from(accessor);
+            time = localDate.atTime(LocalTime.now());
+        } else {
+            throw new DateUtilException("日期类解析异常，时间为：" + date + "；格式为：" + format);
+        }
+        return time;
     }
 
     public enum DateUnit {
