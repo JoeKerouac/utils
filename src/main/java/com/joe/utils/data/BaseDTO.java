@@ -3,8 +3,10 @@ package com.joe.utils.data;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * DTO原型
@@ -13,6 +15,7 @@ import lombok.Data;
  * @version 2018.05.24 14:03
  */
 @Data
+@Slf4j
 public class BaseDTO<T> implements Serializable {
     private static final long                serialVersionUID = 5075924626508128661L;
     private static final Map<String, String> MSG              = new HashMap<>();
@@ -155,5 +158,33 @@ public class BaseDTO<T> implements Serializable {
         BaseDTO<T> dto = new BaseDTO<>();
         dto.status(status, message);
         return dto;
+    }
+
+    /**
+     * 执行函数
+     *
+     * @param callable 函数
+     * @param msg 错误消息模板
+     * @param param 错误消息模板参数
+     * @param <T>      返回数据类型
+     * @return 执行结果
+     */
+    public static <T> BaseDTO<T> exec(Callable<BaseDTO<T>> callable, String msg, Object... param) {
+        try {
+            log.info("函数调用");
+            BaseDTO<T> dto = callable.call();
+            log.info("函数调用结果为：[{}]", dto);
+            return dto;
+        } catch (Exception e) {
+            if (param == null || param.length == 0) {
+                log.error(msg, e);
+            } else {
+                Object[] params = new Object[param.length + 1];
+                System.arraycopy(param, 0, params, 0, param.length);
+                params[param.length] = e;
+                log.error(msg, params);
+            }
+            return BaseDTO.buildError();
+        }
     }
 }
