@@ -13,11 +13,9 @@ import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.lookup.Interpolator;
 import org.apache.logging.log4j.core.lookup.MapLookup;
 import org.apache.logging.log4j.core.lookup.StrLookup;
-import org.springframework.context.EnvironmentAware;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
 
-import com.joe.utils.log.log4j2.plugin.Log4j2Helper;
 import com.joe.utils.log.log4j2.plugin.impl.DefaultPropUtil;
 
 /**
@@ -29,14 +27,15 @@ import com.joe.utils.log.log4j2.plugin.impl.DefaultPropUtil;
  * @author joe
  * @version 2018.07.18 10:55
  */
-@Component
-public class SpringPropUtil implements EnvironmentAware {
+public class SpringPropUtil {
     private static Environment environment;
 
-    @Override
-    public void setEnvironment(Environment environment) {
-        SpringPropUtil.environment = environment;
-        Log4j2Helper.reconfigLog4j2(SpringPropPlugin.class);
+    /**
+     * 初始化log4j2日志配置，使用{@link Environment Environment}重新配置log4j2的properties
+     * @param context spring应用上下文
+     */
+    public static void init(ApplicationContext context) {
+        SpringPropUtil.environment = context.getEnvironment();
     }
 
     @Plugin(name = "properties", category = Node.CATEGORY, printObject = true)

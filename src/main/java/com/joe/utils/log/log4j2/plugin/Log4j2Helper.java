@@ -1,8 +1,13 @@
 package com.joe.utils.log.log4j2.plugin;
 
+import com.joe.utils.common.BeanUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.plugins.util.PluginManager;
+import org.apache.logging.log4j.core.config.plugins.util.PluginType;
+
+import java.util.Map;
 
 /**
  * 公共工具类
@@ -30,7 +35,10 @@ public class Log4j2Helper {
      */
     public static void reconfigLog4j2(Class<?> pluginClazz,
                                       org.apache.logging.log4j.spi.LoggerContext context) {
-        PluginManager.addPackage(pluginClazz.getPackage().getName());
+        Configuration configuration = BeanUtils.getProperty(context, "configuration");
+        PluginManager manager = BeanUtils.getProperty(configuration, "pluginManager");
+        PluginType<?> pluginType = manager.getPluginType("properties");
+        BeanUtils.setProperty(pluginType, "pluginClass", pluginClazz);
 
         LoggerContext loggerContext = (LoggerContext) context;
         loggerContext.reconfigure();

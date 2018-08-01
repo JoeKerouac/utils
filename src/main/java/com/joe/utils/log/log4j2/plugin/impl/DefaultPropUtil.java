@@ -37,7 +37,7 @@ public class DefaultPropUtil {
      */
     public static void reconfigLog4j2(Map<String, String> prop) {
         DefaultPropUtil.prop = prop;
-        Log4j2Helper.reconfigLog4j2(DefaultPropUtil.class);
+        Log4j2Helper.reconfigLog4j2(DefaultPropPlugin.class);
     }
 
     /**
