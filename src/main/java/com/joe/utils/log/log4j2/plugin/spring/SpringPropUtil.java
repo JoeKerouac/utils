@@ -19,10 +19,9 @@ import org.springframework.core.env.Environment;
 import com.joe.utils.log.log4j2.plugin.impl.DefaultPropUtil;
 
 /**
- * {@link DefaultPropUtil DefaultPropUtil}的spring实现，只支持slf4j，不支持
- * 单独的log4j2
+ * {@link DefaultPropUtil DefaultPropUtil}的spring实现
  *
- * 使用方法：只需要将该类加入spring的bean扫描路径即可
+ * 使用方法：spring上下文初始化完毕后调用{@link #init(ApplicationContext) init}方法即可
  *
  * @author joe
  * @version 2018.07.18 10:55
