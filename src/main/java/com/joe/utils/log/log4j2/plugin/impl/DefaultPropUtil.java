@@ -25,6 +25,10 @@ import com.joe.utils.log.log4j2.plugin.Log4j2Helper;
  * 或者{@link #reconfigLog4j2(Map)}方法之前log4j已经被初始化，那么必须在xml配置文件中提供需要的property的默认值用来
  * 初始化，否则log4j2初始化过程中将会报错，稍后在调用reconfigLog4j2方法时会将xml配置文件中提供的property覆盖。
  *
+ * 此方法是采用了反射等黑魔法技术实现，官方提供的还有一种实现，具体的可以参考{@link Interpolator Interpolator}类，但是该
+ * 实现需要xml中的properties采用StrLookupName:placeholder的形式，例如mapStrLookup:customLevel，其中mapStrLookup是StrLookup
+ * 实现类上的注解@Plugin的name值
+ *
  * @author joe
  * @version 2018.07.18 10:55
  */
