@@ -1,13 +1,12 @@
 package com.joe.utils.log.log4j2.plugin;
 
-import com.joe.utils.common.BeanUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.plugins.util.PluginManager;
 import org.apache.logging.log4j.core.config.plugins.util.PluginType;
 
-import java.util.Map;
+import com.joe.utils.common.BeanUtils;
 
 /**
  * 公共工具类
@@ -29,7 +28,7 @@ public class Log4j2Helper {
     }
 
     /**
-     * 使用自定义配置替换log4j的指定context中Properties的值（log4j2使用）
+     * 使用自定义properties插件替换log4j2的指定context中的内置{@link org.apache.logging.log4j.core.config.PropertiesPlugin properties插件}（log4j2使用）
      * @param pluginClazz 插件class
      * @param context 要替换配置的context，可以使用LogManager.getContext()获取
      */

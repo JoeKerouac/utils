@@ -29,7 +29,7 @@ public class SpringPropUtilTest {
      */
     @Test
     public void doTestLog4j2() {
-        SpringPropUtil.init(context);
+        SpringPropUtil.reconfigLog4j2(context);
         org.apache.logging.log4j.Logger logger = LogManager.getLogger(DefaultPropUtilTest.class);
         Log4j2Test.checkInfo(logger);
     }

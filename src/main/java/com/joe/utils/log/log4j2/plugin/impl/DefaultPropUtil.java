@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.core.config.Configuration;
-import org.apache.logging.log4j.core.config.Node;
 import org.apache.logging.log4j.core.config.Property;
-import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginConfiguration;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
@@ -55,7 +53,11 @@ public class DefaultPropUtil {
         Log4j2Helper.reconfigLog4j2(DefaultPropPlugin.class, context);
     }
 
-    @Plugin(name = "properties", category = Node.CATEGORY, printObject = true)
+    /**
+     * 自定义默认properties插件，用于替换log4j2内置{@link org.apache.logging.log4j.core.config.PropertiesPlugin properties插件}
+     *
+     * <p>该插件直接用{@link Log4j2Helper Log4j2Helper}使用反射注入，所以类上不需要{@link org.apache.logging.log4j.core.config.plugins.Plugin @Plugin}注解</p>
+     */
     private static class DefaultPropPlugin {
         /**
          * Creates the Properties component.

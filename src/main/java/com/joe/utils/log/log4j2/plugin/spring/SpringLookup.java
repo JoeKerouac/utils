@@ -21,6 +21,9 @@ public class SpringLookup implements StrLookup {
     private StrLookup   defaultLookup;
 
     public SpringLookup(Environment environment, StrLookup defaultLookup) {
+        if (environment == null || defaultLookup == null) {
+            throw new NullPointerException("environment or defaultLookup must not be null");
+        }
         this.environment = environment;
         this.defaultLookup = defaultLookup;
     }
@@ -34,9 +37,7 @@ public class SpringLookup implements StrLookup {
     @Override
     public String lookup(LogEvent event, String key) {
         String value;
-        //由于log4j2的自动发现机制，此处有可能会为null
-        if (event == null && environment != null
-            && (value = environment.getProperty(key)) != null) {
+        if (event == null && (value = lookup(key)) != null) {
             return value;
         }
         return defaultLookup.lookup(event, key);
