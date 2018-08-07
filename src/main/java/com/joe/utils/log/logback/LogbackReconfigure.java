@@ -1,4 +1,4 @@
-package com.joe.utils.log;
+package com.joe.utils.log.logback;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -50,19 +50,19 @@ public class LogbackReconfigure {
      * 重新配置当前logback
      *
      * @param config logback的xml配置文件
+     * @param context 要配置的context
      */
-    public static void reconfigure(InputStream config) {
-        if (CONTEXT == null) {
-            log.warn("当前日志上下文不是logback，不能使用该配置器重新配置");
-            return;
+    public static void reconfigure(InputStream config, LoggerContext context) {
+        if (context == null) {
+            throw new NullPointerException("LoggerContext must not be null");
         }
-        LoggerContext lc = CONTEXT;
+        LoggerContext lc = context;
         JoranConfigurator jc = new JoranConfigurator();
-        jc.setContext(CONTEXT);
-        StatusUtil statusUtil = new StatusUtil(CONTEXT);
+        jc.setContext(lc);
+        StatusUtil statusUtil = new StatusUtil(lc);
         List<SaxEvent> eventList = jc.recallSafeConfiguration();
 
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(CONTEXT);
+        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(lc);
         lc.reset();
         long threshold = System.currentTimeMillis();
         try {
@@ -73,6 +73,19 @@ public class LogbackReconfigure {
         } catch (JoranException e) {
             fallbackConfiguration(lc, eventList, mainURL);
         }
+    }
+
+    /**
+     * 重新配置当前logback
+     *
+     * @param config logback的xml配置文件
+     */
+    public static void reconfigure(InputStream config) {
+        if (CONTEXT == null) {
+            log.warn("当前日志上下文不是logback，不能使用该配置器重新配置");
+            return;
+        }
+        reconfigure(config , CONTEXT);
     }
 
     private static List<SaxEvent> removeIncludeEvents(List<SaxEvent> unsanitizedEventList) {
