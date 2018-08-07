@@ -78,6 +78,10 @@ public class LogbackReconfigureTest {
             SpringApplication.run(LogbackReconfigureTest.class, new String[] {});
             //启动spring-boot上下文后logback配置更改
             assertLevel("ERROR");
+            //spring-boot启动起来后仍然可以使用LogbackReconfigure修改logback配置
+            LogbackReconfigure.reconfigure(
+                LogbackReconfigureTest.class.getClassLoader().getResourceAsStream("logback.xml"));
+            assertLevel("INFO");
         });
     }
 
@@ -109,7 +113,7 @@ public class LogbackReconfigureTest {
      */
     private void reset() {
         InputStream config = LogbackReconfigureTest.class.getClassLoader()
-                .getResourceAsStream("logback.xml");
+            .getResourceAsStream("logback.xml");
         LogbackReconfigure.reconfigure(config, (LoggerContext) LoggerFactory.getILoggerFactory());
         SpringBootLogbackReconfigure.reconfigure("logback.xml");
     }
