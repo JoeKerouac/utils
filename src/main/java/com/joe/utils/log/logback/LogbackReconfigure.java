@@ -85,17 +85,19 @@ public class LogbackReconfigure {
             log.warn("当前日志上下文不是logback，不能使用该配置器重新配置");
             return;
         }
-        reconfigure(config , CONTEXT);
+        reconfigure(config, CONTEXT);
     }
 
     private static List<SaxEvent> removeIncludeEvents(List<SaxEvent> unsanitizedEventList) {
         List<SaxEvent> sanitizedEvents = new ArrayList<SaxEvent>();
-        if (unsanitizedEventList == null)
+        if (unsanitizedEventList == null) {
             return sanitizedEvents;
+        }
 
         for (SaxEvent e : unsanitizedEventList) {
-            if (!"include".equalsIgnoreCase(e.getLocalName()))
+            if (!"include".equalsIgnoreCase(e.getLocalName())) {
                 sanitizedEvents.add(e);
+            }
 
         }
         return sanitizedEvents;
