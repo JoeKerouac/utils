@@ -81,6 +81,7 @@ public class SymmetryCipher extends AbstractCipher {
      *
      * @param algorithms 算法
      * @param keySpec    keySpec
+     * @return CipherUtil
      */
     public static CipherUtil buildInstance(Algorithms algorithms, byte[] keySpec) {
         SecretKey key = KeyTools.buildKey(algorithms, keySpec);
