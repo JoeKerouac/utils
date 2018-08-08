@@ -5,18 +5,17 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 线程操作类
  *
  * @author joe
  */
+@Slf4j
 public class ThreadUtil {
-    private static final Logger                         logger = LoggerFactory
-        .getLogger(ThreadUtil.class);
-    private static final Map<PoolType, ExecutorService> cache  = new HashMap<>();
+    private static final Map<PoolType, ExecutorService> cache           = new HashMap<>();
+    private static final RejectedExecutionHandler       DEFAULT_HANDLER = new ThreadPoolExecutor.AbortPolicy();
 
     /**
      * 当前线程睡眠一段时间，当线程被中断时会抛出RuntimeException而不是InterruptedException，如果
@@ -33,7 +32,7 @@ public class ThreadUtil {
 
             Thread.sleep(unit.toMillis(time));
         } catch (InterruptedException e) {
-            logger.warn("时间参数不正确或者线程被中断，线程将不会睡眠");
+            log.warn("时间参数不正确或者线程被中断，线程将不会睡眠");
             throw new RuntimeException(e);
         }
     }
@@ -68,35 +67,16 @@ public class ThreadUtil {
     public static ExecutorService getOrCreatePool(PoolType type, String format) {
         ExecutorService service = cache.get(type);
         if (service == null || service.isTerminated() || service.isShutdown()) {
-            String.format(format, 0);//检查是否符合格式
-            ThreadFactory factory = new ThreadFactory() {
-                AtomicInteger counter = new AtomicInteger(0);
+            //检查是否符合格式
+            String.format(format, 0);
 
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format(format, counter.getAndAdd(1)));
-                }
-            };
             synchronized (cache) {
                 if (service == null || service.isTerminated() || service.isShutdown()) {
-                    switch (type) {
-                        case Singleton:
-                            service = Executors.newSingleThreadExecutor(factory);
-                            break;
-                        case IO:
-                            service = new ThreadPoolExecutor(30, 100, 30, TimeUnit.SECONDS,
-                                new LinkedBlockingQueue<>(), factory);
-                            break;
-                        case Calc:
-                            service = Executors.newFixedThreadPool(
-                                Runtime.getRuntime().availableProcessors(), factory);
-                            break;
-                        default:
-                            throw new IllegalArgumentException(
-                                String.format("当前参数为：%s；请使用正确的参数", type.toString()));
-                    }
+                    ThreadFactory factory = build(format);
+
+                    service = build(type, factory);
+                    cache.put(type, service);
                 }
-                cache.put(type, service);
             }
         }
         return service;
@@ -120,7 +100,8 @@ public class ThreadUtil {
      * @return 返回指定类型的线程池
      */
     public static ExecutorService createPool(PoolType type, String format) {
-        String.format(format, 0);//检查是否符合格式
+        //检查是否符合格式
+        String.format(format, 0);
         //线程工厂
         ThreadFactory factory = new ThreadFactory() {
             AtomicInteger counter = new AtomicInteger(0);
@@ -130,26 +111,55 @@ public class ThreadUtil {
                 return new Thread(r, String.format(format, counter.getAndAdd(1)));
             }
         };
-        ExecutorService service;
+
+        return build(type, factory);
+    }
+
+    /**
+     * 构建指定类型的线程池
+     * @param type 线程池类型
+     * @param factory 线程工厂，用来构建线程
+     * @return 线程池
+     */
+    public static ExecutorService build(PoolType type, ThreadFactory factory) {
+        int corePoolSize, maximumPoolSize;
+        int keepAliveTime = 10;
+        BlockingQueue<Runnable> workQueue = new LinkedBlockingQueue<>();
         switch (type) {
             case Singleton:
-                service = Executors.newSingleThreadExecutor(factory);
+                corePoolSize = maximumPoolSize = 1;
                 break;
             case IO:
-                service = new ThreadPoolExecutor(
-                    Math.max(Runtime.getRuntime().availableProcessors() * 50, 80),
-                    Math.max(Runtime.getRuntime().availableProcessors() * 150, 260), 30,
-                    TimeUnit.SECONDS, new LinkedBlockingQueue<>(), factory);
+                corePoolSize = Runtime.getRuntime().availableProcessors() * 10;
+                maximumPoolSize = Runtime.getRuntime().availableProcessors() * 20;
                 break;
             case Calc:
-                service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(),
-                    factory);
+                corePoolSize = maximumPoolSize = Runtime.getRuntime().availableProcessors() + 1;
                 break;
             default:
                 throw new IllegalArgumentException(
-                    String.format("当前参数为：%s；请使用正确的参数", type.toString()));
+                    String.format("内部异常，未知线程池类型[%s]", type.toString()));
         }
-        return service;
+        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+            TimeUnit.SECONDS, workQueue, factory, DEFAULT_HANDLER);
+    }
+
+    /**
+     * 构建ThreadFactory
+     * @param format 线程名字模板，格式为：format-%d，其中%d将被替换为从0开始的数字序列，不能为null
+     * @return ThreadFactory
+     */
+    private static ThreadFactory build(String format) {
+        return new ThreadFactory() {
+            AtomicInteger counter = new AtomicInteger(0);
+
+            @Override
+            public Thread newThread(Runnable r) {
+                Thread thread = new Thread(r, String.format(format, counter.getAndAdd(1)));
+                thread.setDaemon(true);
+                return thread;
+            }
+        };
     }
 
     public enum PoolType {
