@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
+import org.redisson.api.RObject;
 import org.redisson.api.RedissonClient;
 
 import com.joe.utils.cluster.ClusterManager;
@@ -74,6 +75,16 @@ public class RedisClusterManager implements ClusterManager {
     @Override
     public void shutdown() {
         redissonClient.shutdown();
+    }
+
+    @Override
+    public boolean free(Object obj) {
+        if (obj instanceof RObject) {
+            RObject rObject = (RObject) obj;
+            return rObject.delete();
+        } else {
+            return false;
+        }
     }
 
     @Override

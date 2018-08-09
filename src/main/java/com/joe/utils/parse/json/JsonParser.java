@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.MapType;
 
 /**
- * json解析工具
+ * json解析工具（需要注意的是对于byte数组的处理，该实现采用的是jackson的实现，所以对于byte数组会将其转换为BASE64的字符串）
  *
  * @author joe
  */

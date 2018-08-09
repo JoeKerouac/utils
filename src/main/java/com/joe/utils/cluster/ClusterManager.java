@@ -105,6 +105,13 @@ public interface ClusterManager {
     <M> Topic<M> getTopic(String name);
 
     /**
+     * 释放该分布式管理器获取的资源(对于空集合、已经解锁的lock应该需要可以自动删除)
+     * @param obj 资源
+     * @return true表示释放成功
+     */
+    boolean free(Object obj);
+
+    /**
      * 关闭分布式管理器
      */
     void shutdown();
