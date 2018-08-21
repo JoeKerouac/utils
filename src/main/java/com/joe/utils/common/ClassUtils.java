@@ -1,10 +1,37 @@
 package com.joe.utils.common;
 
+import java.io.InputStream;
+
 /**
  * @author joe
  * @version 2018.06.13 14:33
  */
 public class ClassUtils {
+    /** The package separator character: '.' */
+    private static final char  PACKAGE_SEPARATOR = '.';
+    /** The ".class" file suffix */
+    public static final String CLASS_FILE_SUFFIX = ".class";
+
+    /**
+     * 获取指定class的class文件的输入流
+     * @param clazz class
+     * @return 对应的输入流
+     */
+    public static InputStream getClassAsStream(Class<?> clazz) {
+        return clazz.getResourceAsStream(getClassFileName(clazz));
+    }
+
+    /**
+     * 获取class的class文件名（不包含包名，例如：String.class）
+     * @param clazz the class
+     * @return .class文件名
+     */
+    public static String getClassFileName(Class<?> clazz) {
+        Assert.notNull(clazz, "Class must not be null");
+        String className = clazz.getName();
+        int lastDotIndex = className.lastIndexOf(PACKAGE_SEPARATOR);
+        return className.substring(lastDotIndex + 1) + CLASS_FILE_SUFFIX;
+    }
 
     /**
      * 获取默认classloader
