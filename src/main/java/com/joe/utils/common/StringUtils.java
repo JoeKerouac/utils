@@ -18,6 +18,36 @@ import lombok.extern.slf4j.Slf4j;
 public class StringUtils {
 
     /**
+     * 将目标字符串重复count次返回
+     * @param str 目标字符串
+     * @param count 次数
+     * @return 目标字符串重复count次结果，例如目标字符串是test，count是2，则返回testtest，如果count是3则返回testtesttest
+     */
+    public static String copy(String str, int count) {
+        if (str == null) {
+            throw new NullPointerException("原始字符串不能为null");
+        }
+
+        if (count <= 0) {
+            throw new IllegalArgumentException("次数必须大于0");
+        }
+
+        if (count == 1) {
+            return str;
+        }
+
+        if (count == 2) {
+            return str + str;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
+    /**
      * 将字符串中的{}依次替换为指定数据
      * @param templet 字符串模板
      * @param args 变量
