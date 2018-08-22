@@ -3,24 +3,23 @@ package com.joe.utils.parse.json;
 import java.util.Collection;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.MapType;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * json解析工具（需要注意的是对于byte数组的处理，该实现采用的是jackson的实现，所以对于byte数组会将其转换为BASE64的字符串）
  *
  * @author joe
  */
+@Slf4j
 public class JsonParser {
+    private static final JsonParser   JSON_PARSER;
     private static final ObjectMapper MAPPER_IGNORE_NULL;
     private static final ObjectMapper MAPPER;
-    private static final Logger       logger = LoggerFactory.getLogger(JsonParser.class);
-    private static JsonParser         jsonParser;
 
     private JsonParser() {
     }
@@ -31,17 +30,12 @@ public class JsonParser {
 
         MAPPER.setSerializationInclusion(JsonInclude.Include.ALWAYS);
         MAPPER_IGNORE_NULL.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+        JSON_PARSER = new JsonParser();
     }
 
     public static JsonParser getInstance() {
-        if (jsonParser == null) {
-            synchronized (logger) {
-                if (jsonParser == null) {
-                    jsonParser = new JsonParser();
-                }
-            }
-        }
-        return jsonParser;
+        return JSON_PARSER;
     }
 
     /**
@@ -79,7 +73,7 @@ public class JsonParser {
             }
             return mapper.writeValueAsString(obj);
         } catch (Exception e) {
-            logger.error("序列化失败，失败原因：", e);
+            log.error("序列化失败，失败原因：", e);
             return "";
         }
     }
@@ -96,14 +90,14 @@ public class JsonParser {
     public <T> T readAsObject(String content, Class<T> type) {
         try {
             if (content == null || content.isEmpty() || type == null) {
-                logger.debug("content为{}，type为：{}", content, type);
+                log.debug("content为{}，type为：{}", content, type);
                 return null;
             } else if (type.equals(String.class)) {
                 return (T) content;
             }
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
-            logger.error("json解析失败，失败原因：", e);
+            log.error("json解析失败，失败原因：", e);
             return null;
         }
     }
@@ -120,14 +114,14 @@ public class JsonParser {
     public <T> T readAsObject(byte[] content, Class<T> type) {
         try {
             if (content == null || content.length == 0 || type == null) {
-                logger.debug("content为{}，type为：{}", content, type);
+                log.debug("content为{}，type为：{}", content, type);
                 return null;
             } else if (type.equals(String.class)) {
                 return (T) new String(content);
             }
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
-            logger.error("json解析失败，失败原因：", e);
+            log.error("json解析失败，失败原因：", e);
             return null;
         }
     }
@@ -150,7 +144,7 @@ public class JsonParser {
             MapType type = MAPPER.getTypeFactory().constructMapType(mapType, keyType, valueType);
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
-            logger.error("json解析失败，失败原因：", e);
+            log.error("json解析失败，失败原因：", e);
             return null;
         }
     }
@@ -190,7 +184,7 @@ public class JsonParser {
                 .constructCollectionLikeType(collectionType, elementsType);
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
-            logger.error("json解析失败，失败原因：", e);
+            log.error("json解析失败，失败原因：", e);
             return null;
         }
     }
