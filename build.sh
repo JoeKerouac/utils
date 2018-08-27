@@ -24,7 +24,7 @@ check "代码拉取成功" "代码拉取失败"
 
 if [ ! -n "$1" ]
         then
-        echo "请传入具体操作，操作可以是：help,package,install,deploy\n 操作示例:sh build.sh package"
+        echo -e "请传入具体操作，操作可以是：help,package,install,deploy\n 操作示例:sh build.sh package"
 elif [ "$1" = "help" ]
         then
         echo -e "\n help:帮助文档\n package:打包\n install:安装到本地\n deploy:发布到maven仓库"
