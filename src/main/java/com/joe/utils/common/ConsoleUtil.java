@@ -17,7 +17,7 @@ public class ConsoleUtil {
      *
      * @param consumer 处理控制台获取的命令，当输入的是exit时系统退出
      */
-    public static void command(Consumer<String> consumer) {
+    public static void start(Consumer<String> consumer) {
         try {
             Console console = System.console();
             CustomReader reader;
