@@ -16,6 +16,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class StringUtils {
+    private static final String charsets[] = new String[] { "UTF-8", "UTF-16", "UTF-16LE",
+                                                            "UTF-16BE", "UTF-32", "ISO-8859-1",
+                                                            "US-ASCII", "GBK", "GB2312" };
 
     /**
      * 将目标字符串重复count次返回
