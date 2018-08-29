@@ -105,4 +105,11 @@ public class StringUtilsTest {
     public void doToFirstUpperCase() {
         Assert.assertEquals("JoeKerouac", StringUtils.toFirstUpperCase("joeKerouac"));
     }
+
+    @Test
+    public void doLcs() {
+        Assert.assertEquals(3, StringUtils.lcs("123456", "456789"));
+        Assert.assertEquals(3, StringUtils.lcs("123456", "256789"));
+        Assert.assertEquals(2, StringUtils.lcs("123456", "556489"));
+    }
 }
