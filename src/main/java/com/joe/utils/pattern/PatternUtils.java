@@ -24,7 +24,7 @@ public class PatternUtils {
     /**
      * 匹配数字正则（开头不能是0，末尾可以是0）
      */
-    private static Pattern       NUMBER_PARTER     = Pattern.compile("-?[1-9]+\\d*(\\.\\d+)");
+    private static Pattern       NUMBER_PARTER     = Pattern.compile("-?(([1-9]+\\d*(\\.\\d+)?)|(0\\.\\d+))");
     /**
      * 匹配数字字符串，只要字符串包含的只有数字即可
      */
@@ -54,7 +54,7 @@ public class PatternUtils {
     }
 
     /**
-     * 判断字符串参数是否是数字（开头不能是0，结尾可以是0，可以包含小数点）
+     * 判断字符串参数是否是数字（除了0.xx形式的数字，其他数字开头不能是0，例如00.1、01.1、03，上述这些都会返回false）
      *
      * @param arg 字符串
      * @return 如果参数是数字则返回<code>true</code>

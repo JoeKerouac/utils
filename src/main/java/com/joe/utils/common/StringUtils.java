@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.joe.utils.annotation.Nullable;
 import com.joe.utils.pattern.PatternUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -118,44 +117,6 @@ public class StringUtils {
     }
 
     /**
-     * 替换字符串中的字符
-     *
-     * @param inString   字符串
-     * @param oldPattern 旧字符
-     * @param newPattern 新字符
-     * @return 替换后的字符串
-     */
-    public static String replace(String inString, String oldPattern, @Nullable String newPattern) {
-        if (!hasLength(inString) || !hasLength(oldPattern) || newPattern == null) {
-            return inString;
-        }
-        int index = inString.indexOf(oldPattern);
-        if (index == -1) {
-            // no occurrence -> can return input as-is
-            return inString;
-        }
-
-        int capacity = inString.length();
-        if (newPattern.length() > oldPattern.length()) {
-            capacity += 16;
-        }
-        StringBuilder sb = new StringBuilder(capacity);
-
-        int pos = 0; // our position in the old string
-        int patLen = oldPattern.length();
-        while (index >= 0) {
-            sb.append(inString.substring(pos, index));
-            sb.append(newPattern);
-            pos = index + patLen;
-            index = inString.indexOf(oldPattern, pos);
-        }
-
-        // append any characters to the right of a match
-        sb.append(inString.substring(pos));
-        return sb.toString();
-    }
-
-    /**
      * 删除字符串的前/后缀
      *
      * @param str 字符串
@@ -189,13 +150,14 @@ public class StringUtils {
             return Collections.emptyMap();
         }
         String[] params = data.split("&");
-        Map<String, String> map = new HashMap<>();
+
+        HashMap<String, String> map = new HashMap<>((params.length / 3 + 1) * 4);
         for (String str : params) {
-            String strs[] = str.split("=");
-            if (strs.length > 1) {
-                map.put(strs[0], strs[1]);
+            String[] datas = str.split("=");
+            if (datas.length > 1) {
+                map.put(datas[0], datas[1]);
             } else {
-                map.put(strs[0], null);
+                map.put(datas[0], null);
             }
         }
         log.info("URL参数[{}]解析为[{}]", data, map);
@@ -243,7 +205,7 @@ public class StringUtils {
     }
 
     /**
-     * 判断字符串参数是否是数字
+     * 判断字符串参数是否是数字（除了0.xx形式的数字，其他数字开头不能是0，例如00.1、01.1、03，上述这些都会返回false）
      *
      * @param arg 数字参数
      * @return 如果参数是数字则返回<code>true</code>
