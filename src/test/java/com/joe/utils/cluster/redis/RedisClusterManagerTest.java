@@ -1,7 +1,5 @@
 package com.joe.utils.cluster.redis;
 
-import com.joe.utils.cluster.ClusterManager;
-import com.joe.utils.common.Assert;
 import org.junit.Test;
 
 /**
