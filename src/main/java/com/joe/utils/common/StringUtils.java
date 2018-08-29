@@ -229,7 +229,12 @@ public class StringUtils {
      *
      * @param arg0 字符串1
      * @param arg1 字符串2
-     * @return 两个字符串的最大公共子序列的长度
+     * @return 两个字符串的最大公共子序列的长度，例：
+     * <ul>
+     *     <li>123456和456789的lcs为3</li>
+     *     <li>123456和256789的lcs为3</li>
+     *     <li>123456和556489的lcs为2</li>
+     * </ul>
      */
 
     public static long lcs(String arg0, String arg1) {
