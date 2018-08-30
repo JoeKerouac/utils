@@ -21,14 +21,24 @@ public class DocumentRootHelper {
     /**
      * classpath下的doc-root
      */
-    private static final String   DEFAULT_DOC_ROOT = Thread.currentThread().getContextClassLoader()
-        .getResource("").getFile();
+    private static final File     DEFAULT_DOC_ROOT;
     /**
      * 本地工作空间的doc-root
      */
-    private static final String   LOCAL_DOC_ROOT   = DEFAULT_DOC_ROOT.replace("target/classes",
-        "src/main/webapp");
+    private static final File     LOCAL_DOC_ROOT;
     private static final String[] COMMON_DOC_ROOTS = { "src/main/webapp", "public", "static" };
+
+    static {
+        URL url = Thread.currentThread().getContextClassLoader().getResource("");
+        if (url != null) {
+            String path = url.getFile();
+            DEFAULT_DOC_ROOT = new File(path);
+            LOCAL_DOC_ROOT = new File(path.replace("target/classes", "src/main/webapp"));
+        } else {
+            DEFAULT_DOC_ROOT = null;
+            LOCAL_DOC_ROOT = null;
+        }
+    }
 
     /**
      * 获取当前系统的doc-root
@@ -75,13 +85,12 @@ public class DocumentRootHelper {
      * @return doc-root
      */
     private static File getIDEDocumentRoot() {
-        File docRoot = new File(LOCAL_DOC_ROOT);
-        if (docRoot.exists()) {
+        if (LOCAL_DOC_ROOT != null && LOCAL_DOC_ROOT.exists()) {
             log.debug("当前在IDE中运行，并且找到了工作空间");
-            return docRoot;
-        } else if ((docRoot = new File(DEFAULT_DOC_ROOT)).exists()) {
+            return LOCAL_DOC_ROOT;
+        } else if (DEFAULT_DOC_ROOT != null && DEFAULT_DOC_ROOT.exists()) {
             log.debug("当前在IDE中运行，没有找到了工作空间，但是找到了classpath下的doc-root");
-            return docRoot;
+            return DEFAULT_DOC_ROOT;
         } else {
             log.debug("当前没有在IDE中运行");
             return null;
