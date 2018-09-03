@@ -48,15 +48,6 @@ public class BaseDTO<T> implements Serializable {
     }
 
     /**
-     * 设置一个状态的构造器
-     *
-     * @param status 默认状态
-     */
-    public BaseDTO(String status) {
-        this.setStatus(status);
-    }
-
-    /**
      * 添加全局status-msg对（200、500为预设状态，200表示成功，500表示系统异常）
      *
      * @param status 状态码
