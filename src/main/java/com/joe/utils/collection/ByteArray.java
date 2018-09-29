@@ -111,6 +111,14 @@ public class ByteArray implements Iterable<Byte> {
     }
 
     /**
+     * 获取原始数据（请谨慎操作，对该数组进行的任何操作都有可能会带来未知的错误）
+     * @return 原始数据
+     */
+    public byte[] getOriginalData() {
+        return this.datas;
+    }
+
+    /**
      * 获取数组大小（实际数据大小）
      * 
      * @return 数组大小
