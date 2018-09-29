@@ -3,6 +3,7 @@ package com.joe.utils.pool;
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import com.joe.utils.exception.PoolObjectHolderClosedException;
 import com.joe.utils.function.GetObjectFunction;
 import com.joe.utils.secure.impl.SignatureUtilImpl;
 
@@ -15,8 +16,8 @@ import com.joe.utils.secure.impl.SignatureUtilImpl;
  * @version 2018.06.28 16:32
  */
 public class ObjectPool<T> {
-    private Deque<PoolObjectHolder<T>> pool;
-    private GetObjectFunction<T>       function;
+    private Deque<T>             pool;
+    private GetObjectFunction<T> function;
 
     /**
      * Object池
@@ -34,11 +35,12 @@ public class ObjectPool<T> {
      * @return 池元素
      */
     public PoolObjectHolder<T> get() {
-        PoolObjectHolder<T> data = pool.pollLast();
+        T data = pool.pollLast();
         if (data == null) {
-            data = new PoolObjectHolder<>(function.get(), this);
+            data = function.get();
         }
-        return data;
+
+        return new PoolObjectHolder<T>(data, pool);
     }
 
     /**
@@ -77,11 +79,12 @@ public class ObjectPool<T> {
      * @param <T> 池元素持有的实际数据类型
      */
     public static class PoolObjectHolder<T> implements AutoCloseable {
-        private T             data;
-        private ObjectPool<T> pool;
-        private boolean       closed;
+        private final Object lock = new Object();
+        private T            data;
+        private Deque<T>     pool;
+        private boolean      closed;
 
-        private PoolObjectHolder(T data, ObjectPool<T> pool) {
+        private PoolObjectHolder(T data, Deque<T> pool) {
             this.closed = false;
             this.data = data;
             this.pool = pool;
@@ -93,16 +96,36 @@ public class ObjectPool<T> {
          * @return 持有的数据
          */
         public T get() {
-            return data;
+            if (closed) {
+                throw new PoolObjectHolderClosedException("PoolObjectHolder has bean closed");
+            }
+            synchronized (lock) {
+                if (closed) {
+                    throw new PoolObjectHolderClosedException("PoolObjectHolder has bean closed");
+                }
+                return data;
+            }
         }
 
         @Override
-        public synchronized void close() {
+        public void close() {
             if (closed) {
                 return;
             }
-            pool.pool.addLast(this);
-            this.closed = true;
+            synchronized (lock) {
+                if (closed) {
+                    return;
+                } else {
+                    pool.addLast(data);
+                    this.data = null;
+                    this.closed = true;
+                }
+            }
+        }
+
+        @Override
+        protected void finalize()  {
+            this.close();
         }
     }
 }

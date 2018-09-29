@@ -142,7 +142,9 @@ public class DatagramUtil {
     public static Datagram decode(final byte[] data,
                                   boolean allowErr) throws IllegalRequestException {
         try {
-            log.debug("要解析的数据为：{}", data);
+            if (log.isDebugEnabled()) {
+                log.debug("要解析的数据为：{}", Arrays.toString(data));
+            }
             // 字符集数据
             int end = Datagram.CHARSET_OFFSET;
             for (int i = 0; i < Datagram.CHARSET_MAX; end += i, i++) {
@@ -188,19 +190,20 @@ public class DatagramUtil {
             log.debug("数据报ID为：{}", id);
 
             // 有可能是空报文的数据报
+            Datagram datagram;
             if (len == 0) {
                 log.debug("要解析的数据中head标志body长度为0，直接返回一个空body的datagram对象");
-                Datagram datagram = new Datagram(buffer, len, null, version, charset, type, idByte);
-                log.debug("封装好的数据报body为：{}", datagram);
-                return datagram;
+                datagram = new Datagram(buffer, len, null, version, charset, type, idByte);
             } else {
                 // 真实的业务数据
                 byte[] body = new byte[len];
                 System.arraycopy(buffer, Datagram.HEADER_LEN, body, 0, body.length);
-                Datagram datagram = new Datagram(buffer, len, body, version, charset, type, idByte);
-                log.debug("封装好的数据报body为：{}", datagram);
-                return datagram;
+                datagram = new Datagram(buffer, len, body, version, charset, type, idByte);
             }
+            if (log.isDebugEnabled()) {
+                log.debug("封装好的数据报body为：{}", datagram);
+            }
+            return datagram;
         } catch (Exception e) {
             log.error("数据报解析错误，错误原因：{}", e);
             throw new IllegalRequestException(e);
