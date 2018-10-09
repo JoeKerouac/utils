@@ -21,15 +21,17 @@ public final class CollectionUtil {
      */
     public static <T> int calcStackDeep(List<T> input, List<T> output) {
         int max = 0;
+        //当前已有交集大小
+        int helper = 0;
         for (int i = 0; i < output.size(); i++) {
             // 求出出栈元素在原队列中的位置index，然后算出原队列0-index区间与出栈队列0-i区间的交集，用index-该交集长度加上当前元素占用
             // 位置就是当前栈深度，然后遍历出栈队列取最大栈深度即可
             Object obj = output.get(i);
             int index = input.indexOf(obj);
-            if ((index - Math.min(index, i) + 1) < max) {
+            if ((index - Math.min(index, i) + 1 - helper) <= max) {
                 continue;
             }
-            int repeat = intersection(input, 0, index, output, 0, i).size();
+            int repeat = helper = intersection(input, 0, index, output, 0, i).size();
             int temp = index - repeat + 1;
             max = temp > max ? temp : max;
         }
