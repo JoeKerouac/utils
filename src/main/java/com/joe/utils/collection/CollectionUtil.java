@@ -26,6 +26,9 @@ public final class CollectionUtil {
             // 位置就是当前栈深度，然后遍历出栈队列取最大栈深度即可
             Object obj = output.get(i);
             int index = input.indexOf(obj);
+            if ((index - Math.min(index, i) + 1) < max) {
+                continue;
+            }
             int repeat = intersection(input, 0, index, output, 0, i).size();
             int temp = index - repeat + 1;
             max = temp > max ? temp : max;
