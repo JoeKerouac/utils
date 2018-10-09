@@ -13,6 +13,27 @@ import com.joe.utils.math.MathUtil;
  */
 public final class CollectionUtil {
     /**
+     * 给定原顺序队列与出栈顺序队列求出栈最小深度
+     * @param input 原队列，不能包含重复元素
+     * @param output 出栈队列
+     * @param <T> 数据类型
+     * @return 栈的最小深度
+     */
+    public static <T> int calcStackDeep(List<T> input, List<T> output) {
+        int max = 0;
+        for (int i = 0; i < output.size(); i++) {
+            // 求出出栈元素在原队列中的位置index，然后算出原队列0-index区间与出栈队列0-i区间的交集，用index-该交集长度加上当前元素占用
+            // 位置就是当前栈深度，然后遍历出栈队列取最大栈深度即可
+            Object obj = output.get(i);
+            int index = input.indexOf(obj);
+            int repeat = intersection(input, 0, index, output, 0, i).size();
+            int temp = index - repeat + 1;
+            max = temp > max ? temp : max;
+        }
+        return max;
+    }
+
+    /**
      * 矩阵转置（矩阵必须每行的列数都一样）（行变列，列变行）
      * @param datas 要转置的数据
      * @return 转置后的矩阵，例如[[01,02][11,12]]会变为[[01,11],[02,12]]
@@ -322,4 +343,44 @@ public final class CollectionUtil {
         }
     }
 
+    /**
+     * 求集合交集
+     * @param arr1 集合1
+     * @param arr2 集合2
+     * @param <T> 集合中的数据
+     * @return 集合的交集
+     */
+    public static <T> List<T> intersection(List<T> arr1, List<T> arr2) {
+        return intersection(arr1, 0, arr1.size(), arr2, 0, arr2.size());
+    }
+
+    /**
+     * 求两个集合指定区间的交集
+     * @param arr1 集合1
+     * @param start1 集合1区间起始位置（包含）
+     * @param end1 集合1区间结束位置（不包含）
+     * @param arr2 集合2
+     * @param start2 集合2区间起始位置（包含）
+     * @param end2 集合2区间结束位置（不包含）
+     * @param <T> 集合数据类型
+     * @return 两个集合指定区间的交集
+     */
+    public static <T> List<T> intersection(List<T> arr1, int start1, int end1, List<T> arr2,
+                                           int start2, int end2) {
+        if (start1 > end1 || start2 > end2) {
+            throw new IllegalArgumentException("起始位置必须小于等于结束位置");
+        }
+        if (start1 == end1 || start2 == end2) {
+            return Collections.emptyList();
+        }
+
+        List<T> list = new ArrayList<>();
+        for (int i = start1; i < end1; i++) {
+            int index = arr2.indexOf(arr1.get(i));
+            if (index < end2 && index >= start2) {
+                list.add(arr1.get(i));
+            }
+        }
+        return list;
+    }
 }
