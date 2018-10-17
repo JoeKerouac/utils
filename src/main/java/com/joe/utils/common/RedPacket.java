@@ -54,7 +54,6 @@ public class RedPacket {
                 nowMin = Math.max(nowMin, min);
                 //区间
                 int mod = nowMax - nowMin;
-                Assert.isPositive(mod);
                 //当前值
                 int packet;
                 if (mod == 0) {
