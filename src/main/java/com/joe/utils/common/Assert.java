@@ -1,10 +1,31 @@
 package com.joe.utils.common;
 
+import java.util.Objects;
+
 /**
  * @author joe
  * @version 2018.06.13 11:29
  */
 public class Assert {
+
+    /**
+     * 验证参数是否大于0，参数小于等于0时抛出异常
+     * @param number 参数
+     */
+    public static void isPositive(int number) {
+        isPositive(number, "number must is prositive number");
+    }
+
+    /**
+     * 验证参数大于0，参数小于等于0时抛出异常
+     * @param number 参数
+     * @param msg 异常消息
+     */
+    public static void isPositive(int number, String msg) {
+        if (number <= 0) {
+            throw new IllegalArgumentException(msg);
+        }
+    }
 
     /**
      * 断言给定时间是一个正确的时间段（即开始时间小于结束时间）
@@ -78,9 +99,7 @@ public class Assert {
      * @param msg 为null时的异常提示
      */
     public static void notNull(Object obj, String msg) {
-        if (obj == null) {
-            throw new NullPointerException(msg);
-        }
+        Objects.requireNonNull(obj, msg);
     }
 
     /**
@@ -89,7 +108,7 @@ public class Assert {
      * @param objs 参数列表
      */
     public static void notNull(Object[] objs) {
-        notNull(objs, null);
+        notNull(objs, "param must not be null");
     }
 
     /**
@@ -99,9 +118,7 @@ public class Assert {
      * @param msg  为null时的异常提示
      */
     public static void notNull(Object[] objs, String msg) {
-        if (objs == null) {
-            throw new NullPointerException(msg);
-        }
+        notNull(objs, msg);
         for (Object obj : objs) {
             notNull(obj, msg);
         }
