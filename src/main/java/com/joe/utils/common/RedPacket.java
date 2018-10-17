@@ -54,9 +54,15 @@ public class RedPacket {
                 nowMin = Math.max(nowMin, min);
                 //区间
                 int mod = nowMax - nowMin;
-
+                Assert.isPositive(mod);
                 //当前值
-                int packet = random % mod + nowMin;
+                int packet;
+                if (mod == 0) {
+                    // 此时说明后续的红包都是最小的了
+                    packet = nowMin;
+                } else {
+                    packet = random % mod + nowMin;
+                }
 
                 array[i] = packet;
                 nowAmount -= packet;
