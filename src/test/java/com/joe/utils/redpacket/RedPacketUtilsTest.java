@@ -1,4 +1,4 @@
-package com.joe.utils.common;
+package com.joe.utils.redpacket;
 
 import org.junit.Test;
 
@@ -9,7 +9,7 @@ import java.util.Random;
  * @author JoeKerouac
  * @version $Id: joe, v 0.1 2018年10月17日 上午11:08 JoeKerouac Exp $
  */
-public class RedPacketTest {
+public class RedPacketUtilsTest {
     @Test
     public void doSplit() {
         Random random = new Random();
@@ -30,7 +30,7 @@ public class RedPacketTest {
      * @param max 最大值
      */
     private void check(int amount, int count, int min, int max) {
-        int[] packets = RedPacket.split(amount, count, min, max);
+        int[] packets = RedPacketUtils.split(amount, count, min, max);
 
         long error = Arrays.stream(packets).filter(n -> n > max).filter(n -> n < min).count();
         if (error > 0) {

@@ -1,4 +1,6 @@
-package com.joe.utils.common;
+package com.joe.utils.redpacket;
+
+import com.joe.utils.common.Assert;
 
 import java.security.SecureRandom;
 
@@ -8,7 +10,7 @@ import java.security.SecureRandom;
  * @author JoeKerouac
  * @version $Id: joe, v 0.1 2018年10月17日 上午11:00 JoeKerouac Exp $
  */
-public class RedPacket {
+public class RedPacketUtils {
 
     /**
      * 分红包
