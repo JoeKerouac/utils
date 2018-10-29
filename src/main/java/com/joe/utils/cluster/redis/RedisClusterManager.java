@@ -28,6 +28,11 @@ public class RedisClusterManager implements ClusterManager {
     }
 
     @Override
+    public boolean exist(String key) {
+        return redissonClient.getKeys().isExists(key) > 0;
+    }
+
+    @Override
     public Lock getLock(String name) {
         return redissonClient.getLock(name);
     }

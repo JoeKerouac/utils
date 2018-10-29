@@ -22,6 +22,13 @@ import com.joe.utils.cluster.redis.RedisClusterManagerFactory;
 public interface ClusterManager {
 
     /**
+     * 判断指定key是否存在于当前分布式管理器
+     * @param key key
+     * @return 返回true表示存在
+     */
+    boolean exist(String key);
+
+    /**
      * 获取指定名字的lock，该Lock必须为分布式Lock
      *
      * @param name lock的名字
