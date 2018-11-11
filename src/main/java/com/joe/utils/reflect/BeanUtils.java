@@ -1,4 +1,6 @@
-package com.joe.utils.common;
+package com.joe.utils.reflect;
+
+import static com.joe.utils.reflect.ReflectUtil.*;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -7,13 +9,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import org.apache.poi.ss.formula.functions.T;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.collection.LRUCacheMap;
-import com.joe.utils.common.exception.BeanException;
+import com.joe.utils.common.Assert;
+import com.joe.utils.common.StringUtils;
 import com.joe.utils.parse.xml.XmlNode;
-import com.joe.utils.type.ReflectUtil;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BeanUtils {
     private static final LRUCacheMap<Class<?>, CustomPropertyDescriptor[]> CACHE            = new LRUCacheMap<>();
-    private static final LRUCacheMap<Class<?>, Field[]>                    FIELD_CACHE      = new LRUCacheMap<>();
     private static final LRUCacheMap<FieldCache, CustomPropertyDescriptor> FIELD_DESC_CACHE = new LRUCacheMap<>();
 
     /**
@@ -36,7 +36,8 @@ public class BeanUtils {
      * @param annotationType 别名注解类型，支持{@link JsonProperty JsonProperty}和{@link XmlNode XmlNode}
      * @return map，当pojo为null时返回空map
      */
-    public static Map<String, T> convert(Object pojo, Class<? extends Annotation> annotationType) {
+    public static Map<String, Object> convert(Object pojo,
+                                              Class<? extends Annotation> annotationType) {
         return convert(pojo, annotationType, true);
     }
 
@@ -44,17 +45,15 @@ public class BeanUtils {
      * 将pojo的所有字段映射为map
      *
      * @param pojo           pojo
-     * @param annotationType 别名注解类型，支持{@link JsonProperty JsonProperty}和{@link XmlNode XmlNode}
+     * @param annotationType 别名注解类型，支持{@link JsonProperty JsonProperty}和{@link XmlNode XmlNode}，为null时自动获取，优先使用{@link JsonProperty JsonProperty}
      * @param hasNull        是否包含null值，true表示包含
      * @return map，当pojo为null时返回空map
      */
-    public static <T> Map<String, T> convert(Object pojo,
-                                             Class<? extends Annotation> annotationType,
-                                             boolean hasNull) {
+    public static Map<String, Object> convert(Object pojo,
+                                              Class<? extends Annotation> annotationType,
+                                              boolean hasNull) {
         log.debug("获取[{}]的字段映射，使用注解[{}]的值作为别名", pojo, annotationType);
-        if (pojo == null) {
-            return Collections.emptyMap();
-        }
+        Assert.notNull(pojo, "pojo不能为null");
 
         if (annotationType != null && !JsonProperty.class.isAssignableFrom(annotationType)
             && !XmlNode.class.isAssignableFrom(annotationType)) {
@@ -62,7 +61,7 @@ public class BeanUtils {
         }
 
         Field[] fields = getAllFields(pojo.getClass());
-        Map<String, T> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         if (fields.length == 0) {
             return Collections.emptyMap();
         }
@@ -82,12 +81,17 @@ public class BeanUtils {
                 throw new IllegalArgumentException("不支持的注解类型：" + annotationType);
             }
 
-            T value = getProperty(pojo, field.getName());
-            if (value == null && !hasNull) {
-                log.debug("字段[{}]值为null，当前不包含null值，忽略字段[{}]", name, name);
-                continue;
+            try {
+                Object value = getFieldValue(pojo, field.getName());
+                if (value == null && !hasNull) {
+                    log.debug("字段[{}]值为null，当前不包含null值，忽略字段[{}]", name, name);
+                    continue;
+                }
+
+                map.put(name, value);
+            } catch (Exception e) {
+                log.error("获取字段[{}]值失败，忽略字段[{}]", name, name);
             }
-            map.put(name, value);
         }
         log.debug("获取[{}]的字段映射map为[{}]", pojo, map);
         return map;
@@ -102,19 +106,10 @@ public class BeanUtils {
      * @return 如果注入成功则返回<code>true</code>
      */
     public static boolean setProperty(Object obj, String propName, Object value) {
-        log.debug("开始为{}的{}字段写入值{}", obj, propName, value);
-        if (obj == null || StringUtils.isEmpty(propName)) {
-            log.warn("写入数值失败，参数存在空值");
-            return false;
-        }
-        Class<?> clazz = obj.getClass();
-        Field field = getField(clazz, propName);
         try {
-            field.set(obj, value);
-            log.debug("写入成功");
+            setFieldValue(obj, propName, value);
             return true;
-        } catch (Exception e) {
-            log.error("写入数值失败，写入过程中发生异常", e);
+        } catch (Throwable e) {
             return false;
         }
     }
@@ -125,28 +120,16 @@ public class BeanUtils {
      * @param obj      指定对象
      * @param propName 要获取的字段的名称
      * @param <T>      字段的类型
-     * @return 该字段的值
+     * @return 该字段的值，获取失败时抛出异常
      */
 
     public static <T> T getProperty(Object obj, String propName) {
-        log.debug("开始获取{}的{}字段的值", obj, propName);
-        if (obj == null || StringUtils.isEmpty(propName)) {
-            log.warn("获取字段值失败，参数存在空值");
-            return null;
-        }
-        Field field = getField(obj.getClass(), propName);
-        try {
-            log.debug("成功获取到[{}]的[{}]字段", obj.getClass(), propName);
-            T value = (T) field.get(obj);
-            return value;
-        } catch (Exception e) {
-            log.error("获取{}的{}字段值失败", obj, propName, e);
-            throw new BeanException("获取[" + obj.getClass() + "]的字段[" + propName + "]的值失败", e);
-        }
+        return getFieldValue(obj, propName);
     }
 
     /**
-     * 将source中与targetClass同名的字段从source中复制到targetClass的实例中
+     * 将source中与targetClass同名的字段从source中复制到targetClass的实例中，source中的{@link Alias Alias}注解将会生效，需要注
+     * 意的是source中的Alias注解不要对应dest中的多个字段，否则会发生不可预测错误
      *
      * @param source      被复制的源对象
      * @param targetClass 要复制的目标对象的class对象
@@ -173,7 +156,8 @@ public class BeanUtils {
 
     /**
      * 将sources中所有与dest同名的字段的值复制到dest中，如果dest中包含字段A，同时sources中多个对象都包含字段A，那么将
-     * 以sources中最后一个包含字段A的对象的值为准
+     * 以sources中最后一个包含字段A的对象的值为准，source中的{@link Alias Alias}注解将会生效，需要注意的是source中的Alias注解
+     * 不要对应dest中的多个字段，否则会发生不可预测错误
      *
      * @param dest    目标
      * @param sources 源
@@ -194,12 +178,13 @@ public class BeanUtils {
     }
 
     /**
-     * 将source中与dest的同名字段的值复制到dest中
+     * 将source中与dest的同名字段的值复制到dest中，source中的{@link Alias Alias}注解将会生效，需要注意的是source中的Alias注解
+     * 不要对应dest中的多个字段，否则会发生不可预测错误
      *
      * @param dest   目标
      * @param source 源
      * @param <E>    目标对象的实际类型
-     * @return 复制后的目标对象
+     * @return 复制后的目标对象，如果的dest或者source有一个为null则直接返回dest，如果dest和source是同一个对象也直接返回dest
      */
     public static <E> E copy(E dest, Object source) {
         if (dest == null || source == null) {
@@ -208,46 +193,42 @@ public class BeanUtils {
         if (dest == source) {
             return dest;
         }
-        @SuppressWarnings("unchecked")
-        Class<E> destClass = (Class<E>) dest.getClass();
 
         Class<?> sourceClass = source.getClass();
         String sourceName = sourceClass.getName();
         log.debug("开始获取{}的字段说明", sourceName);
 
-        CustomPropertyDescriptor[] descriptors = getPropertyDescriptors(sourceClass);
-        if (descriptors.length == 0) {
+        Field[] fields = getAllFields(sourceClass);
+
+        if (fields.length == 0) {
             log.debug("源{}中不存在已经声明的字段", sourceName);
             return dest;
         }
 
-        String targetClassName = destClass.getName();
-        for (CustomPropertyDescriptor descriptor : descriptors) {
-            String name = descriptor.getName();
-            try {
-                Field field = descriptor.getField();
-                // NoSuchFieldException, SecurityException
-                CustomPropertyDescriptor propertyDescriptor = buildDescriptor(field, destClass);
-                if (propertyDescriptor == null) {
-                    log.debug("目标{}中不存在已经声明的字段[{}]", targetClassName, field.getName());
-                    continue;
-                }
+        for (Field field : fields) {
+            Alias alias = field.getAnnotation(Alias.class);
+            String fieldName = field.getName();
+            Set<String> names = new HashSet<>();
+            names.add(fieldName);
+            if (alias != null && !CollectionUtil.safeIsEmpty(alias.value())) {
+                names.addAll(Arrays.asList(alias.value()));
+            }
 
-                if (propertyDescriptor.getWriteMethod() == null) {
-                    log.debug("目标{}中不存在字段[{}]的write方法", targetClassName, field.getName());
-                } else if (descriptor.getReadMethod() == null) {
-                    log.debug("源{}中不存在字段[{}]的read方法", sourceName, field.getName());
-                } else {
-                    // 调用反射复制
-                    propertyDescriptor.getWriteMethod().invoke(dest,
-                        descriptor.getReadMethod().invoke(source));
-                    log.info("copy {}.{} to {}.{}", source.getClass().getName(), name,
-                        targetClassName, name);
+            log.error("开始将source中的字段[{}]的值复制到dest中，别名列表为：[{}]", fields, names);
+
+            try {
+                Object value = getFieldValue(source, fieldName);
+                //尝试分别使用别名设置
+                for (String name : names) {
+                    if (setProperty(dest, name, value)) {
+                        break;
+                    }
                 }
             } catch (Exception e) {
-                log.warn("copy中复制{}时发生错误，忽略该字段", name, e);
+                log.warn("copy中复制{}时发生错误，忽略该字段", fieldName, e);
             }
         }
+
         return dest;
     }
 
@@ -328,59 +309,13 @@ public class BeanUtils {
     }
 
     /**
-     * 获取指定类的所有字段（包含父类）
-     *
-     * @param clazz 指定类
-     * @return 指定类的所有字段
-     */
-    public static Field[] getAllFields(Class<?> clazz) {
-        Field[] result = FIELD_CACHE.get(clazz);
-        if (result != null) {
-            return result;
-        }
-        log.debug("获取类{}的字段", clazz);
-        List<Field> fields = new ArrayList<>();
-        fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-        if (clazz.getSuperclass() != null) {
-            fields.addAll(Arrays.asList(getAllFields(clazz.getSuperclass())));
-        }
-        log.debug("类{}的字段为：{}", clazz, fields);
-        result = fields.toArray(new Field[fields.size()]);
-        FIELD_CACHE.put(clazz, result);
-        for (Field field : result) {
-            try {
-                field.setAccessible(true);
-            } catch (Throwable e) {
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 根据字段名获取指定类的指定字段（会尝试将字段设置为可访问的）
-     *
-     * @param clazz 指定类
-     * @param name  字段名
-     * @return 根据字段名获取到的指定类的指定字段，不存在时返回null
-     */
-    public static Field getField(Class<?> clazz, String name) {
-        Field[] fields = getAllFields(clazz);
-        for (Field field : fields) {
-            if (field.getName().equals(name)) {
-                return field;
-            }
-        }
-        return null;
-    }
-
-    /**
      * 构建指定字段的说明
      *
      * @param field 字段
      * @param clazz 该字段所属的class
      * @return 该字段的说明，构建异常时返回null
      */
-    private static CustomPropertyDescriptor buildDescriptor(Field field, Class<?> clazz) {
+    public static CustomPropertyDescriptor buildDescriptor(Field field, Class<?> clazz) {
         FieldCache fieldCache = new FieldCache(field, clazz);
 
         // 首先检查缓存
@@ -392,7 +327,7 @@ public class BeanUtils {
 
         CustomPropertyDescriptor customPropertyDescriptor = null;
         try {
-            if (ReflectUtil.isFinal(field)) {
+            if (isFinal(field)) {
                 log.debug("字段{}是final类型，尝试为该字段创建说明", name);
                 customPropertyDescriptor = tryBuildFinal(field, clazz);
             } else {
@@ -434,7 +369,7 @@ public class BeanUtils {
     }
 
     /**
-     * 从注解获取字段名字
+     * 从注解获取字段名字，优先使用{@link JsonProperty JsonProperty}
      *
      * @param jsonProperty json注解
      * @param xmlNode      xml注解

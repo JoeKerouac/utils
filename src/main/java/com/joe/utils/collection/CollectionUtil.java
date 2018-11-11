@@ -3,6 +3,7 @@ package com.joe.utils.collection;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.joe.utils.math.MathUtil;
 
@@ -12,6 +13,15 @@ import com.joe.utils.math.MathUtil;
  * @author joe
  */
 public final class CollectionUtil {
+
+    public static <K, NEW, OLD> Map<K, NEW> convert(Map<K, OLD> map, Function<OLD, NEW> function) {
+        Map<K, NEW> newMap = new HashMap<>();
+        map.forEach((k,v) -> {
+            newMap.put(k, function.apply(v));
+        });
+        return newMap;
+    }
+
     /**
      * 给定原顺序队列与出栈顺序队列求出栈最小深度
      * @param input 原队列，不能包含重复元素
@@ -93,6 +103,16 @@ public final class CollectionUtil {
      */
     public static boolean safeIsEmpty(Collection collection) {
         return collection == null || collection.isEmpty();
+    }
+
+    /**
+     * 安全判断数组是否为空
+     *
+     * @param array 数组
+     * @return 返回true表示空
+     */
+    public static boolean safeIsEmpty(Object[] array) {
+        return array == null || array.length == 0;
     }
 
     /**

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.joe.utils.common.ClassUtils;
+import com.joe.utils.reflect.ClassUtils;
 
 /**
  * Class类扫描
@@ -89,8 +89,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * @throws ScannerException 扫描异常
      */
     @Override
-    public List<Class<?>> scan(List<ClassFilter> excludeFilters,
-                               Object... args) throws ScannerException {
+    public List<Class<?>> scanByFilter(List<ClassFilter> excludeFilters,
+                                       Object... args) throws ScannerException {
         logger.debug("搜索扫描所有的类，过滤器为：{}，参数为：{}", excludeFilters, args);
 
         if (args == null || args.length == 0) {
@@ -106,7 +106,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
 
         List<Class<?>> result = null;
         for (Object obj : args) {
-            List<Class<?>> list = scan((String) obj, excludeFilters);
+            List<Class<?>> list = scanByFilter((String) obj, excludeFilters);
             if (result == null) {
                 result = list;
             } else {
@@ -123,7 +123,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * @param filters 过滤器组合，不能为null，filter返回true时扫描出的class将被过滤
      * @return 过滤后的所有Class
      */
-    public List<Class<?>> scan(String pack, List<ClassFilter> filters) {
+    public List<Class<?>> scanByFilter(String pack, List<ClassFilter> filters) {
         logger.debug("开始扫描包{}下的所有类的集合", pack);
         // 第一个class类的集合
         List<Class<?>> classes = new ArrayList<>();
@@ -179,7 +179,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * @return 扫描出来的所有类
      */
     private List<Class<?>> scan(String packageName) {
-        return scan(packageName, Collections.emptyList());
+        return scanByFilter(packageName, Collections.emptyList());
     }
 
     /**

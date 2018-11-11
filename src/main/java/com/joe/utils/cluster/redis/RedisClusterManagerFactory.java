@@ -8,7 +8,7 @@ import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.redisson.config.SingleServerConfig;
 
-import com.joe.utils.common.BeanUtils;
+import com.joe.utils.reflect.BeanUtils;
 
 /**
  * RedisClusterManager工厂

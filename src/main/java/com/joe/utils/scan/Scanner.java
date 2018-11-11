@@ -25,5 +25,5 @@ public interface Scanner<T, F> {
      * @param args    参数
      * @return 扫描结果
      */
-    List<T> scan(List<F> excludeFilters, Object... args);
+    List<T> scanByFilter(List<F> excludeFilters, Object... args);
 }

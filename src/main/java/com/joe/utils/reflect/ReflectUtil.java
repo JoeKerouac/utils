@@ -1,4 +1,4 @@
-package com.joe.utils.type;
+package com.joe.utils.reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -8,13 +8,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.joe.utils.common.BeanUtils;
-import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
+import com.joe.utils.collection.LRUCacheMap;
+import com.joe.utils.common.Assert;
+import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
+import com.joe.utils.common.StringUtils;
 import com.joe.utils.scan.ClassScanner;
-import com.joe.utils.scan.MethodScanner;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,22 +26,39 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ReflectUtil {
-    private static final Logger                 logger         = LoggerFactory
-        .getLogger(ReflectUtil.class);
-    private static final Pattern                superPattern   = Pattern.compile("(.*) super.*");
-    private static final Pattern                extendsPattern = Pattern.compile("(.*) extends.*");
-    private static final ClassScanner           CLASS_SCANNER  = ClassScanner.getInstance();
-    private static final MethodScanner          METHOD_SCANNER = MethodScanner.getInstance();
+    private static final Pattern                        superPattern    = Pattern
+        .compile("(.*) super.*");
+    private static final Pattern                        extendsPattern  = Pattern
+        .compile("(.*) extends.*");
+    private static final ClassScanner                   CLASS_SCANNER   = ClassScanner
+        .getInstance();
     /**
      * 方法缓存
      */
-    private static final Map<MethodKey, Method> CACHE          = new HashMap<>();
+    private static final Map<MethodKey, Method>         METHOD_CACHE    = new LRUCacheMap<>();
+    /**
+     * field缓存
+     */
+    private static final Map<FieldKey, Field>           FIELD_CACHE     = new LRUCacheMap<>();
+    /**
+     * 所有field缓存
+     */
+    private static final LRUCacheMap<Class<?>, Field[]> ALL_FIELD_CACHE = new LRUCacheMap<>();
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     private static class MethodKey {
-        private String   methodName;
+        private String     methodName;
+        private Class<?>   clazz;
+        private Class<?>[] parameterTypes;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    private static class FieldKey {
+        private String   fieldName;
         private Class<?> clazz;
     }
 
@@ -52,14 +67,20 @@ public class ReflectUtil {
 
     /**
      * 调用指定对象的指定方法
-     * @param obj 指定对象
-     * @param methodName 要调用的方法名
+     * @param obj 指定对象，不能为空
+     * @param methodName 要调用的方法名，不能为空
+     * @param parameterTypes  方法参数类型，方法没有参数请传null
      * @param args 参数
      * @param <R> 结果类型
      * @return 调用结果
      */
-    public static <R> R invoke(Object obj, String methodName, Object... args) {
-        Method method = getMethod(obj.getClass(), methodName);
+    @SuppressWarnings("unchecked")
+    public static <R> R invoke(Object obj, String methodName, Class<?>[] parameterTypes,
+                               Object... args) {
+        Assert.isTrue(parameterTypes != null ^ args != null, "方法参数类型列表必须和方法参数列表一致");
+        Assert.isTrue(parameterTypes == null || parameterTypes.length == args.length,
+            "方法参数类型列表长度必须和方法参数列表长度一致");
+        Method method = getMethod(obj.getClass(), methodName, parameterTypes);
         try {
             return (R) method.invoke(obj, args);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
@@ -71,29 +92,48 @@ public class ReflectUtil {
      * 获取指定类型中指定的方法
      * @param clazz 类型
      * @param methodName 方法名
+     * @param parameterTypes 方法参数类型
      * @return 指定方法，获取不到时会抛出异常
      */
-    public static Method getMethod(Class<?> clazz, String methodName) {
-        if (clazz == null || methodName == null) {
-            throw new NullPointerException("clazz和methodName不能为null");
-        }
-        MethodKey key = new MethodKey(methodName, clazz);
-        Method method = CACHE.get(key);
-        if (method != null) {
-            return method;
-        }
-        try {
-            method = clazz.getDeclaredMethod(methodName);
-        } catch (NoSuchMethodException e) {
-            throw new ReflectException("获取类型[" + clazz + "]的方法[" + methodName + "]失败", e);
-        }
+    public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+        Assert.notNull(clazz, "类型不能为空");
+        Assert.notNull(methodName, "方法名不能为空");
 
+        return METHOD_CACHE.compute(new MethodKey(methodName, clazz, parameterTypes), (k, v) -> {
+            if (v == null) {
+                try {
+                    return allowAccess(clazz.getDeclaredMethod(methodName, parameterTypes));
+                } catch (NoSuchMethodException e) {
+                    log.error(
+                        StringUtils.format("类[{}]中不存在方法名为[{}]、方法列表为[{}]的方法", clazz, methodName,
+                            parameterTypes == null ? "null" : Arrays.toString(parameterTypes)));
+                    throw new ReflectException(
+                        StringUtils.format("类[{}]中不存在方法名为[{}]、方法列表为[{}]的方法", clazz, methodName,
+                            parameterTypes == null ? "null" : Arrays.toString(parameterTypes)),
+                        e);
+                }
+            } else {
+                return v;
+            }
+        });
+    }
+
+    /**
+     * 执行方法
+     * @param method 要调用的方法
+     * @param target 方法所在Class的实例
+     * @param params 调用方法的参数
+     * @param <T> 方法返回类型
+     * @return 方法调用结果
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T execMethod(Method method, Object target, Object... params) {
+        allowAccess(method);
         try {
-            method.setAccessible(true);
-        } catch (SecurityException e) {
-            log.warn("无法更改方法[{}]的访问权限", method);
+            return (T) method.invoke(target, params);
+        } catch (Throwable e) {
+            throw new ReflectException(e);
         }
-        return method;
     }
 
     /**
@@ -110,9 +150,9 @@ public class ReflectUtil {
         }
 
         log.debug("开始扫描包{}下的带注解[{}]的列表", packages, annotation);
-        List<Class<?>> classes = CLASS_SCANNER.scan(Collections.singletonList(clazz -> {
-            return !clazz.isAnnotationPresent(annotation);
-        }), packages);
+        List<Class<?>> classes = CLASS_SCANNER.scanByFilter(
+            Collections.singletonList(clazz -> !clazz.isAnnotationPresent(annotation)), packages);
+        log.debug("包{}下的带注解{}的列表为：[{}]", packages, annotation, classes);
         return classes;
     }
 
@@ -140,18 +180,118 @@ public class ReflectUtil {
      * @param fieldName 字段名
      * @param <T>       字段类型
      * @return 指定对象中指定字段名对应字段的值
-     * @throws NoSuchFieldException 当给定对象不存在指定字段的时候抛出该异常
      */
-    public static <T extends Object> T getFieldValue(Object obj,
-                                                     String fieldName) throws NoSuchFieldException {
-        Field field = obj.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
+    @SuppressWarnings("unchecked")
+    public static <T extends Object> T getFieldValue(Object obj, String fieldName) {
+        Assert.notNull(obj, "obj不能为空");
+        Assert.notNull(fieldName, "fieldName不能为空");
+
+        Field field = getField(obj.getClass(), fieldName);
         try {
             return (T) field.get(obj);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
+        } catch (IllegalArgumentException e) {
             //不可能有这种情况
-            throw new RuntimeException(e);
+            throw new ReflectException(e);
+        } catch (IllegalAccessException e) {
+            String msg = StringUtils.format("类型[{}]的字段[{}]不允许访问", obj.getClass(), fieldName);
+            log.error(msg);
+            throw new ReflectException(msg, e);
         }
+    }
+
+    /**
+     * 设置指定对象指定对象名的字段值
+     * @param obj 对象
+     * @param fieldName 字段名
+     * @param fieldValue 字段值
+     * @param <T> 字段值的类型
+     * @return 字段值原样返回
+     */
+    public static <T extends Object> T setFieldValue(Object obj, String fieldName, T fieldValue) {
+        Assert.notNull(obj, "obj不能为空");
+        Assert.notNull(fieldName, "fieldName不能为空");
+        Field field = getField(obj.getClass(), fieldName);
+        try {
+            field.set(obj, fieldValue);
+        } catch (IllegalAccessException e) {
+            String msg = StringUtils.format("类型[{}]的字段[{}]不允许设置", obj.getClass(), fieldName);
+            log.error(msg);
+            throw new ReflectException(msg, e);
+        }
+        return fieldValue;
+    }
+
+    /**
+     * 从指定Class中获取指定Field，并尝试将其accessible属性设置为true
+     * @param clazz Class
+     * @param fieldName fieldName
+     * @return Field，不会为null，只会抛出异常
+     */
+    public static Field getField(Class<?> clazz, String fieldName) {
+        Assert.notNull(clazz, "clazz不能为空");
+        Assert.notNull(fieldName, "fieldName不能为空");
+        return FIELD_CACHE.compute(new FieldKey(fieldName, clazz), (k, v) -> {
+            if (v == null) {
+                try {
+                    return allowAccess(clazz.getDeclaredField(fieldName));
+                } catch (NoSuchFieldException e) {
+                    log.error(StringUtils.format("类[{}]中不存在字段[{}]", clazz, fieldName));
+                    throw new ReflectException(
+                        StringUtils.format("类[{}]中不存在字段[{}]", clazz, fieldName), e);
+                }
+            } else {
+                return v;
+            }
+        });
+    }
+
+    /**
+     * 获取指定Class的所有field（包含父类的）
+     * @param clazz Class
+     * @return 所有field数组
+     */
+    public static Field[] getAllFields(Class<?> clazz) {
+        Assert.notNull(clazz, "clazz不能为空");
+        return ALL_FIELD_CACHE.compute(clazz, (k, v) -> {
+            if (v == null) {
+                List<Field> fields = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
+
+                //查找是否存在父类，如果存在且不是Object那么查找父类的field
+                Class<?> superClass = clazz.getSuperclass();
+                if (superClass != null && superClass != Object.class) {
+                    fields.addAll(Arrays.asList(getAllFields(superClass)));
+                }
+
+                // 遍历设置访问权限，同时加入单个field的缓存
+                fields.stream().map(ReflectUtil::allowAccess).forEach(
+                    f -> FIELD_CACHE.compute(new FieldKey(f.getName(), clazz), (fk, fv) -> {
+                        if (fv == null) {
+                            return f;
+                        } else {
+                            return fv;
+                        }
+                    }));
+
+                return fields.toArray(new Field[0]);
+            } else {
+                return v;
+            }
+        });
+    }
+
+    /**
+     * 更改AccessibleObject的访问权限
+     * @param object AccessibleObject
+     * @param <T> AccessibleObject的具体类型
+     * @return AccessibleObject
+     */
+    public static <T extends AccessibleObject> T allowAccess(T object) {
+        try {
+            object.setAccessible(true);
+        } catch (SecurityException e) {
+            log.warn("无法更改[{}]的访问权限", object);
+        }
+        return object;
     }
 
     /**
@@ -244,6 +384,33 @@ public class ReflectUtil {
     }
 
     /**
+     * 判断方法是否是static
+     * @param method 方法
+     * @return true表示方法是静态的
+     */
+    public static boolean isStatic(Method method) {
+        return Modifier.isStatic(method.getModifiers());
+    }
+
+    /**
+     * 判断方法是否是抽象的
+     * @param method 方法
+     * @return 返回true表示方法是抽象的
+     */
+    public static boolean isAbstract(Method method) {
+        return Modifier.isAbstract(method.getModifiers());
+    }
+
+    /**
+     * 判断字段是否是static
+     * @param field 字段
+     * @return true表示字段是静态的
+     */
+    public static boolean isStatic(Field field) {
+        return Modifier.isStatic(field.getModifiers());
+    }
+
+    /**
      * 根据java系统类型得出自定义类型
      *
      * @param type java反射取得的类型
@@ -257,23 +424,23 @@ public class ReflectUtil {
         JavaType javaType;
         if (type instanceof WildcardType) {
             // 该类型是不确定的泛型，即泛型为 ?
-            logger.debug("类型{}是不确定的泛型", typeName);
+            log.debug("类型{}是不确定的泛型", typeName);
             WildcardType wildcardTypeImpl = (WildcardType) type;
             Type[] child = wildcardTypeImpl.getLowerBounds();// 子类
             Type[] parent = wildcardTypeImpl.getUpperBounds();// 父类
             javaType = new GenericType();
             GenericType genericType = (GenericType) javaType;
             if (child.length > 0) {
-                logger.debug("类型{}必须是{}的父类型", typeName, child[0]);
+                log.debug("类型{}必须是{}的父类型", typeName, child[0]);
                 genericType.setChild(createJavaType(child[0]));
             } else {
-                logger.debug("类型{}必须是{}的子类型", typeName, parent[0]);
+                log.debug("类型{}必须是{}的子类型", typeName, parent[0]);
                 genericType.setParent(createJavaType(parent[0]));
             }
             genericType.setName(dealName(typeName));
         } else if (type instanceof ParameterizedType) {
             // 该类型存在泛型
-            logger.debug("类型{}存在泛型", typeName);
+            log.debug("类型{}存在泛型", typeName);
             ParameterizedType parameterizedTypeImpl = (ParameterizedType) type;
             Type[] types = parameterizedTypeImpl.getActualTypeArguments();
             JavaType[] generics = new JavaType[types.length];
@@ -287,7 +454,7 @@ public class ReflectUtil {
             baseType.setName(baseType.getType().getSimpleName());
         } else if (type instanceof TypeVariable) {
             // 该类型是泛型
-            logger.debug("类型{}是泛型", typeName);
+            log.debug("类型{}是泛型", typeName);
             TypeVariable typeVariableImpl = (TypeVariable) type;
             javaType = new GenericType();
             GenericType genericType = (GenericType) javaType;
@@ -359,17 +526,15 @@ public class ReflectUtil {
      * @throws NullPointerException 当传入Class对象为null时抛出该异常
      */
     public static boolean isSimple(Class<?> clazz) throws NullPointerException {
-        if (clazz == null)
-            throw new NullPointerException("Class不能为null");
-        else
-            return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
-                   || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-                   || String.class.isAssignableFrom(clazz)
-                   || Collection.class.isAssignableFrom(clazz) || Enum.class.isAssignableFrom(clazz)
-                   || boolean.class.isAssignableFrom(clazz) || char.class.isAssignableFrom(clazz)
-                   || byte.class.isAssignableFrom(clazz) || short.class.isAssignableFrom(clazz)
-                   || int.class.isAssignableFrom(clazz) || long.class.isAssignableFrom(clazz)
-                   || double.class.isAssignableFrom(clazz) || float.class.isAssignableFrom(clazz);
+        Assert.notNull(clazz, "clazz不能为null");
+        return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
+               || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
+               || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
+               || Enum.class.isAssignableFrom(clazz) || boolean.class.isAssignableFrom(clazz)
+               || char.class.isAssignableFrom(clazz) || byte.class.isAssignableFrom(clazz)
+               || short.class.isAssignableFrom(clazz) || int.class.isAssignableFrom(clazz)
+               || long.class.isAssignableFrom(clazz) || double.class.isAssignableFrom(clazz)
+               || float.class.isAssignableFrom(clazz);
     }
 
     /**
@@ -380,13 +545,11 @@ public class ReflectUtil {
      * @throws NullPointerException 当传入Class对象为null时抛出该异常
      */
     public static boolean isBasic(Class<?> clazz) throws NullPointerException {
-        if (clazz == null)
-            throw new NullPointerException("Class不能为null");
-        else
-            return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
-                   || Byte.class.isAssignableFrom(clazz) || Short.class.isAssignableFrom(clazz)
-                   || Integer.class.isAssignableFrom(clazz) || Long.class.isAssignableFrom(clazz)
-                   || Double.class.isAssignableFrom(clazz) || Float.class.isAssignableFrom(clazz);
+        Assert.notNull(clazz, "clazz不能为null");
+        return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
+               || Byte.class.isAssignableFrom(clazz) || Short.class.isAssignableFrom(clazz)
+               || Integer.class.isAssignableFrom(clazz) || Long.class.isAssignableFrom(clazz)
+               || Double.class.isAssignableFrom(clazz) || Float.class.isAssignableFrom(clazz);
     }
 
     /**
@@ -396,11 +559,12 @@ public class ReflectUtil {
      * @return 该指定JavaType对应的基类
      */
     public static Class<?> getRealType(JavaType type) {
+        Assert.notNull(type, "type不能为null");
         if (type instanceof BaseType) {
-            logger.debug("参数不是泛型的");
+            log.debug("参数不是泛型的");
             return ((BaseType) type).getType();
         } else {
-            logger.debug("参数是泛型的");
+            log.debug("参数是泛型的");
             JavaType parent = ((GenericType) type).getParent();
             JavaType child = ((GenericType) type).getChild();
             return parent == null ? getRealType(child) : getRealType(parent);
@@ -415,9 +579,7 @@ public class ReflectUtil {
      * @throws NullPointerException 当传入Class对象为空时抛出该异常
      */
     public static boolean isGeneralType(Class<?> clazz) throws NullPointerException {
-        if (clazz == null) {
-            throw new NullPointerException("Class不能为null");
-        }
+        Assert.notNull(clazz, "clazz不能为null");
         return clazz.isPrimitive();
     }
 
@@ -429,9 +591,7 @@ public class ReflectUtil {
      * @throws NullPointerException 当传入Class对象为空时抛出该异常
      */
     public static boolean isGeneralArrayType(Class<?> clazz) throws NullPointerException {
-        if (clazz == null) {
-            throw new NullPointerException("Class不能为null");
-        }
+        Assert.notNull(clazz, "clazz不能为null");
         String name = clazz.getName();
         return isGeneralArrayType(name);
     }

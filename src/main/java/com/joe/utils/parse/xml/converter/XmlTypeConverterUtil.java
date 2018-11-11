@@ -7,7 +7,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.joe.utils.common.BeanUtils;
+import com.joe.utils.reflect.BeanUtils;
 import com.joe.utils.parse.xml.XmlNode;
 import com.joe.utils.parse.xml.XmlTypeConvert;
 

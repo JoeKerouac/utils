@@ -14,10 +14,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import com.joe.utils.collection.CollectionUtil;
-import com.joe.utils.common.BeanUtils;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.exception.UtilsException;
 import com.joe.utils.poi.data.*;
+import com.joe.utils.reflect.ReflectUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -285,7 +285,7 @@ public class ExcelExecutor {
             return workbook;
         }
         //获取所有字段（包括父类的）
-        Field[] fields = BeanUtils.getAllFields(datas.get(0).getClass());
+        Field[] fields = ReflectUtil.getAllFields(datas.get(0).getClass());
 
         log.info("获取可写入excel的字段");
         List<Field> writeFields = new ArrayList<>();

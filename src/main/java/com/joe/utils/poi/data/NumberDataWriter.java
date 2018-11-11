@@ -3,7 +3,7 @@ package com.joe.utils.poi.data;
 import org.apache.poi.ss.usermodel.Cell;
 
 import com.joe.utils.poi.ExcelDataWriter;
-import com.joe.utils.type.ReflectUtil;
+import com.joe.utils.reflect.ReflectUtil;
 
 /**
  * number数据

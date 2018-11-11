@@ -13,11 +13,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.joe.utils.collection.CollectionUtil;
-import com.joe.utils.common.BeanUtils;
-import com.joe.utils.common.BeanUtils.CustomPropertyDescriptor;
+import com.joe.utils.reflect.BeanUtils;
+import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.parse.xml.converter.XmlTypeConverterUtil;
-import com.joe.utils.type.ReflectUtil;
+import com.joe.utils.reflect.ReflectUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -379,19 +379,23 @@ public class XmlParser {
             for (CustomPropertyDescriptor descriptor : propertyDescriptors) {
                 XmlNode xmlNode = descriptor.getAnnotation(XmlNode.class);
                 //字段值
-                Object valueObj = pojo == null ? null
-                    : BeanUtils.getProperty(pojo, descriptor.getName());
-                //判断是否忽略
-                if ((ignoreNull && valueObj == null) || (xmlNode != null && xmlNode.ignore())) {
-                    log.debug("忽略空节点或者节点被注解忽略");
-                    continue;
-                }
+                try {
+                    Object valueObj = pojo == null ? null
+                        : BeanUtils.getProperty(pojo, descriptor.getName());
+                    //判断是否忽略
+                    if ((ignoreNull && valueObj == null) || (xmlNode != null && xmlNode.ignore())) {
+                        log.debug("忽略空节点或者节点被注解忽略");
+                        continue;
+                    }
 
-                //节点名
-                String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name()))
-                    ? descriptor.getName()
-                    : xmlNode.name();
-                map.put(nodeName, new XmlData(xmlNode, valueObj, descriptor.getRealType()));
+                    //节点名
+                    String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name()))
+                        ? descriptor.getName()
+                        : xmlNode.name();
+                    map.put(nodeName, new XmlData(xmlNode, valueObj, descriptor.getRealType()));
+                } catch (Exception e) {
+                    log.error("获取字段值时发生异常，忽略改值", e);
+                }
             }
         }
 

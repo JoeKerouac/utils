@@ -135,6 +135,18 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
+        <!-- 动态代理使用 -->
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!--CGLIB依赖包，生成测试类使用-->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,4 +1,4 @@
-package com.joe.utils.type;
+package com.joe.utils.reflect;
 
 import com.joe.utils.exception.UtilsException;
 

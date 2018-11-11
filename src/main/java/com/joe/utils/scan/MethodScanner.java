@@ -35,12 +35,17 @@ public class MethodScanner implements Scanner<Method, MethodFilter> {
     }
 
     @Override
-    public List<Method> scan(List<MethodFilter> excludeFilters, Object... args) {
+    public List<Method> scanByFilter(List<MethodFilter> excludeFilters, Object... args) {
         if (args == null || args.length == 0) {
             return Collections.emptyList();
         }
         List<Method> result = new ArrayList<>();
         for (Object obj : args) {
+            if (obj == null) {
+                continue;
+            } else if (!(obj instanceof Class)) {
+                obj = obj.getClass();
+            }
             Class<?> clazz = (Class<?>) obj;
             Method[] methods = clazz.getMethods();
             if (excludeFilters == null || excludeFilters.isEmpty()) {
