@@ -32,8 +32,8 @@ public class GeneralInterceptor {
      * @return 执行结果
      */
     @RuntimeType
-    public Object interceptClass(@AllArguments Object[] params,
-                                   @Origin Method method, @SuperCall Callable<Object> callable) {
+    public Object interceptClass(@AllArguments Object[] params, @Origin Method method,
+                                 @SuperCall Callable<Object> callable) throws Throwable {
         return interception.invoke(params, callable::call, method);
     }
 
@@ -44,7 +44,8 @@ public class GeneralInterceptor {
      * @return 执行结果
      */
     @RuntimeType
-    public Object interceptInterface(@AllArguments Object[] params, @Origin Method method) {
+    public Object interceptInterface(@AllArguments Object[] params,
+                                     @Origin Method method) throws Throwable {
         return interception.invoke(params, null, method);
     }
 }

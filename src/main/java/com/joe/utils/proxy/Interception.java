@@ -16,6 +16,7 @@ public interface Interception {
      * @param invoker 父类方法调用（可能为null，为null时表示无法调用父类方法）
      * @param method 拦截的方法
      * @return 拦截点执行结果
+     * @throws Throwable 执行异常
      */
-    Object invoke(Object[] params, Invoker invoker, Method method);
+    Object invoke(Object[] params, Invoker invoker, Method method) throws Throwable;
 }

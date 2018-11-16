@@ -41,7 +41,7 @@ public class ThreadUtil {
      * 当前线程睡眠一段时间（单位为秒），当线程被中断时不会抛出异常，如果
      * 你的实现依赖于该异常请勿调用该方法休眠
      *
-     * @param time 时长
+     * @param time 时长，单位为秒
      */
     public static void sleep(long time) {
         sleep(time, TimeUnit.SECONDS);
