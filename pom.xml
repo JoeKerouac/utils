@@ -46,6 +46,10 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+        </dependency>
         <!-- 二维码操作工具类 -->
         <dependency>
             <groupId>net.glxn</groupId>

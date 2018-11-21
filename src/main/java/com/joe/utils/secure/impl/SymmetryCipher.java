@@ -1,7 +1,7 @@
 package com.joe.utils.secure.impl;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class SymmetryCipher extends AbstractCipher {
-    private static final Map<String, SecretKey> KEY_CACHE = new HashMap<>();
+    private static final Map<String, SecretKey> KEY_CACHE = new ConcurrentHashMap<>();
 
     private SymmetryCipher(Algorithms algorithms, SecretKey key) {
         super(new String(key.getEncoded()), algorithms, key, key);
@@ -64,15 +64,13 @@ public class SymmetryCipher extends AbstractCipher {
      */
     public static CipherUtil buildInstance(Algorithms algorithms, String seed, int keySize) {
         String id = (algorithms.name() + seed + keySize).intern();
-        SecretKey key;
-        if ((key = KEY_CACHE.get(id)) == null) {
-            synchronized (id) {
-                if ((key = KEY_CACHE.get(id)) == null) {
-                    key = KeyTools.buildKey(algorithms, seed, keySize);
-                    KEY_CACHE.put(id, key);
-                }
+        SecretKey key = KEY_CACHE.compute(id, (k, v) -> {
+            if (v == null) {
+                return KeyTools.buildKey(algorithms, seed, keySize);
+            } else {
+                return v;
             }
-        }
+        });
         return buildInstance(algorithms, key.getEncoded());
     }
 

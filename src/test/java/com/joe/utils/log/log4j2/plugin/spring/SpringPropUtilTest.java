@@ -1,6 +1,8 @@
 package com.joe.utils.log.log4j2.plugin.spring;
 
+import com.joe.utils.test.BaseTest;
 import org.apache.logging.log4j.LogManager;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,7 @@ import com.joe.utils.log.log4j2.plugin.impl.DefaultPropUtilTest;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SpringPropUtilTest.class, properties = { "level=INFO" })
-public class SpringPropUtilTest {
+public class SpringPropUtilTest extends BaseTest {
 
     @Autowired
     private ApplicationContext context;
@@ -29,8 +31,15 @@ public class SpringPropUtilTest {
      */
     @Test
     public void doTestLog4j2() {
-        SpringPropUtil.reconfigLog4j2(context);
-        org.apache.logging.log4j.Logger logger = LogManager.getLogger(DefaultPropUtilTest.class);
-        Log4j2Test.checkInfo(logger);
+        runCase(() -> {
+            SpringPropUtil.reconfigLog4j2(context);
+            org.apache.logging.log4j.Logger logger = LogManager.getLogger(DefaultPropUtilTest.class);
+            Log4j2Test.checkInfo(logger);
+        });
+    }
+
+    @Before
+    public void junitInit() {
+        skipAll(true);
     }
 }

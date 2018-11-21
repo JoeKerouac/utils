@@ -15,6 +15,6 @@ public class CipherUtilTest {
      * @param cipher 加密器
      */
     public static void checkCipher(CipherUtil cipher) {
-        Assert.assertTrue(data.equals(cipher.decrypt(cipher.encrypt(data))));
+        Assert.assertEquals(data, cipher.decrypt(cipher.encrypt(data)));
     }
 }

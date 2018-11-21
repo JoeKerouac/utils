@@ -1,6 +1,7 @@
 package com.joe.utils.img;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.junit.Test;
@@ -16,7 +17,7 @@ import reactor.core.support.Assert;
 public class IQRCodeTest {
     @Test
     public void doCreate() throws IOException {
-        IQRCode.create("123456", System.out, 100, 100);
+        IQRCode.create("123456", new ByteArrayOutputStream(), 100, 100);
     }
 
     @Test

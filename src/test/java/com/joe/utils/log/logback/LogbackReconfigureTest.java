@@ -3,6 +3,7 @@ package com.joe.utils.log.logback;
 import java.io.InputStream;
 import java.util.concurrent.Semaphore;
 
+import com.joe.utils.test.BaseTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,23 +21,13 @@ import lombok.extern.slf4j.Slf4j;
  * @version 2018.05.17 17:50
  */
 @Slf4j
-public class LogbackReconfigureTest {
-    private InputStream config;
-    private Semaphore   semaphore;
-
-    @Before
-    public void init() {
-        config = LogbackReconfigureTest.class.getClassLoader().getResourceAsStream("error.xml");
-        semaphore = new Semaphore(1);
-    }
-
+public class LogbackReconfigureTest extends BaseTest {
     /**
      * 测试使用LogbackReconfigure重新配置logback
-     * @throws Exception
      */
     @Test
-    public void doReconfigureByContext() throws Exception {
-        run(() -> {
+    public void doReconfigureByContext()  {
+        runCase(() -> {
             assertLevel("INFO");
             //更改logback配置
             reconfig(false);
@@ -46,11 +37,10 @@ public class LogbackReconfigureTest {
 
     /**
      * 测试在spring-boot环境下LogbackReconfigure重新配置失效
-     * @throws Exception
      */
     @Test
-    public void doLogbackInSpringBoot() throws Exception {
-        run(() -> {
+    public void doLogbackInSpringBoot()  {
+        runCase(() -> {
             assertLevel("INFO");
             //使用logback重配
             reconfig(false);
@@ -64,11 +54,10 @@ public class LogbackReconfigureTest {
 
     /**
      * 测试SpringBootLogbackReconfigure
-     * @throws Exception
      */
     @Test
-    public void doSpringBootLogbackReconfigure() throws Exception {
-        run(() -> {
+    public void doSpringBootLogbackReconfigure()  {
+        runCase(() -> {
             assertLevel("INFO");
             //使用SpringBootLogbackReconfigure重配logback
             reconfig(true);
@@ -98,14 +87,14 @@ public class LogbackReconfigureTest {
         }
     }
 
-    private void run(Runnable runnable) throws Exception {
-        semaphore.acquire();
-        try {
-            reset();
-            runnable.run();
-        } finally {
-            semaphore.release();
-        }
+    @Before
+    public void junitInit() {
+        skipAll(true);
+    }
+
+    @Override
+    protected void init() {
+        reset();
     }
 
     /**

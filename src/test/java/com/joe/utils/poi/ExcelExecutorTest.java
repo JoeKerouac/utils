@@ -50,13 +50,13 @@ public class ExcelExecutorTest {
     }
 
     @Test
-    public void doWriteFile() throws IOException {
+    public void doWriteFile() {
         //测试写入文件
         fileTest(file -> {
             try {
                 ExcelExecutor.getInstance().writeToExcel(list, true, file.getAbsolutePath());
             } catch (IOException e) {
-                Assert.assertTrue("发生IO异常", e == null);
+                Assert.assertNotNull("发生IO异常", e);
             }
         });
     }
@@ -81,7 +81,7 @@ public class ExcelExecutorTest {
                 wb.dispose();
                 wb.close();
             } catch (IOException e) {
-                Assert.assertTrue("发生IO异常", e == null);
+                Assert.assertNotNull("发生IO异常", e);
             }
         });
     }
@@ -107,19 +107,22 @@ public class ExcelExecutorTest {
                 });
                 executor.writeToExcel(list, true, file.getAbsolutePath());
             } catch (IOException e) {
-                Assert.assertTrue("发生IO异常", e == null);
+                Assert.assertNotNull("发生IO异常", e);
             }
         });
     }
 
     private void fileTest(Consumer<File> function) {
-        File file = new File("user.xlsx");
-        Assert.assertTrue(!file.exists());
+        File file = new File("user-" + Math.random() + ".xlsx");
+        try {
+            Assert.assertTrue(!file.exists());
 
-        function.accept(file);
+            function.accept(file);
 
-        Assert.assertTrue(file.exists());
-        file.delete();
+            Assert.assertTrue(file.exists());
+        } finally {
+            file.delete();
+        }
     }
 
     @Data
