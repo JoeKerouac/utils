@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
  * @author JoeKerouac
  * @version $Id: joe, v 0.1 2018年11月21日 18:37 JoeKerouac Exp $
  */
-public class BaseTest {
+public abstract class BaseTest {
     private boolean skipAll = false;
 
     /**
