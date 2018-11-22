@@ -33,11 +33,11 @@ elif [ "$1" = "help" ]
 elif [ "$1" = "package" ]
         then
         echo "开始打包"
-        mvn clean package -Dmaven.test.skip=true
+        mvn clean package
         checkAndExit "打包完成" "打包失败"
 elif [ "$1" = "install" ]
         then
-        mvn clean install -Dmaven.test.skip=true
+        mvn clean install
         checkAndExit "安装完成" "安装失败"
 elif [ "$1" = "deploy" ]
         then
