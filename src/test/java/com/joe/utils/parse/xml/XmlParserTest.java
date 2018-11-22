@@ -27,134 +27,13 @@ public class XmlParserTest {
                                                 + "></user></root>";
 
     @Test
-    public void test() {
-        String xml = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www"
-                     + ".w3.org/2001/XMLSchema-instance\"\n"
-                     + "\txsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache"
-                     + ".org/xsd/maven-4.0.0.xsd\">\n" + "\t<modelVersion>4.0.0</modelVersion>\n"
-                     + "\t<parent>\n" + "\t\t<groupId>com.fruit.user</groupId>\n"
-                     + "\t\t<artifactId>fruit-farm-user</artifactId>\n"
-                     + "\t\t<version>1.0</version>\n" + "\t</parent>\n"
-                     + "\t<artifactId>fruit-farm-user-service</artifactId>\n"
-                     + "\t<packaging>jar</packaging>\n" + "\n" + "\t<dependencies>\n"
-                     + "\t\t<!--spring-boot-starter -->\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>org.springframework.boot</groupId>\n"
-                     + "\t\t\t<artifactId>spring-boot-starter</artifactId>\n"
-                     + "\t\t</dependency>\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>org.springframework.boot</groupId>\n"
-                     + "\t\t\t<artifactId>spring-boot-starter-test</artifactId>\n"
-                     + "\t\t</dependency>\n" + "\t\t<!--配置中心 -->\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>org.springframework.cloud</groupId>\n"
-                     + "\t\t\t<artifactId>spring-cloud-starter-config</artifactId>\n"
-                     + "\t\t</dependency>\n" + "\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>com.fruit</groupId>\n"
-                     + "\t\t\t<artifactId>fruit-farm-redis</artifactId>\n"
-                     + "\t\t\t<version>1.0</version>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.fruit.user</groupId>\n"
-                     + "\t\t\t<artifactId>fruit-farm-user-sdk</artifactId>\n"
-                     + "\t\t\t<version>1.0</version>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.fruit.user</groupId>\n"
-                     + "\t\t\t<artifactId>fruit-farm-user-mapper</artifactId>\n"
-                     + "\t\t\t<version>1.0</version>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.fruit</groupId>\n"
-                     + "\t\t\t<artifactId>fruit-farm-sys-mapper</artifactId>\n"
-                     + "\t\t\t<version>1.0</version>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.fruit.goods</groupId>\n"
-                     + "\t\t\t<artifactId>fruit-farm-goods-sdk</artifactId>\n"
-                     + "\t\t\t<version>1.0</version>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>org.apache.httpcomponents</groupId>\n"
-                     + "\t\t\t<artifactId>httpclient</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.alibaba</groupId>\n"
-                     + "\t\t\t<artifactId>dubbo</artifactId>\n" + "\t\t\t<exclusions>\n"
-                     + "\t\t\t\t<exclusion>\n"
-                     + "\t\t\t\t\t<groupId>org.springframework</groupId>\n"
-                     + "\t\t\t\t\t<artifactId>spring</artifactId>\n" + "\t\t\t\t</exclusion>\n"
-                     + "\t\t\t\t<exclusion>\n" + "\t\t\t\t\t<groupId>javax.servlet</groupId>\n"
-                     + "\t\t\t\t\t<artifactId>javax.servlet-api</artifactId>\n"
-                     + "\t\t\t\t</exclusion>\n" + "\t\t\t</exclusions>\n" + "\t\t</dependency>\n"
-                     + "\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>org.apache.zookeeper</groupId>\n"
-                     + "\t\t\t<artifactId>zookeeper</artifactId>\n" + "\t\t\t<exclusions>\n"
-                     + "\t\t\t\t<exclusion>\n" + "\t\t\t\t\t<groupId>org.slf4j</groupId>\n"
-                     + "\t\t\t\t\t<artifactId>slf4j-log4j12</artifactId>\n"
-                     + "\t\t\t\t</exclusion>\n" + "\t\t\t</exclusions>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.github.sgroschupf</groupId>\n"
-                     + "\t\t\t<artifactId>zkclient</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.aliyun</groupId>\n"
-                     + "\t\t\t<artifactId>aliyun-java-sdk-core</artifactId>\n"
-                     + "\t\t</dependency>\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>com.aliyun</groupId>\n"
-                     + "\t\t\t<artifactId>aliyun-java-sdk-dysmsapi</artifactId>\n"
-                     + "\t\t</dependency>\n" + "\t\t<!-- oss -->\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>com.aliyun.oss</groupId>\n"
-                     + "\t\t\t<artifactId>aliyun-sdk-oss</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\n" + "\t\t<!-- 极光推送 开始 -->\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>cn.jpush.api</groupId>\n"
-                     + "\t\t\t<artifactId>jpush-client</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>cn.jpush.api</groupId>\n"
-                     + "\t\t\t<artifactId>jiguang-common</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>io.netty</groupId>\n"
-                     + "\t\t\t<artifactId>netty-all</artifactId>\n"
-                     + "\t\t\t<scope>compile</scope>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.google.code.gson</groupId>\n"
-                     + "\t\t\t<artifactId>gson</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t\t<!-- 极光推送 结束 -->\n" + "\t\t<!-- 小米推送 开始 -->\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>com.xiaomi</groupId>\n"
-                     + "\t\t\t<artifactId>json-simple</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t\t<dependency>\n" + "\t\t\t<groupId>com.xiaomi</groupId>\n"
-                     + "\t\t\t<artifactId>MiPush_SDK_Server</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t\t<!-- 小米推送 结束 -->\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>org.springframework.boot</groupId>\n"
-                     + "\t\t\t<artifactId>spring-boot-starter-jdbc</artifactId>\n"
-                     + "\t\t</dependency>\n" + "\t\t<dependency>\n"
-                     + "\t\t\t<groupId>com.github.JoeKerouac</groupId>\n"
-                     + "\t\t\t<artifactId>utils</artifactId>\n" + "\t\t</dependency>\n"
-                     + "\t</dependencies>\n" + "\n" + "\t<build>\n"
-                     + "\t\t<finalName>user-service</finalName>\n" + "\t\t<plugins>\n"
-                     + "\t\t\t<!--jar包构建插件 -->\n" + "\t\t\t<plugin>\n"
-                     + "\t\t\t\t<groupId>org.springframework.boot</groupId>\n"
-                     + "\t\t\t\t<artifactId>spring-boot-maven-plugin</artifactId>\n"
-                     + "\t\t\t</plugin>\n" + "\t\t</plugins>\n" + "\t</build>\n" + "\n"
-                     + "</project>";
-
-        Pom pom = PARSER.parse(xml, Pom.class);
-        System.out.println(pom);
-        System.out.println(NOTHASNULL);
-
-        Pom p = new Pom();
-        Dependency dependency = new Dependency();
-        dependency.setArtifactId("123");
-        dependency.setGroupId("123");
-        List<Dependency> list = new ArrayList<>();
-        list.add(dependency);
-        list.add(dependency);
-        p.setDependencies(list);
-
-        System.out.println(PARSER.toXml(p));
-    }
-
-    @Data
-    static class Pom {
-        @XmlNode(general = Dependency.class)
-        private List<Dependency> dependencies;
-        private String           artifactId;
-    }
-
-    @Data
-    static class Dependency {
-        private String groupId;
-        private String artifactId;
-        private String version;
-    }
-
-    @Test
     public void doMapToXml() {
         User user = build();
         Map<String, Object> map = new HashMap<>();
         map.put("test", "test");
         map.put("user", user);
         String xml = PARSER.toXml(map);
-        Assert.assertTrue(xml.equals(MAP_XML));
+        Assert.assertEquals(xml, MAP_XML);
     }
 
     @Test

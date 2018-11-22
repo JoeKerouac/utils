@@ -476,7 +476,7 @@ public class ReflectUtil {
         if (javaType instanceof BaseType) {
             BaseType baseType = (BaseType) javaType;
             //需要isSimple判断出来类型是否是基本类型，如果不是则认为类型是pojo类型，然后对该类型的各个字段进行描述
-            if (!isPojo(baseType.getType())) {
+            if (!isNotPojo(baseType.getType())) {
                 // 是自定义类型，对自定义类型的各个属性进行描述
                 Map<String, JavaType> params = new TreeMap<>();
                 // 获取该自定义类型的各个属性
@@ -522,15 +522,15 @@ public class ReflectUtil {
      * 类、String、Collection的子类、Map的子类、Enum，如果不是这些类型将会认为该类型是一个复杂类型（pojo类型））
      *
      * @param clazz Class对象，不能为null
-     * @return 如果是pojo则返回<code>true</code>
+     * @return 如果是pojo则返回<code>false</code>
      * @throws NullPointerException 当传入Class对象为null时抛出该异常
      */
-    public static boolean isPojo(Class<?> clazz) throws NullPointerException {
+    public static boolean isNotPojo(Class<?> clazz) throws NullPointerException {
         Assert.notNull(clazz, "clazz不能为null");
-        return !(Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
+        return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
                  || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
                  || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
-                 || Enum.class.isAssignableFrom(clazz) || isGeneralType(clazz));
+                 || Enum.class.isAssignableFrom(clazz) || isGeneralType(clazz);
     }
 
     /**
