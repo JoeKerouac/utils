@@ -2,6 +2,7 @@ package com.joe.utils.cluster.redis;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  *
@@ -9,6 +10,7 @@ import lombok.EqualsAndHashCode;
  * @version 2018.04.18 11:01
  */
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 public class RedisSingleServerConfig extends RedisBaseConfig {
     /**

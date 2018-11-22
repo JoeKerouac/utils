@@ -4,6 +4,7 @@ import java.util.Map;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * 基本java类型
@@ -11,6 +12,7 @@ import lombok.EqualsAndHashCode;
  * @author joe
  */
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 public class BaseType extends JavaType {
     /*

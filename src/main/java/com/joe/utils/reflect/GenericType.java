@@ -2,6 +2,7 @@ package com.joe.utils.reflect;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * 泛型
@@ -10,6 +11,7 @@ import lombok.EqualsAndHashCode;
  * @author joe
  */
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 public class GenericType extends JavaType {
     /*
