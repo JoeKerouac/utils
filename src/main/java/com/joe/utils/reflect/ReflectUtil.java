@@ -476,7 +476,7 @@ public class ReflectUtil {
         if (javaType instanceof BaseType) {
             BaseType baseType = (BaseType) javaType;
             //需要isSimple判断出来类型是否是基本类型，如果不是则认为类型是pojo类型，然后对该类型的各个字段进行描述
-            if (!isSimple(baseType.getType())) {
+            if (!isPojo(baseType.getType())) {
                 // 是自定义类型，对自定义类型的各个属性进行描述
                 Map<String, JavaType> params = new TreeMap<>();
                 // 获取该自定义类型的各个属性
@@ -519,22 +519,28 @@ public class ReflectUtil {
 
     /**
      * 判断Class对象是否为指定的几种简单类型（该方法认为java自带简单类型包括java八大基本类型及其对应的封装类型、Number的子
-     * 类、String、Collection的子类、Map的子类、Enum，如果不是这六种类型将会认为该类型是一个复杂类型（pojo类型））
+     * 类、String、Collection的子类、Map的子类、Enum，如果不是这些类型将会认为该类型是一个复杂类型（pojo类型））
      *
      * @param clazz Class对象，不能为null
-     * @return 如果是基本类型则返回<code>true</code>
+     * @return 如果是pojo则返回<code>true</code>
      * @throws NullPointerException 当传入Class对象为null时抛出该异常
      */
-    public static boolean isSimple(Class<?> clazz) throws NullPointerException {
+    public static boolean isPojo(Class<?> clazz) throws NullPointerException {
         Assert.notNull(clazz, "clazz不能为null");
-        return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
-               || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-               || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
-               || Enum.class.isAssignableFrom(clazz) || boolean.class.isAssignableFrom(clazz)
-               || char.class.isAssignableFrom(clazz) || byte.class.isAssignableFrom(clazz)
-               || short.class.isAssignableFrom(clazz) || int.class.isAssignableFrom(clazz)
-               || long.class.isAssignableFrom(clazz) || double.class.isAssignableFrom(clazz)
-               || float.class.isAssignableFrom(clazz);
+        return !(Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
+                 || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
+                 || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
+                 || Enum.class.isAssignableFrom(clazz) || isGeneralType(clazz));
+    }
+
+    /**
+     * 判断是否是八大基本类型、枚举类型、String、Number类型
+     * @param clazz Class
+     * @return 如果不是以上几种类型返回false
+     */
+    public static boolean isSimple(Class<?> clazz) {
+        return isGeneralType(clazz) || isBasic(clazz) || Enum.class.isAssignableFrom(clazz)
+               || String.class.isAssignableFrom(clazz) || Number.class.isAssignableFrom(clazz);
     }
 
     /**
@@ -550,6 +556,18 @@ public class ReflectUtil {
                || Byte.class.isAssignableFrom(clazz) || Short.class.isAssignableFrom(clazz)
                || Integer.class.isAssignableFrom(clazz) || Long.class.isAssignableFrom(clazz)
                || Double.class.isAssignableFrom(clazz) || Float.class.isAssignableFrom(clazz);
+    }
+
+    /**
+     * 判断指定Class是否是8大基本类型（int、short等，不包含对应的封装类型）
+     *
+     * @param clazz class对象
+     * @return 如果是基本类型则返回<code>true</code>
+     * @throws NullPointerException 当传入Class对象为空时抛出该异常
+     */
+    public static boolean isGeneralType(Class<?> clazz) throws NullPointerException {
+        Assert.notNull(clazz, "clazz不能为null");
+        return clazz.isPrimitive();
     }
 
     /**
@@ -569,18 +587,6 @@ public class ReflectUtil {
             JavaType child = ((GenericType) type).getChild();
             return parent == null ? getRealType(child) : getRealType(parent);
         }
-    }
-
-    /**
-     * 判断指定Class是否是8大基本类型（int、short等，不包含对应的封装类型）
-     *
-     * @param clazz class对象
-     * @return 如果是基本类型则返回<code>true</code>
-     * @throws NullPointerException 当传入Class对象为空时抛出该异常
-     */
-    public static boolean isGeneralType(Class<?> clazz) throws NullPointerException {
-        Assert.notNull(clazz, "clazz不能为null");
-        return clazz.isPrimitive();
     }
 
     /**

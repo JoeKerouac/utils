@@ -435,7 +435,7 @@ public class XmlParser {
                 node.addAttribute(attrName, attrValue);
             } else if (type == null) {
                 log.debug("当前不知道节点[{}]的类型，忽略该节点", k);
-            } else if (ReflectUtil.isSimple(type)) {
+            } else if (ReflectUtil.isPojo(type)) {
                 //是简单类型或者集合类型
                 if (Map.class.isAssignableFrom(type)) {
                     log.warn("当前字段[{}]是map类型", k);
