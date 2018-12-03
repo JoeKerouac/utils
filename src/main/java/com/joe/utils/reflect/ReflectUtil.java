@@ -528,9 +528,9 @@ public class ReflectUtil {
     public static boolean isNotPojo(Class<?> clazz) throws NullPointerException {
         Assert.notNull(clazz, "clazz不能为null");
         return Boolean.class.isAssignableFrom(clazz) || Character.class.isAssignableFrom(clazz)
-                 || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
-                 || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
-                 || Enum.class.isAssignableFrom(clazz) || isGeneralType(clazz);
+               || Number.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)
+               || String.class.isAssignableFrom(clazz) || Collection.class.isAssignableFrom(clazz)
+               || Enum.class.isAssignableFrom(clazz) || isGeneralType(clazz);
     }
 
     /**
