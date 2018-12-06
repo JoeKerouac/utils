@@ -32,7 +32,7 @@ public class MethodInterceptorAdapter implements MethodInterceptor {
 
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
-        Interception interception = filter(method);
+        Interception interception = MethodMetadata.filter(method, proxyMap);
         try {
             if (interception == null) {
                 return proxy.invokeSuper(obj, args);
@@ -40,27 +40,12 @@ public class MethodInterceptorAdapter implements MethodInterceptor {
                 // cglib不支持调用接口中声明的default方法
                 if (ReflectUtil.isAbstract(method) || method.getDeclaringClass().isInterface()) {
                     return interception.invoke(args, null, method);
-                }else {
+                } else {
                     return interception.invoke(args, () -> proxy.invokeSuper(obj, args), method);
                 }
             }
         } catch (Throwable e) {
             throw new ProxyException(e);
         }
-    }
-
-    /**
-     * 从代理方法集合中筛选出来该方法对应的代理
-     * @param method 要代理的方法
-     * @return 代理方法，不对要代理的方法进行代理返回null
-     */
-    private Interception filter(Method method) {
-        MethodMetadata metadata = MethodMetadata.build(method);
-        for (Map.Entry<MethodMetadata, Interception> entry : proxyMap.entrySet()) {
-            if (metadata.equals(entry.getKey())) {
-                return entry.getValue();
-            }
-        }
-        return null;
     }
 }

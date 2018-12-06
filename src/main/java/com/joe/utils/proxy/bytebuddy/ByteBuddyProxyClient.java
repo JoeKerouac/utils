@@ -35,6 +35,11 @@ public class ByteBuddyProxyClient implements ProxyClient {
         return new DefaultBuilder<>(parent, loader);
     }
 
+    @Override
+    public ClientType getClientType() {
+        return ClientType.BYTE_BUDDY;
+    }
+
     private static class DefaultBuilder<T> extends Builder<T> {
 
         DefaultBuilder(Class<T> parent) {

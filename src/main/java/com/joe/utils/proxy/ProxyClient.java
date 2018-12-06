@@ -13,6 +13,10 @@ import com.joe.utils.scan.MethodScanner;
 /**
  * 代理客户端，代理的class必须是公共可访问的（如果是内部类那么必须是静态内部类）
  *
+ * 注意java代理客户端{@link com.joe.utils.proxy.java.JavaProxyClient JavaProxyClient}的特殊性
+ *
+ * 不保证多次创建的代理对象{@link Object#getClass() getClass}方法的返回值相同
+ *
  * @author JoeKerouac
  * @version $Id: joe, v 0.1 2018年11月07日 11:17 JoeKerouac Exp $
  */
@@ -37,7 +41,7 @@ public interface ProxyClient {
     /**
      * 构建指定接口的代理Class，class必须是公共的，同时代理方法也必须是公共的
      * @param parent 指定接口
-     * @param name 动态生成的Class的名字，例如com.joe.Test
+     * @param name 动态生成的Class的名字，例如com.joe.Test（注意：java原生代理对此不支持）
      * @param filter 方法拦截器
      * @param <T> 代理真实类型
      * @return 代理Class
@@ -77,6 +81,12 @@ public interface ProxyClient {
     <T> Builder<T> createBuilder(Class<T> parent, ProxyClassLoader loader);
 
     /**
+     * 获取代理客户端的类型
+     * @return 代理客户端类型
+     */
+    ClientType getClientType();
+
+    /**
      * 获取指定类型的代理客户端
      * @param type 代理客户端类型
      * @return 客户端
@@ -89,7 +99,20 @@ public interface ProxyClient {
      * 
      */
     enum ClientType {
-                     CGLIB("com.joe.utils.proxy.cglib.CglibProxyClient"), BYTE_BUDDY("com.joe.utils.proxy.bytebuddy.ByteBuddyProxyClient");
+        /**
+         * CGLIB代理客户端
+         */
+        CGLIB("com.joe.utils.proxy.cglib.CglibProxyClient"),
+
+        /**
+         * ByteBuddy客户端
+         */
+        BYTE_BUDDY("com.joe.utils.proxy.bytebuddy.ByteBuddyProxyClient"),
+
+        /**
+         * JAVA代理客户端
+         */
+        JAVA("com.joe.utils.proxy.java.JavaProxyClient");
 
         private String clientClass;
 

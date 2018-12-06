@@ -9,18 +9,19 @@ import org.junit.Assert;
  * @author JoeKerouac
  * @version $Id: joe, v 0.1 2018年11月08日 10:49 JoeKerouac Exp $
  */
-public class ProxyClientTest {
+public class ProxyClientTestHelper {
 
-    private ProxyClient    client;
-    private MethodMetadata metadata;
+    private static final MethodMetadata METADATA = new MethodMetadata("say", String.class,
+        new Type[] { String.class });
 
-    public ProxyClientTest(ProxyClient client) {
+    private ProxyClient                 client;
+
+    public ProxyClientTestHelper(ProxyClient client) {
         this.client = client;
-        metadata = new MethodMetadata("say", String.class, new Type[] { String.class });
     }
 
     /**
-     * 测试
+     * 测试入口
      */
     public void doTest() {
         doCreate(true);
@@ -29,32 +30,60 @@ public class ProxyClientTest {
         doBuilder(false);
         doFilter(true);
         doFilter(false);
+        doObjectMethodTest(client);
     }
 
     /**
+     * 测试Object方法行为（只对toString、hashCode、equals方法的行为测试，主要是防止递归）
+     */
+    public static void doObjectMethodTest(ProxyClient client) {
+        Say say1 = client.create(Say.class,
+            Collections.singletonMap(METADATA, (params, callable, method) -> null));
+
+        Say say2 = client.create(Say.class,
+            Collections.singletonMap(METADATA, (params, callable, method) -> null));
+
+        Assert.assertNotEquals(say1, say2);
+        Assert.assertNotEquals(say1.toString(), say2.toString());
+        Assert.assertNotEquals(say1.hashCode(), say2.hashCode());
+
+        // 不保证不同对象getClass返回的值相同
+        Assert.assertNotNull(say1.getClass());
+    }
+
+    /**
+     * 测试create方法直接生成代理
      * 
      * @param flag true表示使用Say，false表示使用SayDefault
      */
     private void doCreate(boolean flag) {
         Environment environment = new Environment(flag);
         Say sayHi = client.create(environment.clazz,
-            Collections.singletonMap(metadata, environment.hiMethodProxy));
+            Collections.singletonMap(METADATA, environment.hiMethodProxy));
 
         Say sayHello = client.create(environment.clazz,
-            Collections.singletonMap(metadata, environment.helloMethodProxy));
+            Collections.singletonMap(METADATA, environment.helloMethodProxy));
 
         doTest(sayHi, sayHello);
     }
 
+    /**
+     * 测试builder方法生成代理
+     * @param flag true表示使用Say，false表示使用SayDefault
+     */
     private void doBuilder(boolean flag) {
         Environment environment = new Environment(flag);
         Say sayHi = client.createBuilder(environment.clazz)
-            .proxyMethod(metadata, environment.hiMethodProxy).build();
+            .proxyMethod(METADATA, environment.hiMethodProxy).build();
         Say sayHello = client.createBuilder(environment.clazz)
-            .proxyMethod(metadata, environment.helloMethodProxy).build();
+            .proxyMethod(METADATA, environment.helloMethodProxy).build();
         doTest(sayHi, sayHello);
     }
 
+    /**
+     * 测试filter
+     * @param flag true表示使用Say，false表示使用SayDefault
+     */
     private void doFilter(boolean flag) {
         Environment environment = new Environment(flag);
         Say sayHi = client.create(environment.clazz, method -> {
@@ -97,7 +126,7 @@ public class ProxyClientTest {
         }
     }
 
-    class Hello {
+    static class Hello {
         String hi(String str) {
             return "hi:" + str;
         }
@@ -107,7 +136,7 @@ public class ProxyClientTest {
         }
     }
 
-    private class Environment {
+    private static class Environment {
         Interception         hiMethodProxy;
         Interception         helloMethodProxy;
         Class<? extends Say> clazz;
