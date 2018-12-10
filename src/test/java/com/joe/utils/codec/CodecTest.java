@@ -2,7 +2,6 @@ package com.joe.utils.codec;
 
 import java.util.Arrays;
 
-import com.joe.utils.common.StringUtils;
 import com.joe.utils.reflect.ReflectUtil;
 import org.junit.Assert;
 import org.junit.Test;
