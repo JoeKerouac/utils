@@ -13,10 +13,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.joe.utils.collection.CollectionUtil;
-import com.joe.utils.reflect.BeanUtils;
-import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.parse.xml.converter.XmlTypeConverterUtil;
+import com.joe.utils.reflect.BeanUtils;
+import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.reflect.ReflectUtil;
 
 import lombok.AllArgsConstructor;
@@ -60,7 +60,7 @@ public class XmlParser {
      * @return 新的XmlParser实例
      */
     public static XmlParser buildInstance() {
-        return buildInstance(null);
+        return buildInstance(Collections.emptyMap());
     }
 
     /**
@@ -518,7 +518,7 @@ public class XmlParser {
                     // 如果map中已经包含该key，说明该key有多个，是个list
                     Object obj = map.get(ele.getName());
                     List<String> list;
-                    if (obj != null && obj instanceof List) {
+                    if (obj instanceof List) {
                         // 如果obj不等于null并且是list对象，说明map中存的已经是一个list
                         list = (List<String>) obj;
                     } else {
@@ -550,7 +550,7 @@ public class XmlParser {
         log.debug("要赋值的fieldName为{}", field.getName());
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
         if (!BeanUtils.setProperty(pojo, field.getName(), convert.read(element, attrName))) {
-            log.warn("copy中复制{}时发生错误，属性[{}]的值将被忽略", field.getName(), field.getName());
+            log.debug("copy中复制{}时发生错误，属性[{}]的值将被忽略", field.getName(), field.getName());
         }
     }
 
@@ -633,9 +633,9 @@ public class XmlParser {
      * @return 集合实例
      */
     private Collection tryBuildCollection(Class<? extends Collection> clazz) {
-        if (clazz.equals(List.class)) {
+        if (List.class.equals(clazz) || Collection.class.equals(clazz)) {
             return new ArrayList();
-        } else if (clazz.equals(Set.class)) {
+        } else if (Set.class.equals(clazz)) {
             return new HashSet();
         } else if (List.class.isAssignableFrom(clazz)) {
             try {
