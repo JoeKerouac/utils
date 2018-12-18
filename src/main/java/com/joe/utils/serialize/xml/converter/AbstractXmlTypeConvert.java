@@ -1,4 +1,4 @@
-package com.joe.utils.parse.xml.converter;
+package com.joe.utils.serialize.xml.converter;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.joe.utils.parse.xml.XmlTypeConvert;
+import com.joe.utils.serialize.xml.XmlTypeConvert;
 
 /**
  * @author joe

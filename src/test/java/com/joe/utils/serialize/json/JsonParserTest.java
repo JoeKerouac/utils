@@ -1,4 +1,4 @@
-package com.joe.utils.parse.json;
+package com.joe.utils.serialize.json;
 
 import java.util.ArrayList;
 import java.util.Arrays;

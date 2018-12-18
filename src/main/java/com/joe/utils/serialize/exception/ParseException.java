@@ -1,4 +1,4 @@
-package com.joe.utils.parse.exception;
+package com.joe.utils.serialize.exception;
 
 /**
  * 解析异常

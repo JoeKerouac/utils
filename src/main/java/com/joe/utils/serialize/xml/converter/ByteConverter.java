@@ -1,24 +1,24 @@
-package com.joe.utils.parse.xml.converter;
+package com.joe.utils.serialize.xml.converter;
 
 import org.dom4j.Element;
 
 import com.joe.utils.common.StringUtils;
 
 /**
- * float转换器
+ * Byte转换器
  *
  * @author joe
  * @version 2018.01.30 14:34
  */
-public class FloatConverter extends AbstractXmlTypeConvert<Float> {
+public class ByteConverter extends AbstractXmlTypeConvert<Byte> {
     @Override
-    public Float read(Element element, String attrName) {
+    public Byte read(Element element, String attrName) {
         String data = StringUtils.isEmpty(attrName) ? element.getText()
             : element.attributeValue(attrName);
         if (StringUtils.isEmpty(data)) {
-            return 0.0F;
+            return 0;
         } else {
-            return Float.valueOf(data);
+            return Byte.valueOf(data);
         }
     }
 }

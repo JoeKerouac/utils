@@ -1,9 +1,14 @@
-package com.joe.utils.parse.xml;
+package com.joe.utils.serialize.xml;
 
 import java.io.StringReader;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import com.joe.utils.exception.ExceptionWraper;
+import com.joe.utils.serialize.SerializeException;
+import com.joe.utils.serialize.Serializer;
+import com.joe.utils.serialize.xml.converter.XmlTypeConverterUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -14,7 +19,6 @@ import org.xml.sax.SAXException;
 
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.StringUtils;
-import com.joe.utils.parse.xml.converter.XmlTypeConverterUtil;
 import com.joe.utils.reflect.BeanUtils;
 import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.reflect.ReflectUtil;
@@ -32,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author JoeKerouac
  */
 @Slf4j
-public class XmlParser {
+public class XmlParser implements Serializer {
     private static final XmlParser DEFAULT      = new XmlParser();
     private static final String    DEFAULT_ROOT = "root";
     private SAXReader              reader;
@@ -196,7 +200,7 @@ public class XmlParser {
 
     /**
      * 将XML解析为POJO对象，暂时无法解析map，当需要解析的字段是{@link java.util.Collection}的子类时必须带有注
-     * 解{@link com.joe.utils.parse.xml.XmlNode}，否则将解析失败。
+     * 解{@link XmlNode}，否则将解析失败。
      * <p>
      * PS：对象中的集合字段必须添加注解，必须是简单集合，即集合中只有一种数据类型，并且当类型不是String时需要指定
      * converter，否则将会解析失败。
@@ -655,6 +659,26 @@ public class XmlParser {
             log.warn("未知集合类型：[{}]", clazz);
             return null;
         }
+    }
+
+    @Override
+    public <T> byte[] write(T t) throws SerializeException {
+        return writeToString(t).getBytes();
+    }
+
+    @Override
+    public <T> String writeToString(T t) throws SerializeException {
+        return ExceptionWraper.convert(() -> toXml(t), SerializeException::new);
+    }
+
+    @Override
+    public <T> T read(byte[] data, Class<T> clazz) throws SerializeException {
+        return read(new String(data), clazz);
+    }
+
+    @Override
+    public <T> T read(String data, Class<T> clazz) throws SerializeException {
+        return ExceptionWraper.convert(() -> parse(data, clazz), SerializeException::new);
     }
 
     /**

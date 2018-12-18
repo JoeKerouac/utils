@@ -1,4 +1,4 @@
-package com.joe.utils.parse;
+package com.joe.utils.serialize;
 
 /**
  * 序列化异常

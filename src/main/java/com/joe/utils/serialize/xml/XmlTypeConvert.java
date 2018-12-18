@@ -1,4 +1,4 @@
-package com.joe.utils.parse.xml;
+package com.joe.utils.serialize.xml;
 
 import org.dom4j.Element;
 

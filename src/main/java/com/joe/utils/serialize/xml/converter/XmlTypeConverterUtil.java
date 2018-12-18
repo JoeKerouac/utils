@@ -1,4 +1,4 @@
-package com.joe.utils.parse.xml.converter;
+package com.joe.utils.serialize.xml.converter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.joe.utils.reflect.BeanUtils;
-import com.joe.utils.parse.xml.XmlNode;
-import com.joe.utils.parse.xml.XmlTypeConvert;
+import com.joe.utils.serialize.xml.XmlNode;
+import com.joe.utils.serialize.xml.XmlTypeConvert;
 
 /**
  * XmlTypeConverter工具

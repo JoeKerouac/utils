@@ -1,4 +1,4 @@
-package com.joe.utils.parse.xml;
+package com.joe.utils.serialize.xml;
 
 import java.lang.annotation.*;
 

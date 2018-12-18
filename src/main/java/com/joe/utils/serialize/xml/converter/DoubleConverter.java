@@ -1,25 +1,24 @@
-package com.joe.utils.parse.xml.converter;
+package com.joe.utils.serialize.xml.converter;
 
 import org.dom4j.Element;
 
 import com.joe.utils.common.StringUtils;
 
 /**
- * Boolean转换器
+ * Double转换器
  *
  * @author joe
- * @version 2018.01.30 14:25
+ * @version 2018.01.30 14:34
  */
-public class BooleanConverter extends AbstractXmlTypeConvert<Boolean> {
+public class DoubleConverter extends AbstractXmlTypeConvert<Double> {
     @Override
-    public Boolean read(Element element, String attrName) {
+    public Double read(Element element, String attrName) {
         String data = StringUtils.isEmpty(attrName) ? element.getText()
             : element.attributeValue(attrName);
         if (StringUtils.isEmpty(data)) {
-            return false;
+            return 0.0;
         } else {
-            return Boolean.valueOf(data);
+            return Double.valueOf(data);
         }
     }
-
 }

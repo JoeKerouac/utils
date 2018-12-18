@@ -1,12 +1,12 @@
-package com.joe.utils.parse.xml.converter;
+package com.joe.utils.serialize.xml.converter;
 
 import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.joe.utils.common.StringUtils;
-import com.joe.utils.parse.xml.XmlParser;
-import com.joe.utils.parse.xml.XmlTypeConvert;
+import com.joe.utils.serialize.xml.XmlParser;
+import com.joe.utils.serialize.xml.XmlTypeConvert;
 import com.joe.utils.reflect.ReflectUtil;
 
 /**

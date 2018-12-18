@@ -1,4 +1,4 @@
-package com.joe.utils.parse.json;
+package com.joe.utils.serialize.json;
 
 import java.util.Collection;
 import java.util.Map;
@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.MapType;
 
+import com.joe.utils.exception.ExceptionWraper;
+import com.joe.utils.serialize.SerializeException;
+import com.joe.utils.serialize.Serializer;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author joe
  */
 @Slf4j
-public class JsonParser {
+public class JsonParser implements Serializer {
     private static final JsonParser   JSON_PARSER;
     private static final ObjectMapper MAPPER_IGNORE_NULL;
     private static final ObjectMapper MAPPER;
@@ -36,6 +39,26 @@ public class JsonParser {
 
     public static JsonParser getInstance() {
         return JSON_PARSER;
+    }
+
+    @Override
+    public <T> byte[] write(T t) throws SerializeException {
+        return ExceptionWraper.convert(() -> toJson(t).getBytes(), SerializeException::new);
+    }
+
+    @Override
+    public <T> String writeToString(T t) throws SerializeException {
+        return ExceptionWraper.convert(() -> toJson(t), SerializeException::new);
+    }
+
+    @Override
+    public <T> T read(byte[] data, Class<T> clazz) throws SerializeException {
+        return ExceptionWraper.convert(() -> readAsObject(data, clazz), SerializeException::new);
+    }
+
+    @Override
+    public <T> T read(String data, Class<T> clazz) throws SerializeException {
+        return ExceptionWraper.convert(() -> readAsObject(data, clazz), SerializeException::new);
     }
 
     /**
