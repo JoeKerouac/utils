@@ -81,10 +81,23 @@ public class ReflectUtil {
         Assert.isTrue(parameterTypes == null || parameterTypes.length == args.length,
             "方法参数类型列表长度必须和方法参数列表长度一致");
         Method method = getMethod(obj.getClass(), methodName, parameterTypes);
+        return invoke(obj, method, args);
+    }
+
+    /**
+     * 调用指定对象的指定方法
+     * @param obj 指定对象，不能为空
+     * @param method 要调用的方法
+     * @param args 参数
+     * @param <R> 结果类型
+     * @return 调用结果
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R invoke(Object obj, Method method, Object... args) {
         try {
             return (R) method.invoke(obj, args);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw new ReflectException("调用方法[" + methodName + "]失败", e);
+            throw new ReflectException("调用方法[" + method + "]失败", e);
         }
     }
 
