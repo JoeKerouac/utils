@@ -8,7 +8,10 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.constraints.NotNull;
 import javax.validation.executable.ExecutableValidator;
+
+import com.joe.utils.common.Assert;
 
 /**
  * bean校验工具，不符合规则的会抛出异常
@@ -37,7 +40,8 @@ public class ValidatorUtil {
      *
      * @param bean 要校验的bean
      */
-    public static void validate(Object bean) {
+    public static void validate(@NotNull Object bean) {
+        Assert.notNull(bean, "bean不能为null");
         Set<ConstraintViolation<Object>> constraintViolations = validator.validate(bean);
         check(constraintViolations);
     }
@@ -50,6 +54,8 @@ public class ValidatorUtil {
      * @param params   参数
      */
     public static void validateParameters(Object instance, Method method, Object[] params) {
+        Assert.notNull(instance, "instance不能为null");
+        Assert.notNull(method, "method不能为null");
         Set<ConstraintViolation<Object>> constraintViolations = executableValidator
             .validateParameters(instance, method, params);
         check(constraintViolations);
