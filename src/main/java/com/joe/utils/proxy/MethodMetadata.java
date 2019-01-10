@@ -1,7 +1,6 @@
 package com.joe.utils.proxy;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -83,46 +82,36 @@ public class MethodMetadata {
     private final String                     name;
 
     /**
-     * 方法返回值类型
+     * 声明类
      */
-    private final Type                       returnType;
+    private final Class<?>                   declareClass;
 
     /**
      * 方法参数类型列表
      */
     private final Type[]                     params;
 
-    /**
-     * 方法访问权限
-     */
-    private final int                        modifier;
-
-    public MethodMetadata(String name, Type returnType, Type[] params) {
-        this(name, returnType, params, Modifier.PUBLIC);
-    }
-
-    public MethodMetadata(String name, Type returnType, Type[] params, int modifier) {
+    public MethodMetadata(String name, Class<?> declareClass, Type... params) {
         Assert.notNull(name, "name不能为null");
-        Assert.notNull(returnType, "returnType不能为null");
+        Assert.notNull(declareClass, "declareClass不能为null");
         this.name = name;
-        this.returnType = returnType;
+        this.declareClass = declareClass;
         this.params = params == null ? NULL : params;
-        this.modifier = modifier;
     }
 
     static {
         OBJECT_METHOD = new ArrayList<>(11);
-        GET_CLASS_META = new MethodMetadata("getClass", Class.class, null);
-        HASH_CODE_META = new MethodMetadata("hashCode", int.class, null);
-        EQUALS_META = new MethodMetadata("equals", boolean.class, new Type[] { Object.class });
-        CLONE_META = new MethodMetadata("clone", Object.class, null);
-        TO_STRING_META = new MethodMetadata("toString", String.class, null);
-        NOTIFY_META = new MethodMetadata("notify", void.class, null);
-        NOTIFY_ALL_META = new MethodMetadata("notifyAll", void.class, null);
-        WAIT_META = new MethodMetadata("wait", void.class, null);
-        WAIT1_META = new MethodMetadata("wait", void.class, new Type[] { long.class });
-        WAIT2_META = new MethodMetadata("wait", void.class, new Type[] { long.class, int.class });
-        FINALIZE_META = new MethodMetadata("finalize", void.class, null);
+        GET_CLASS_META = new MethodMetadata("getClass", Object.class);
+        HASH_CODE_META = new MethodMetadata("hashCode", Object.class);
+        EQUALS_META = new MethodMetadata("equals", Object.class, Object.class);
+        CLONE_META = new MethodMetadata("clone", Object.class);
+        TO_STRING_META = new MethodMetadata("toString", Object.class);
+        NOTIFY_META = new MethodMetadata("notify", Object.class);
+        NOTIFY_ALL_META = new MethodMetadata("notifyAll", Object.class);
+        WAIT_META = new MethodMetadata("wait", Object.class);
+        WAIT1_META = new MethodMetadata("wait", Object.class, long.class);
+        WAIT2_META = new MethodMetadata("wait", Object.class, long.class, int.class);
+        FINALIZE_META = new MethodMetadata("finalize", Object.class);
         OBJECT_METHOD.add(GET_CLASS_META);
         OBJECT_METHOD.add(HASH_CODE_META);
         OBJECT_METHOD.add(EQUALS_META);
@@ -142,24 +131,8 @@ public class MethodMetadata {
      * @return method元数据
      */
     public static MethodMetadata build(Method method) {
-        return new MethodMetadata(method.getName(), method.getReturnType(),
-            method.getParameterTypes(), method.getModifiers());
-    }
-
-    /**
-     * 从代理方法集合中筛选出来该方法对应的代理
-     * @param method 要代理的方法
-     * @param proxyMap 要代理的方法集合
-     * @return 代理方法，不对要代理的方法进行代理返回null
-     */
-    public static Interception filter(Method method, Map<MethodMetadata, Interception> proxyMap) {
-        for (Map.Entry<MethodMetadata, Interception> entry : proxyMap.entrySet()) {
-            MethodMetadata metadata = entry.getKey();
-            if (metadata != null && metadata.equals(method)) {
-                return entry.getValue();
-            }
-        }
-        return null;
+        return new MethodMetadata(method.getName(), method.getDeclaringClass(),
+            method.getParameterTypes());
     }
 
     /**

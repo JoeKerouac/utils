@@ -1,15 +1,11 @@
 package com.joe.utils.proxy.java;
 
-import java.lang.reflect.Type;
-import java.util.Collections;
-
-import com.joe.utils.proxy.ProxyClientTestHelper;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.joe.utils.proxy.Interception;
-import com.joe.utils.proxy.MethodMetadata;
 import com.joe.utils.proxy.ProxyClient;
+import com.joe.utils.proxy.ProxyClientTestHelper;
 
 /**
  * @author JoeKerouac
@@ -18,13 +14,17 @@ import com.joe.utils.proxy.ProxyClient;
 public class JavaProxyClientTest {
     @Test
     public void doTest() {
-        Interception hiMethodProxy = (params, callable, method) -> new Hello()
-            .hi((String) params[0]);
-        MethodMetadata metadata = new MethodMetadata("say", String.class,
-            new Type[] { String.class });
         ProxyClient client = ProxyClient.getInstance(ProxyClient.ClientType.JAVA);
 
-        Say say = client.create(Say.class, Collections.singletonMap(metadata, hiMethodProxy));
+        Interception interception = (target, params, invoker, method) -> {
+            if (method.getName().equals("say")) {
+                return new Hello().hi((String) params[0]);
+            } else {
+                return invoker.call();
+            }
+        };
+
+        Say say = client.create(Say.class, interception);
 
         String str = "123";
         Assert.assertEquals(say.say(str), "hi:" + str);

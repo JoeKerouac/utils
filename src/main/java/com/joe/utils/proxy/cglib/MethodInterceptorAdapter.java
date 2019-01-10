@@ -1,13 +1,11 @@
 package com.joe.utils.proxy.cglib;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 
+import com.joe.utils.common.Assert;
 import com.joe.utils.proxy.Interception;
-import com.joe.utils.proxy.MethodMetadata;
-import com.joe.utils.proxy.ProxyException;
+import com.joe.utils.proxy.Invoker;
 
-import com.joe.utils.reflect.ReflectUtil;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -20,30 +18,32 @@ import net.sf.cglib.proxy.MethodProxy;
 public class MethodInterceptorAdapter implements MethodInterceptor {
 
     /**
-     * 代理方法集合
+     * 代理方法实现
      */
-    private final Map<MethodMetadata, Interception> proxyMap;
+    private final Interception proxy;
 
-    public MethodInterceptorAdapter(Map<MethodMetadata, Interception> proxyMap) {
-        this.proxyMap = proxyMap;
+    /**
+     * target，可以为空，为空表示生成新代理，不为空表示对target代理
+     */
+    private final Object       target;
+
+    private final Class<?>     parent;
+
+    public MethodInterceptorAdapter(Interception proxy, Object target, Class<?> parent) {
+        Assert.notNull(proxy);
+        Assert.notNull(parent);
+        this.proxy = proxy;
+        this.target = target;
+        this.parent = parent;
     }
 
     @Override
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
-        Interception interception = MethodMetadata.filter(method, proxyMap);
-        try {
-            if (interception == null) {
-                return proxy.invokeSuper(obj, args);
-            } else {
-                // cglib不支持调用接口中声明的default方法
-                if (ReflectUtil.isAbstract(method) || method.getDeclaringClass().isInterface()) {
-                    return interception.invoke(args, null, method);
-                } else {
-                    return interception.invoke(args, () -> proxy.invokeSuper(obj, args), method);
-                }
-            }
-        } catch (Throwable e) {
-            throw new ProxyException(e);
+    public Object intercept(Object obj, Method method, Object[] args,
+                            MethodProxy methodProxy) throws Throwable {
+        Invoker supperCall = null;
+        if (!parent.isInterface()) {
+            supperCall = () -> methodProxy.invokeSuper(obj, args);
         }
+        return Interception.invokeWrap(proxy, target, method, obj, args, supperCall);
     }
 }

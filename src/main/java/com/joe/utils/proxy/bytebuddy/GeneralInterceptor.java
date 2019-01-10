@@ -3,6 +3,7 @@ package com.joe.utils.proxy.bytebuddy;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
+import com.joe.utils.common.Assert;
 import com.joe.utils.proxy.Interception;
 
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
@@ -18,10 +19,25 @@ import net.bytebuddy.implementation.bind.annotation.SuperCall;
  */
 public class GeneralInterceptor {
 
+    /**
+     * 代理方法实现
+     */
     private final Interception interception;
 
-    public GeneralInterceptor(Interception interception) {
+    /**
+     * target，可以为空，为空表示生成新代理，不为空表示对target代理
+     */
+    private final Object       target;
+
+    public GeneralInterceptor(Interception interception, Class<?> parent) {
+        this(interception, parent, null);
+    }
+
+    public GeneralInterceptor(Interception interception, Class<?> parent, Object target) {
+        Assert.notNull(interception);
+        Assert.notNull(parent);
         this.interception = interception;
+        this.target = target;
     }
 
     /**
@@ -34,7 +50,8 @@ public class GeneralInterceptor {
     @RuntimeType
     public Object interceptClass(@AllArguments Object[] params, @Origin Method method,
                                  @SuperCall Callable<Object> callable) throws Throwable {
-        return interception.invoke(params, callable::call, method);
+        return Interception.invokeWrap(interception, this.target, method, null, params,
+            callable::call);
     }
 
     /**
@@ -46,6 +63,6 @@ public class GeneralInterceptor {
     @RuntimeType
     public Object interceptInterface(@AllArguments Object[] params,
                                      @Origin Method method) throws Throwable {
-        return interception.invoke(params, null, method);
+        return Interception.invokeWrap(interception, null, method, null, params, null);
     }
 }

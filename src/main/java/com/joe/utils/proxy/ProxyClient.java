@@ -1,14 +1,6 @@
 package com.joe.utils.proxy;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.joe.utils.common.Assert;
 import com.joe.utils.reflect.ClassUtils;
-import com.joe.utils.scan.MethodScanner;
 
 /**
  * 代理客户端，代理的class必须是公共可访问的（如果是内部类那么必须是静态内部类）
@@ -30,55 +22,101 @@ public interface ProxyClient {
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
      * @param parent 指定接口
-     * @param filter 方法拦截器
+     * @param proxy 方法代理
      * @param <T> 代理真实类型
      * @return 代理
      */
-    default <T> T create(Class<T> parent, ProxyMethodFilter filter) {
-        return createBuilder(parent).filterMethod(filter).build();
-    }
-
-    /**
-     * 构建指定接口的代理Class，class必须是公共的，同时代理方法也必须是公共的
-     * @param parent 指定接口
-     * @param name 动态生成的Class的名字，例如com.joe.Test（注意：java原生代理对此不支持）
-     * @param filter 方法拦截器
-     * @param <T> 代理真实类型
-     * @return 代理Class
-     */
-    default <T> T create(Class<T> parent, String name, ProxyMethodFilter filter) {
-        return createBuilder(parent).name(name).filterMethod(filter).build();
+    default <T> T create(Class<T> parent, Interception proxy) {
+        return create(parent, DEFAULT_LOADER, null, proxy);
     }
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
      * @param parent 指定接口
-     * @param interceptionMap 方法映射
+     * @param proxy 被代理的对象
+     * @param interception 方法代理
      * @param <T> 代理真实类型
      * @return 代理
      */
-    default <T> T create(Class<T> parent, Map<MethodMetadata, Interception> interceptionMap) {
-        Builder<T> builder = createBuilder(parent);
-        interceptionMap.forEach(builder::proxyMethod);
-        return builder.build();
+    default <T> T create(Class<T> parent, T proxy, Interception interception) {
+        return create(parent, proxy, DEFAULT_LOADER, null, interception);
     }
 
     /**
-     * 创建一个Class构建器用于自定义构建Class，class必须是公共的，同时代理方法也必须是公共的
-     * @param parent 要构建的Class的父类
-     * @param <T> 父类类型
-     * @return 代理构建器
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
+     * @param proxy 方法代理
+     * @param <T> 代理真实类型
+     * @return 代理
      */
-    <T> Builder<T> createBuilder(Class<T> parent);
+    default <T> T create(Class<T> parent, String name, Interception proxy) {
+        return create(parent, DEFAULT_LOADER, name, proxy);
+    }
 
     /**
-     * 创建一个Class构建器用于自定义构建Class，class必须是公共的，同时代理方法也必须是公共的
-     * @param parent 要构建的Class的父类
-     * @param loader 要构建的Class的加载器
-     * @param <T> 父类类型
-     * @return 代理构建器
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param proxy 被代理的对象
+     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception 方法代理
+     * @param <T> 代理真实类型
+     * @return 代理
      */
-    <T> Builder<T> createBuilder(Class<T> parent, ProxyClassLoader loader);
+    default <T> T create(Class<T> parent, T proxy, String name, Interception interception) {
+        return create(parent, proxy, DEFAULT_LOADER, name, interception);
+    }
+
+    /**
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param loader 加载生成的对象的class的classloader
+     * @param proxy 方法代理
+     * @param <T> 代理真实类型
+     * @return 代理
+     */
+    default <T> T create(Class<T> parent, ClassLoader loader, Interception proxy) {
+        return create(parent, loader, null, proxy);
+    }
+
+    /**
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param proxy 被代理的对象
+     * @param loader 加载生成的对象的class的classloader
+     * @param interception 方法代理
+     * @param <T> 代理真实类型
+     * @return 代理
+     */
+    default <T> T create(Class<T> parent, T proxy, ClassLoader loader, Interception interception) {
+        return create(parent, proxy, loader, null, interception);
+    }
+
+    /**
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param loader 加载生成的对象的class的classloader
+     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
+     * @param proxy 方法代理
+     * @param <T> 代理真实类型
+     * @return 代理
+     */
+    default <T> T create(Class<T> parent, ClassLoader loader, String name, Interception proxy) {
+        return create(parent, null, loader, name, proxy);
+    }
+
+    /**
+     * 构建指定对象的代理，对象的类必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param proxy 被代理的对象
+     * @param loader 加载生成的对象的class的classloader
+     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception 方法代理
+     * @param <T> 代理真实类型
+     * @return 代理
+     */
+    <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
+                 Interception interception);
 
     /**
      * 获取代理客户端的类型
@@ -99,115 +137,25 @@ public interface ProxyClient {
      * 
      */
     enum ClientType {
-        /**
-         * CGLIB代理客户端
-         */
-        CGLIB("com.joe.utils.proxy.cglib.CglibProxyClient"),
+                     /**
+                      * CGLIB代理客户端
+                      */
+                     CGLIB("com.joe.utils.proxy.cglib.CglibProxyClient"),
 
-        /**
-         * ByteBuddy客户端
-         */
-        BYTE_BUDDY("com.joe.utils.proxy.bytebuddy.ByteBuddyProxyClient"),
+                     /**
+                      * ByteBuddy客户端
+                      */
+                     BYTE_BUDDY("com.joe.utils.proxy.bytebuddy.ByteBuddyProxyClient"),
 
-        /**
-         * JAVA代理客户端
-         */
-        JAVA("com.joe.utils.proxy.java.JavaProxyClient");
+                     /**
+                      * JAVA代理客户端
+                      */
+                     JAVA("com.joe.utils.proxy.java.JavaProxyClient");
 
         private String clientClass;
 
         ClientType(String clientClass) {
             this.clientClass = clientClass;
         }
-    }
-
-    /**
-     * 代理构建器
-     * @param <T> 构建的代理的父类类型
-     */
-    abstract class Builder<T> {
-
-        /**
-         * parent
-         */
-        protected final Class<T>                          parent;
-
-        /**
-         * 用于加载生成类的ClassLoader
-         */
-        protected final ProxyClassLoader                  loader;
-
-        /**
-         * 代理方法映射
-         */
-        protected final Map<MethodMetadata, Interception> proxyMap;
-
-        /**
-         * 创建的class的名字
-         */
-        protected String                                  name;
-
-        protected Builder(Class<T> parent) {
-            this(parent, ProxyClient.DEFAULT_LOADER);
-        }
-
-        protected Builder(Class<T> parent, ProxyClassLoader loader) {
-            Assert.notNull(parent, "parent不能为null");
-            Assert.notNull(loader, "loader不能为null");
-            this.parent = parent;
-            this.loader = loader;
-            this.proxyMap = new HashMap<>();
-        }
-
-        /**
-         * 拦截指定方法到另外的方法上
-         * @param filter 方法拦截器
-         * @return Builder
-         */
-        public Builder<T> filterMethod(ProxyMethodFilter filter) {
-            List<Method> methods = MethodScanner.getInstance().scanByFilter(
-                Collections.singletonList(method -> filter.filter(method) != null), parent);
-
-            methods.forEach(
-                method -> proxyMethod(MethodMetadata.build(method), filter.filter(method)));
-            return this;
-        }
-
-        /**
-         * 将指定metadata的方法代理到指定方法代理proxy上
-         * @param metadata 被代理的方法的信息
-         * @param proxy 代理方法
-         * @return Builder
-         */
-        public Builder<T> proxyMethod(MethodMetadata metadata, Interception proxy) {
-            if (metadata != null && proxy != null) {
-                proxyMap.put(metadata, proxy);
-            }
-            return this;
-        }
-
-        /**
-         * Builder构建的class的名字
-         * @param name class名字，例如com.joe.Test
-         * @return Builder
-         */
-        public Builder<T> name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        /**
-         * 获取该builder的classloader
-         * @return 该builder对应的classloader
-         */
-        public ProxyClassLoader getClassLoader() {
-            return this.loader;
-        }
-
-        /**
-         * 构建Class对象
-         * @return 构建的代理对象，注意：多次调用该方法返回的代理对象不保证相同
-         */
-        public abstract T build();
     }
 }

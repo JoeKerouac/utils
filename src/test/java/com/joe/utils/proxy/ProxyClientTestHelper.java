@@ -1,8 +1,5 @@
 package com.joe.utils.proxy;
 
-import java.lang.reflect.Type;
-import java.util.Collections;
-
 import org.junit.Assert;
 
 /**
@@ -10,11 +7,7 @@ import org.junit.Assert;
  * @version $Id: joe, v 0.1 2018年11月08日 10:49 JoeKerouac Exp $
  */
 public class ProxyClientTestHelper {
-
-    private static final MethodMetadata METADATA = new MethodMetadata("say", String.class,
-        new Type[] { String.class });
-
-    private ProxyClient                 client;
+    private ProxyClient client;
 
     public ProxyClientTestHelper(ProxyClient client) {
         this.client = client;
@@ -26,10 +19,6 @@ public class ProxyClientTestHelper {
     public void doTest() {
         doCreate(true);
         doCreate(false);
-        doBuilder(true);
-        doBuilder(false);
-        doFilter(true);
-        doFilter(false);
         doObjectMethodTest(client);
     }
 
@@ -37,11 +26,12 @@ public class ProxyClientTestHelper {
      * 测试Object方法行为（只对toString、hashCode、equals方法的行为测试，主要是防止递归）
      */
     public static void doObjectMethodTest(ProxyClient client) {
-        Say say1 = client.create(Say.class,
-            Collections.singletonMap(METADATA, (params, callable, method) -> null));
+        Interception interception = (target, params, invoker,
+                                     method) -> method.getName().equals("say") ? null
+                                         : invoker.call();
+        Say say1 = client.create(Say.class, interception);
 
-        Say say2 = client.create(Say.class,
-            Collections.singletonMap(METADATA, (params, callable, method) -> null));
+        Say say2 = client.create(Say.class, interception);
 
         Assert.assertNotEquals(say1, say2);
         Assert.assertNotEquals(say1.toString(), say2.toString());
@@ -52,55 +42,15 @@ public class ProxyClientTestHelper {
     }
 
     /**
-     * 测试create方法直接生成代理
+     * 测试{@link ProxyClient#create(Class, Interception)}
      * 
      * @param flag true表示使用Say，false表示使用SayDefault
      */
     private void doCreate(boolean flag) {
         Environment environment = new Environment(flag);
-        Say sayHi = client.create(environment.clazz,
-            Collections.singletonMap(METADATA, environment.hiMethodProxy));
+        Say sayHi = client.create(environment.clazz, environment.hiMethodProxy);
 
-        Say sayHello = client.create(environment.clazz,
-            Collections.singletonMap(METADATA, environment.helloMethodProxy));
-
-        doTest(sayHi, sayHello);
-    }
-
-    /**
-     * 测试builder方法生成代理
-     * @param flag true表示使用Say，false表示使用SayDefault
-     */
-    private void doBuilder(boolean flag) {
-        Environment environment = new Environment(flag);
-        Say sayHi = client.createBuilder(environment.clazz)
-            .proxyMethod(METADATA, environment.hiMethodProxy).build();
-        Say sayHello = client.createBuilder(environment.clazz)
-            .proxyMethod(METADATA, environment.helloMethodProxy).build();
-        doTest(sayHi, sayHello);
-    }
-
-    /**
-     * 测试filter
-     * @param flag true表示使用Say，false表示使用SayDefault
-     */
-    private void doFilter(boolean flag) {
-        Environment environment = new Environment(flag);
-        Say sayHi = client.create(environment.clazz, method -> {
-            if (method.getName().equals("say")) {
-                return environment.hiMethodProxy;
-            } else {
-                return null;
-            }
-        });
-
-        Say sayHello = client.create(environment.clazz, method -> {
-            if (method.getName().equals("say")) {
-                return environment.helloMethodProxy;
-            } else {
-                return null;
-            }
-        });
+        Say sayHello = client.create(environment.clazz, environment.helloMethodProxy);
 
         doTest(sayHi, sayHello);
     }
@@ -144,29 +94,31 @@ public class ProxyClientTestHelper {
         Environment(boolean flag) {
             clazz = flag ? Say.class : SayDefault.class;
 
-            hiMethodProxy = (params, callable, method) -> {
-                try {
+            hiMethodProxy = (target, params, callable, method) -> {
+                if (method.getName().equals("say")) {
                     if (flag) {
                         Assert.assertNull(callable);
                     } else {
                         Assert.assertEquals(callable.call(), "default");
                     }
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                    return new Hello().hi((String) params[0]);
+                } else {
+                    return callable.call();
                 }
-                return new Hello().hi((String) params[0]);
+
             };
-            helloMethodProxy = (params, callable, method) -> {
-                try {
+            helloMethodProxy = (target, params, callable, method) -> {
+                if (method.getName().equals("say")) {
                     if (flag) {
                         Assert.assertNull(callable);
                     } else {
                         Assert.assertEquals(callable.call(), "default");
                     }
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                    return new Hello().hello((String) params[0]);
+                } else {
+                    return callable.call();
                 }
-                return new Hello().hello((String) params[0]);
+
             };
         }
     }
