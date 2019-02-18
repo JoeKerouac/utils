@@ -20,6 +20,24 @@ public class ProxyClientTestHelper {
         doCreate(true);
         doCreate(false);
         doObjectMethodTest(client);
+        doProxyParentMethodTest(client);
+
+    }
+
+    /**
+     * 测试
+     * @param client
+     */
+    public static void doProxyParentMethodTest(ProxyClient client) {
+        Interception interception = (target, params, invoker,
+                                     method) -> method.getName().equals("say") ? null
+                                         : invoker.call();
+        Say say = client.create(Say.class, interception);
+        Assert.assertTrue(say instanceof ProxyParent);
+        ProxyParent parent = (ProxyParent) say;
+        Assert.assertNull(parent.getTarget());
+        Assert.assertEquals(parent.getInterfaces().length, 1);
+        Assert.assertEquals(parent.getTargetClass(), Say.class);
     }
 
     /**

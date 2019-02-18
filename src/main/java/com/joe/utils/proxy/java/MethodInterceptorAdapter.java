@@ -3,8 +3,10 @@ package com.joe.utils.proxy.java;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
 import com.joe.utils.proxy.Interception;
+import com.joe.utils.proxy.ProxyParent;
 
 /**
  * @author JoeKerouac
@@ -22,17 +24,26 @@ public class MethodInterceptorAdapter implements InvocationHandler {
      */
     private final Object       target;
 
+    private final ProxyParent  proxyParent;
+
     public MethodInterceptorAdapter(Object target, Class<?> targetClass,
                                     Interception interception) {
         Assert.notNull(targetClass);
         Assert.notNull(interception);
         this.target = target;
         this.interception = interception;
+        this.proxyParent = new ProxyParent.InternalProxyParent(target, targetClass,
+            CollectionUtil.addTo(ProxyParent.class, targetClass.getInterfaces(), Class<?>[]::new));
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // 构建父方法调用
-        return Interception.invokeWrap(interception, target, method, proxy, args, null);
+        if (ProxyParent.canInvoke(method)) {
+            return Interception.invokeWrap(interception, null, method, proxy, args,
+                () -> ProxyParent.invoke(method, proxyParent));
+        } else {
+            return Interception.invokeWrap(interception, target, method, proxy, args, null);
+        }
     }
 }

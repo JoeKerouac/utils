@@ -3,8 +3,10 @@ package com.joe.utils.proxy.bytebuddy;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
 import com.joe.utils.proxy.Interception;
+import com.joe.utils.proxy.ProxyParent;
 
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
@@ -29,6 +31,8 @@ public class GeneralInterceptor {
      */
     private final Object       target;
 
+    private final ProxyParent  proxyParent;
+
     public GeneralInterceptor(Interception interception, Class<?> parent) {
         this(interception, parent, null);
     }
@@ -38,6 +42,8 @@ public class GeneralInterceptor {
         Assert.notNull(parent);
         this.interception = interception;
         this.target = target;
+        this.proxyParent = new ProxyParent.InternalProxyParent(target, parent,
+            CollectionUtil.addTo(ProxyParent.class, parent.getInterfaces(), Class<?>[]::new));
     }
 
     /**
@@ -63,6 +69,11 @@ public class GeneralInterceptor {
     @RuntimeType
     public Object interceptInterface(@AllArguments Object[] params,
                                      @Origin Method method) throws Throwable {
-        return Interception.invokeWrap(interception, null, method, null, params, null);
+        if (ProxyParent.canInvoke(method)) {
+            return Interception.invokeWrap(interception, null, method, null, params,
+                () -> ProxyParent.invoke(method, proxyParent));
+        } else {
+            return Interception.invokeWrap(interception, null, method, null, params, null);
+        }
     }
 }

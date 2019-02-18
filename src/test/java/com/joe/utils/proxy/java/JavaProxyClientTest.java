@@ -30,6 +30,7 @@ public class JavaProxyClientTest {
         Assert.assertEquals(say.say(str), "hi:" + str);
 
         ProxyClientTestHelper.doObjectMethodTest(client);
+        ProxyClientTestHelper.doProxyParentMethodTest(client);
     }
 
     public interface Say {

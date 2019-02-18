@@ -2,9 +2,11 @@ package com.joe.utils.proxy.cglib;
 
 import java.lang.reflect.Method;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
 import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.Invoker;
+import com.joe.utils.proxy.ProxyParent;
 
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -29,12 +31,17 @@ public class MethodInterceptorAdapter implements MethodInterceptor {
 
     private final Class<?>     parent;
 
+    private final ProxyParent  proxyParent;
+
     public MethodInterceptorAdapter(Interception proxy, Object target, Class<?> parent) {
         Assert.notNull(proxy);
         Assert.notNull(parent);
         this.proxy = proxy;
         this.target = target;
         this.parent = parent;
+
+        this.proxyParent = new ProxyParent.InternalProxyParent(target, parent,
+            CollectionUtil.addTo(ProxyParent.class, parent.getInterfaces(), Class<?>[]::new));
     }
 
     @Override
@@ -44,6 +51,12 @@ public class MethodInterceptorAdapter implements MethodInterceptor {
         if (!parent.isInterface()) {
             supperCall = () -> methodProxy.invokeSuper(obj, args);
         }
-        return Interception.invokeWrap(proxy, target, method, obj, args, supperCall);
+
+        if (ProxyParent.canInvoke(method)) {
+            return Interception.invokeWrap(proxy, null, method, obj, args,
+                () -> ProxyParent.invoke(method, proxyParent));
+        } else {
+            return Interception.invokeWrap(proxy, target, method, obj, args, supperCall);
+        }
     }
 }

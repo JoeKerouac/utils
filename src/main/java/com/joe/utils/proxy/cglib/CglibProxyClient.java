@@ -2,6 +2,7 @@ package com.joe.utils.proxy.cglib;
 
 import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.ProxyClient;
+import com.joe.utils.proxy.ProxyParent;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -17,7 +18,12 @@ public class CglibProxyClient implements ProxyClient {
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
                         Interception interception) {
         Enhancer enhancer = new Enhancer();
-        enhancer.setSuperclass(parent);
+        if (parent.isInterface()) {
+            enhancer.setInterfaces(new Class[] { ProxyParent.class, parent });
+        } else {
+            enhancer.setSuperclass(parent);
+            enhancer.setInterfaces(new Class[] { ProxyParent.class });
+        }
         enhancer.setClassLoader(loader);
         enhancer.setCallback(new MethodInterceptorAdapter(interception, proxy, parent));
         return (T) enhancer.create();

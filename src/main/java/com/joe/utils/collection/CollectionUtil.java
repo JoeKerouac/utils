@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.joe.utils.function.ArrayCreater;
 import com.joe.utils.math.MathUtil;
 
 /**
@@ -16,10 +17,25 @@ public final class CollectionUtil {
 
     public static <K, NEW, OLD> Map<K, NEW> convert(Map<K, OLD> map, Function<OLD, NEW> function) {
         Map<K, NEW> newMap = new HashMap<>();
-        map.forEach((k,v) -> {
+        map.forEach((k, v) -> {
             newMap.put(k, function.apply(v));
         });
         return newMap;
+    }
+
+    /**
+     * 将数据添加到指定数组的末尾
+     * @param target 要添加的数据
+     * @param array 目标数组
+     * @param creater 数组生成器
+     * @param <T> 数组类型
+     * @return 新数组
+     */
+    public static <T> T[] addTo(T target, T[] array, ArrayCreater<T> creater) {
+        T[] newArray = creater.create(array.length + 1);
+        System.arraycopy(array, 0, newArray, 0, array.length);
+        newArray[array.length] = target;
+        return newArray;
     }
 
     /**

@@ -5,6 +5,7 @@ import com.joe.utils.common.StringUtils;
 import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.ProxyClassLoader;
 import com.joe.utils.proxy.ProxyClient;
+import com.joe.utils.proxy.ProxyParent;
 import com.joe.utils.reflect.ClassUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class ByteBuddyProxyClient implements ProxyClient {
     @Override
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
                         Interception interception) {
-        DynamicType.Builder<T> builder = new ByteBuddy().subclass(parent);
+        DynamicType.Builder<T> builder = new ByteBuddy().subclass(parent).implement(ProxyParent.class);
 
         if (!StringUtils.isEmpty(name)) {
             builder = builder.name(name);
