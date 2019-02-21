@@ -24,6 +24,16 @@ public final class CollectionUtil {
     }
 
     /**
+     * 将边长数组返回
+     * @param args 边长数组
+     * @param <T> 数组类型
+     * @return 数组
+     */
+    public static <T> T[] array(T... args) {
+        return args;
+    }
+
+    /**
      * 将数据添加到指定数组的末尾
      * @param target 要添加的数据
      * @param array 目标数组
@@ -129,6 +139,15 @@ public final class CollectionUtil {
      */
     public static boolean safeIsEmpty(Object[] array) {
         return array == null || array.length == 0;
+    }
+
+    /**
+     * 安全的获取数组的长度
+     * @param array 数组
+     * @return 数组的长度，为null时返回0
+     */
+    public static int safeSizeOf(Object[] array) {
+        return array == null ? 0 : array.length;
     }
 
     /**

@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 
 import com.joe.utils.collection.LRUCacheMap;
 import com.joe.utils.common.Assert;
-import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.common.StringUtils;
+import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.scan.ClassScanner;
 
 import lombok.AllArgsConstructor;
@@ -63,6 +63,24 @@ public class ReflectUtil {
     }
 
     private ReflectUtil() {
+    }
+
+    /**
+     * 获取指定Class的指定参数构造器
+     * @param type 指定Class
+     * @param parameterTypes 构造器参数列表
+     * @param <T> 构造器类型
+     * @return 构造器
+     */
+    public static <T> Constructor<T> getConstructor(Class<T> type, Class<?>... parameterTypes) {
+        try {
+            return type.getConstructor(parameterTypes);
+        } catch (NoSuchMethodException e) {
+            log.error(StringUtils.format("类[{0}]中不存在参数列表为[{1}]的构造器", type,
+                parameterTypes == null ? "null" : Arrays.toString(parameterTypes)));
+            throw new ReflectException(StringUtils.format("类[{0}]中不存在参数列表为[{1}]的构造器", type,
+                parameterTypes == null ? "null" : Arrays.toString(parameterTypes)), e);
+        }
     }
 
     /**
@@ -118,10 +136,10 @@ public class ReflectUtil {
                     return allowAccess(clazz.getDeclaredMethod(methodName, parameterTypes));
                 } catch (NoSuchMethodException e) {
                     log.error(
-                        StringUtils.format("类[{}]中不存在方法名为[{}]、方法列表为[{}]的方法", clazz, methodName,
+                        StringUtils.format("类[{0}]中不存在方法名为[{1}]、方法列表为[{2}]的方法", clazz, methodName,
                             parameterTypes == null ? "null" : Arrays.toString(parameterTypes)));
                     throw new ReflectException(
-                        StringUtils.format("类[{}]中不存在方法名为[{}]、方法列表为[{}]的方法", clazz, methodName,
+                        StringUtils.format("类[{0}]中不存在方法名为[{1}]、方法列表为[{2}]的方法", clazz, methodName,
                             parameterTypes == null ? "null" : Arrays.toString(parameterTypes)),
                         e);
                 }
@@ -206,7 +224,7 @@ public class ReflectUtil {
             //不可能有这种情况
             throw new ReflectException(e);
         } catch (IllegalAccessException e) {
-            String msg = StringUtils.format("类型[{}]的字段[{}]不允许访问", obj.getClass(), fieldName);
+            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许访问", obj.getClass(), fieldName);
             log.error(msg);
             throw new ReflectException(msg, e);
         }
@@ -227,7 +245,7 @@ public class ReflectUtil {
         try {
             field.set(obj, fieldValue);
         } catch (IllegalAccessException e) {
-            String msg = StringUtils.format("类型[{}]的字段[{}]不允许设置", obj.getClass(), fieldName);
+            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许设置", obj.getClass(), fieldName);
             log.error(msg);
             throw new ReflectException(msg, e);
         }
@@ -248,9 +266,9 @@ public class ReflectUtil {
                 try {
                     return allowAccess(clazz.getDeclaredField(fieldName));
                 } catch (NoSuchFieldException e) {
-                    log.error(StringUtils.format("类[{}]中不存在字段[{}]", clazz, fieldName));
+                    log.error(StringUtils.format("类[{0}]中不存在字段[{1}]", clazz, fieldName));
                     throw new ReflectException(
-                        StringUtils.format("类[{}]中不存在字段[{}]", clazz, fieldName), e);
+                        StringUtils.format("类[{0}]中不存在字段[{1}]", clazz, fieldName), e);
                 }
             } else {
                 return v;
@@ -394,6 +412,17 @@ public class ReflectUtil {
     public static boolean isPublic(Executable executable) {
         int modifier = executable.getModifiers();
         return isPublic(modifier);
+    }
+
+    /**
+     * 判断方法、构造器是否是protected
+     *
+     * @param executable 方法、构造器对象
+     * @return 返回true表示是protected
+     */
+    public static boolean isProtected(Executable executable) {
+        int modifier = executable.getModifiers();
+        return isProtected(modifier);
     }
 
     /**
@@ -667,5 +696,15 @@ public class ReflectUtil {
      */
     private static boolean isPublic(int modifier) {
         return Modifier.isPublic(modifier);
+    }
+
+    /**
+     * 判断修饰符是否是protected
+     *
+     * @param modifier 修饰符
+     * @return 返回true表示是protected
+     */
+    private static boolean isProtected(int modifier) {
+        return Modifier.isProtected(modifier);
     }
 }

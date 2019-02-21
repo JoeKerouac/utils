@@ -3,6 +3,7 @@ package com.joe.utils.reflect;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
 
 /**
@@ -136,6 +137,25 @@ public class ClassUtils {
             Constructor<T> constructor = clazz.getConstructor();
             ReflectUtil.allowAccess(constructor);
             return constructor.newInstance();
+        } catch (Exception e) {
+            throw new ReflectException("获取类实例异常，可能是没有默认无参构造器", e);
+        }
+    }
+
+    /**
+     * 获取class的实例
+     * @param clazz class
+     * @param paramTypes 构造器参数类型
+     * @param params 参数
+     * @param <T> class类型
+     * @return Class实例
+     */
+    public static <T> T getInstance(Class<T> clazz, Class<?>[] paramTypes, Object[] params) {
+        Assert.isTrue(CollectionUtil.safeSizeOf(paramTypes) == CollectionUtil.safeSizeOf(params));
+        try {
+            Constructor<T> constructor = clazz.getConstructor(paramTypes);
+            ReflectUtil.allowAccess(constructor);
+            return constructor.newInstance(params);
         } catch (Exception e) {
             throw new ReflectException("获取类实例异常，可能是没有默认无参构造器", e);
         }

@@ -78,7 +78,7 @@ public interface ProxyParent {
         if (canInvoke(method)) {
             return metadata.invoke(proxyParent);
         } else {
-            throw new ProxyException(StringUtils.format("方法[{}]不是ProxyParent中声明的", method));
+            throw new ProxyException(StringUtils.format("方法[{0}]不是ProxyParent中声明的", method));
         }
     }
 

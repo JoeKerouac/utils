@@ -1,5 +1,6 @@
 package com.joe.utils.common;
 
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +19,16 @@ public class StringUtils {
     private static final String charsets[] = new String[] { "UTF-8", "UTF-16", "UTF-16LE",
                                                             "UTF-16BE", "UTF-32", "ISO-8859-1",
                                                             "US-ASCII", "GBK", "GB2312" };
+
+    /**
+     * 比较两个字符串是否相等（调用equals方法）
+     * @param arg0 第一个字符串
+     * @param arg1 第二个字符串
+     * @return
+     */
+    public static boolean equals(String arg0, String arg1) {
+        return arg0 == arg1 || (arg0 != null && arg0.equals(arg1));
+    }
 
     /**
      * 将目标字符串重复count次返回
@@ -56,13 +67,7 @@ public class StringUtils {
      * @return 字符串
      */
     public static String format(String templet, Object... args) {
-        if (args == null || args.length == 0) {
-            return templet;
-        }
-        for (Object arg : args) {
-            templet = templet.replaceFirst("\\{}", String.valueOf(arg));
-        }
-        return templet;
+        return MessageFormat.format(templet, args);
     }
 
     /**

@@ -106,7 +106,7 @@ public class LogbackReconfigure {
     private static void fallbackConfiguration(LoggerContext lc, List<SaxEvent> eventList,
                                               URL mainURL) {
         // failsafe events are used only in case of errors. Therefore, we must *not*
-        // invoke file inclusion since the included files may be the cause of the error.
+        // quickInvoke file inclusion since the included files may be the cause of the error.
 
         List<SaxEvent> failsafeEvents = removeIncludeEvents(eventList);
         JoranConfigurator joranConfigurator = new JoranConfigurator();
