@@ -1,6 +1,5 @@
 package com.joe.utils.log.log4j2.plugin.spring;
 
-import com.joe.utils.test.BaseTest;
 import org.apache.logging.log4j.LogManager;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.joe.utils.log.log4j2.plugin.Log4j2Test;
 import com.joe.utils.log.log4j2.plugin.impl.DefaultPropUtilTest;
+import com.joe.utils.test.BaseTest;
 
 /**
  * 集成spring的单元测试
@@ -33,7 +33,8 @@ public class SpringPropUtilTest extends BaseTest {
     public void doTestLog4j2() {
         runCase(() -> {
             SpringPropUtil.reconfigLog4j2(context);
-            org.apache.logging.log4j.Logger logger = LogManager.getLogger(DefaultPropUtilTest.class);
+            org.apache.logging.log4j.Logger logger = LogManager
+                .getLogger(DefaultPropUtilTest.class);
             Log4j2Test.checkInfo(logger);
         });
     }

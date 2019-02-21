@@ -1,8 +1,9 @@
 package com.joe.utils.proxy.bytebuddy;
 
+import org.junit.Test;
+
 import com.joe.utils.proxy.ProxyClient;
 import com.joe.utils.proxy.ProxyClientTestHelper;
-import org.junit.Test;
 
 /**
  * @author JoeKerouac
@@ -12,6 +13,7 @@ public class ByteBuddyProxyClientTest {
 
     @Test
     public void doTest() {
-        new ProxyClientTestHelper(ProxyClient.getInstance(ProxyClient.ClientType.BYTE_BUDDY)).doTest();
+        new ProxyClientTestHelper(ProxyClient.getInstance(ProxyClient.ClientType.BYTE_BUDDY))
+            .doTest();
     }
 }

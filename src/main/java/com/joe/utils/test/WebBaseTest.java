@@ -1,5 +1,7 @@
 package com.joe.utils.test;
 
+import java.util.concurrent.Callable;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
@@ -9,8 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.joe.utils.function.CustomFunction;
-
-import java.util.concurrent.Callable;
 
 /**
  * 提供基础的web测试环境，所有测试方法必须通过{@link #runCase(CustomFunction)}方法或者{@link #runCase(Callable)}方法执行，否则不

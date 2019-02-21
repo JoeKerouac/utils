@@ -1,9 +1,9 @@
 package com.joe.utils.redpacket;
 
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Random;
+
+import org.junit.Test;
 
 /**
  * @author JoeKerouac

@@ -23,7 +23,8 @@ public class TelnetException extends UtilsException {
         super(cause);
     }
 
-    protected TelnetException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected TelnetException(String message, Throwable cause, boolean enableSuppression,
+                              boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

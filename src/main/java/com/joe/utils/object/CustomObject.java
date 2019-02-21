@@ -15,7 +15,7 @@ public interface CustomObject<T> {
      */
     boolean in(T... args);
 
-    static <T>CustomObject<T> of(T object) {
+    static <T> CustomObject<T> of(T object) {
         return new CustomObjectImpl<>(object);
     }
 }

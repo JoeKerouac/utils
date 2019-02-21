@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.joe.utils.common.StringUtils;
+import com.joe.utils.reflect.ReflectUtil;
 import com.joe.utils.serialize.xml.XmlParser;
 import com.joe.utils.serialize.xml.XmlTypeConvert;
-import com.joe.utils.reflect.ReflectUtil;
 
 /**
  * xml解析器，只需要实现该类并且实现{@link #resolve()}方法即可解析pojo类型的字段

@@ -1,8 +1,8 @@
 package com.joe.utils.test;
 
-import com.joe.utils.function.CustomFunction;
-
 import java.util.concurrent.Callable;
+
+import com.joe.utils.function.CustomFunction;
 
 /**
  * @author JoeKerouac

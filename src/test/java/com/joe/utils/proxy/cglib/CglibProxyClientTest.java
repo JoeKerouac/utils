@@ -1,8 +1,9 @@
 package com.joe.utils.proxy.cglib;
 
+import org.junit.Test;
+
 import com.joe.utils.proxy.ProxyClient;
 import com.joe.utils.proxy.ProxyClientTestHelper;
-import org.junit.Test;
 
 /**
  * @author JoeKerouac

@@ -23,8 +23,9 @@ public class JsonParserTest {
 
     @Test
     public void doParse() {
-        Assert.assertEquals(parser.toJson(users) , usersJson);
-        Arrays.deepEquals(parser.readAsCollection(usersJson, ArrayList.class, User.class).toArray(), users.toArray());
+        Assert.assertEquals(parser.toJson(users), usersJson);
+        Arrays.deepEquals(parser.readAsCollection(usersJson, ArrayList.class, User.class).toArray(),
+            users.toArray());
     }
 
     @Data

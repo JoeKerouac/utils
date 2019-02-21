@@ -1,8 +1,8 @@
 package com.joe.utils.redpacket;
 
-import com.joe.utils.common.Assert;
-
 import java.security.SecureRandom;
+
+import com.joe.utils.common.Assert;
 
 /**
  * 红包工具

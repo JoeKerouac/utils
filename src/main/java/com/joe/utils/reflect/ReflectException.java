@@ -25,7 +25,8 @@ public class ReflectException extends UtilsException {
         super(cause);
     }
 
-    protected ReflectException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected ReflectException(String message, Throwable cause, boolean enableSuppression,
+                               boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

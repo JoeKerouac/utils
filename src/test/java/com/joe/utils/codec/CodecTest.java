@@ -2,9 +2,10 @@ package com.joe.utils.codec;
 
 import java.util.Arrays;
 
-import com.joe.utils.reflect.ReflectUtil;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.joe.utils.reflect.ReflectUtil;
 
 /**
  * @author joe

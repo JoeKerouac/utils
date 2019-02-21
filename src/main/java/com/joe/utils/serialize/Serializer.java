@@ -1,7 +1,5 @@
 package com.joe.utils.serialize;
 
-import java.util.concurrent.Callable;
-
 /**
  * 序列化接口，提供序列化能力
  *

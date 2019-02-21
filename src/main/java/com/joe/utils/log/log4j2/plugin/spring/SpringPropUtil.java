@@ -43,7 +43,8 @@ public class SpringPropUtil {
      * @param applicationContext spring应用上下文
      * @param context LoggerContext
      */
-    public static void reconfigLog4j2(ApplicationContext applicationContext, LoggerContext context) {
+    public static void reconfigLog4j2(ApplicationContext applicationContext,
+                                      LoggerContext context) {
         SpringPropUtil.environment = applicationContext.getEnvironment();
         Log4j2Helper.reconfigLog4j2(SpringPropPlugin.class, context);
     }

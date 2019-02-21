@@ -66,8 +66,8 @@ public class InvokeDistributeWraper<T> {
     public <R> R invoke(Method method, Object[] params) {
         Assert.notNull(method);
         if (!method.getDeclaringClass().isAssignableFrom(realTarget.getClass())) {
-            throw new InvokeException(StringUtils.format("方法[{0}]不是指定类[{1}]或者其父类的", method.getName(),
-                realTarget.getClass()));
+            throw new InvokeException(StringUtils.format("方法[{0}]不是指定类[{1}]或者其父类的",
+                method.getName(), realTarget.getClass()));
         }
 
         int modifier = method.getModifiers();

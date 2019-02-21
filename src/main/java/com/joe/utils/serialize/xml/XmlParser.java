@@ -2,13 +2,8 @@ package com.joe.utils.serialize.xml;
 
 import java.io.StringReader;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import com.joe.utils.exception.ExceptionWraper;
-import com.joe.utils.serialize.SerializeException;
-import com.joe.utils.serialize.Serializer;
-import com.joe.utils.serialize.xml.converter.XmlTypeConverterUtil;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -19,9 +14,13 @@ import org.xml.sax.SAXException;
 
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.StringUtils;
+import com.joe.utils.exception.ExceptionWraper;
 import com.joe.utils.reflect.BeanUtils;
 import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
 import com.joe.utils.reflect.ReflectUtil;
+import com.joe.utils.serialize.SerializeException;
+import com.joe.utils.serialize.Serializer;
+import com.joe.utils.serialize.xml.converter.XmlTypeConverterUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

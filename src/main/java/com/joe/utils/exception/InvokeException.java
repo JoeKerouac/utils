@@ -1,7 +1,5 @@
 package com.joe.utils.exception;
 
-import com.joe.utils.exception.UtilsException;
-
 /**
  * 调用异常
  *
@@ -24,7 +22,8 @@ public class InvokeException extends UtilsException {
         super(cause);
     }
 
-    public InvokeException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public InvokeException(String message, Throwable cause, boolean enableSuppression,
+                           boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -6,12 +6,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 
-import com.joe.utils.test.BaseTest;
-import com.joe.utils.test.TestException;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.joe.utils.test.BaseTest;
+import com.joe.utils.test.TestException;
 
 /**
  * @author joe
@@ -107,7 +107,6 @@ public class ClusterManagerTest extends BaseTest {
     public void junitInit() {
         skipAll(true);
     }
-
 
     @Override
     protected void init() {

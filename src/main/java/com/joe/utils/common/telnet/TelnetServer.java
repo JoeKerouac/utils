@@ -41,7 +41,7 @@ public class TelnetServer {
     /**
      * kill命令hook
      */
-    private Thread             shutdownHook;
+    private Thread               shutdownHook;
 
     /**
      * 命令处理器

@@ -1,9 +1,7 @@
 package com.joe.utils.log.logback;
 
 import java.io.InputStream;
-import java.util.concurrent.Semaphore;
 
-import com.joe.utils.test.BaseTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 
 import com.joe.utils.log.logback.spring.SpringBootLogbackReconfigure;
+import com.joe.utils.test.BaseTest;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -26,7 +25,7 @@ public class LogbackReconfigureTest extends BaseTest {
      * 测试使用LogbackReconfigure重新配置logback
      */
     @Test
-    public void doReconfigureByContext()  {
+    public void doReconfigureByContext() {
         runCase(() -> {
             assertLevel("INFO");
             //更改logback配置
@@ -39,7 +38,7 @@ public class LogbackReconfigureTest extends BaseTest {
      * 测试在spring-boot环境下LogbackReconfigure重新配置失效
      */
     @Test
-    public void doLogbackInSpringBoot()  {
+    public void doLogbackInSpringBoot() {
         runCase(() -> {
             assertLevel("INFO");
             //使用logback重配
@@ -56,7 +55,7 @@ public class LogbackReconfigureTest extends BaseTest {
      * 测试SpringBootLogbackReconfigure
      */
     @Test
-    public void doSpringBootLogbackReconfigure()  {
+    public void doSpringBootLogbackReconfigure() {
         runCase(() -> {
             assertLevel("INFO");
             //使用SpringBootLogbackReconfigure重配logback

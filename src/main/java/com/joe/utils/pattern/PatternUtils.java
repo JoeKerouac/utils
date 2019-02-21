@@ -24,7 +24,8 @@ public class PatternUtils {
     /**
      * 匹配数字正则（开头不能是0，末尾可以是0）
      */
-    private static Pattern       NUMBER_PARTER     = Pattern.compile("-?(([1-9]+\\d*(\\.\\d+)?)|(0\\.\\d+))");
+    private static Pattern       NUMBER_PARTER     = Pattern
+        .compile("-?(([1-9]+\\d*(\\.\\d+)?)|(0\\.\\d+))");
     /**
      * 匹配数字字符串，只要字符串包含的只有数字即可
      */

@@ -18,10 +18,10 @@ public class ThreadUtilTest {
         ExecutorService service = ThreadUtil.createPool(ThreadUtil.PoolType.Calc);
         int count = 1000;
         CountDownLatch latch = new CountDownLatch(count);
-        for(int i = 0 ; i < count ; i++) {
+        for (int i = 0; i < count; i++) {
             service.submit(() -> latch.countDown());
         }
-        latch.await(5 , TimeUnit.SECONDS);
+        latch.await(5, TimeUnit.SECONDS);
         Assert.assertTrue(latch.getCount() == 0);
     }
 }

@@ -124,7 +124,7 @@ public class ObjectPool<T> {
         }
 
         @Override
-        protected void finalize()  {
+        protected void finalize() {
             this.close();
         }
     }

@@ -28,7 +28,8 @@ public class ByteBuddyProxyClient implements ProxyClient {
     @Override
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
                         Interception interception) {
-        DynamicType.Builder<T> builder = new ByteBuddy().subclass(parent).implement(ProxyParent.class);
+        DynamicType.Builder<T> builder = new ByteBuddy().subclass(parent)
+            .implement(ProxyParent.class);
 
         if (!StringUtils.isEmpty(name)) {
             builder = builder.name(name);
