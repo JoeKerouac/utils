@@ -13,6 +13,7 @@ public class AsmInvokeDistributeFactoryTest {
     private String name = "joe";
 
     @Test
+    @SuppressWarnings("unchecked")
     public void test() {
         User user = new User();
         InvokeDistributeWraper<User> wraper = new InvokeDistributeWraper<>(user);
@@ -23,6 +24,7 @@ public class AsmInvokeDistributeFactoryTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testNotFound() {
         User user = new User();
         InvokeDistributeWraper<User> wraper = new InvokeDistributeWraper<>(user);
