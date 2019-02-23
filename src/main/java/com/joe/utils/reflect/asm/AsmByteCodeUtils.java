@@ -11,7 +11,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import com.joe.utils.reflect.ByteCodeUtils;
-import com.joe.utils.reflect.ReflectUtil;
+import com.joe.utils.reflect.MethodConst;
 
 /**
  * Asm byte code 工具
@@ -22,13 +22,13 @@ import com.joe.utils.reflect.ReflectUtil;
 public class AsmByteCodeUtils {
 
     /**
-     * String的equals方法
+     * 动态类计数器，用于生成动态类的名字
      */
-    private static final Method        EQUALAS_METHOD = ReflectUtil.getMethod(String.class,
-        "equals", Object.class);
-
     private static final AtomicInteger COUNTER        = new AtomicInteger(0);
 
+    /**
+     * 生成的动态类的前缀
+     */
     private static final String        PRE_CLASS_NAME = "com.joe.reflect.asm.Proxy$";
 
     /**
@@ -81,7 +81,7 @@ public class AsmByteCodeUtils {
         mv.visitLdcInsn(content);
         // 调用String的equals方法
         mv.visitMethodInsn(INVOKEVIRTUAL, convert(String.class), "equals",
-            ByteCodeUtils.getMethodDesc(EQUALAS_METHOD), false);
+            ByteCodeUtils.getMethodDesc(MethodConst.EQUALAS_METHOD), false);
         // 如果结果为false则跳转到下一个
         mv.visitJumpInsn(IFEQ, next);
         success.run();

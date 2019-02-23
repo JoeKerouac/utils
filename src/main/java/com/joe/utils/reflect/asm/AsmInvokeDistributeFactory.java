@@ -9,13 +9,16 @@ import static org.objectweb.asm.Opcodes.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
+import com.joe.utils.common.IOUtils;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.exception.InvokeException;
 import com.joe.utils.reflect.*;
@@ -51,10 +54,6 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
         Assert.notNull(nowVersion);
         if (nowVersion.startsWith("1.8")) {
             version = V1_8;
-        } else if (nowVersion.startsWith("1.7")) {
-            version = V1_7;
-        } else if (nowVersion.startsWith("1.6")) {
-            version = V1_6;
         } else {
             throw new InvokeException("不支持的java版本:" + nowVersion);
         }
@@ -66,6 +65,7 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
                                          DynamicClassLoader classLoader) {
         Assert.notNull(clazz);
 
+        // 校验给定的class
         {
             if (InvokeDistribute.class.isAssignableFrom(clazz)) {
                 return (Class<InvokeDistribute>) clazz;
@@ -78,8 +78,8 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
             }
         }
 
+        // 校验构造器
         {
-            // 校验构造器
             try {
                 Constructor<?> constructor = clazz.getDeclaredConstructor();
                 if (!ReflectUtil.isPublic(constructor)) {
@@ -110,6 +110,11 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
 
         // 开始生成
         byte[] byteCode = buildByteCode(clazz, className);
+        try {
+            IOUtils.saveAsFile(byteCode, "/Users/joekerouac/workspace/code/Ab.class");
+        } catch (Exception e) {
+
+        }
         return classLoader.buildClass(className, byteCode, 0, byteCode.length);
     }
 
@@ -158,36 +163,66 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
             DISTRIBUTE_METHOD_NAME, // name
             DISTRIBUTE_METHOD_DESC, // descriptor
             null, // signature (null means not generic)
-            null); // exceptions (array of strings)
+            CollectionUtil.array(convert(NoSuchMethodException.class))); // exceptions (array of strings)
         // 开始方法区
         mv.visitCode();
 
-        Method[] methods = parentClass.getDeclaredMethods();
+        // 判断要调用那个方法，然后将动态调用转化为对应的本地调用
+        {
+            List<Method> allMethod = ReflectUtil.getAllMethod(parentClass);
 
-        Label next = new Label();
-        Label start = new Label();
-        for (Method method : methods) {
-            // 只处理非静态的public方法和protected方法
-            if (Modifier.isStatic(method.getModifiers())
-                || (!ReflectUtil.isPublic(method) && !ReflectUtil.isProtected(method))) {
-                continue;
+            Label next = new Label();
+            Label start = new Label();
+            for (Method method : allMethod) {
+                // 只处理非静态的public方法和protected方法
+                if (Modifier.isStatic(method.getModifiers())
+                    || (!ReflectUtil.isPublic(method) && !ReflectUtil.isProtected(method))) {
+                    continue;
+                }
+
+                createIf(mv, method, next, start, className, parentClass);
+                start = next;
+                next = new Label();
             }
-
-            createIf(mv, method, next, start, className, parentClass);
-            start = next;
-            next = new Label();
+            // 结束位置标记
+            mv.visitLabel(start);
+            mv.visitFrame(F_SAME, 0, null, 0, null);
         }
-        // 结束位置标记
-        mv.visitLabel(start);
-        mv.visitFrame(F_SAME, 0, null, 0, null);
-        // 默认抛出Error，不应该有这种情况
-        mv.visitTypeInsn(NEW, convert(Error.class));
-        mv.visitInsn(DUP);
-        mv.visitLdcInsn("method not found");
-        mv.visitMethodInsn(INVOKESPECIAL, convert(Error.class), INIT,
-            getConstructorDesc(ERROR_CONSTRUCTOR), false);
-        mv.visitInsn(ATHROW);
-        mv.visitMaxs(0, 0);
+
+        // throw new NoSuchMethodException(String.format("method [%s:%s:%s] not found", owner, methodName, desc));
+        {
+            // 默认抛出Error，不应该有这种情况
+            mv.visitTypeInsn(NEW, convert(NoSuchMethodException.class));
+            mv.visitInsn(DUP);
+            mv.visitLdcInsn("method [%s:%s:%s] not found");
+            mv.visitInsn(ICONST_3);
+            mv.visitTypeInsn(ANEWARRAY, convert(Object.class));
+            mv.visitInsn(DUP);
+
+            mv.visitInsn(ICONST_0);
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitInsn(AASTORE);
+            mv.visitInsn(DUP);
+
+            mv.visitInsn(ICONST_1);
+            mv.visitVarInsn(ALOAD, 2);
+            mv.visitInsn(AASTORE);
+            mv.visitInsn(DUP);
+
+            mv.visitInsn(ICONST_2);
+            mv.visitVarInsn(ALOAD, 3);
+            mv.visitInsn(AASTORE);
+
+            mv.visitMethodInsn(INVOKESTATIC, convert(String.class),
+                MethodConst.FORMAT_METHOD.getName(), getMethodDesc(MethodConst.FORMAT_METHOD),
+                false);
+
+            mv.visitMethodInsn(INVOKESPECIAL, convert(NoSuchMethodException.class), INIT,
+                getConstructorDesc(ERROR_CONSTRUCTOR), false);
+            mv.visitInsn(ATHROW);
+            mv.visitMaxs(0, 0);
+        }
+
         mv.visitEnd();
     }
 
@@ -203,38 +238,42 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
         // 标记分支开始位置
         mv.visitLabel(start);
         mv.visitFrame(F_SAME, 0, null, 0, null);
-        // 首先比较方法名
-        stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 2), method.getName(), next, () -> {
-            // 方法名一致再比较方法说明
-            stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 3), ByteCodeUtils.getMethodDesc(method),
-                next, () -> {
-                    // 方法说明也一致后执行方法
-                    invokeMethod(mv, method, () -> {
-                        // 调用代理对象对应的方法而不是本代理的方法
-                        mv.visitVarInsn(ALOAD, 0);
-                        mv.visitFieldInsn(GETFIELD, convert(className), TARGET_FIELD_NAME,
-                            getByteCodeType(parentClass));
-                        // 获取参数数量，用于载入参数
-                        int count = method.getParameterCount();
-                        Class<?>[] types = method.getParameterTypes();
+        // 比较方法声明类
+        stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 1), convert(method.getDeclaringClass()), next,
+            () -> {
+                // 比较方法名
+                stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 2), method.getName(), next, () -> {
+                    // 方法名一致再比较方法说明
+                    stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 3),
+                        ByteCodeUtils.getMethodDesc(method), next, () -> {
+                            // 方法说明也一致后执行方法
+                            invokeMethod(mv, method, () -> {
+                                // 调用代理对象对应的方法而不是本代理的方法
+                                mv.visitVarInsn(ALOAD, 0);
+                                mv.visitFieldInsn(GETFIELD, convert(className), TARGET_FIELD_NAME,
+                                    getByteCodeType(parentClass));
+                                // 获取参数数量，用于载入参数
+                                int count = method.getParameterCount();
+                                Class<?>[] types = method.getParameterTypes();
 
-                        // 循环载入参数
-                        for (int i = 0; i < count; i++) {
-                            mv.visitVarInsn(Opcodes.ALOAD, 4);
-                            // 这里注意，访问数组下标0-5和6-无穷是不一样的
-                            // 访问0-5对应的byte code：  aload | iconst_[0-5] | aaload
-                            // 访问下标大于5的byte code: aload | bipush [6-无穷] aaload
-                            if (i <= 5) {
-                                mv.visitInsn(ICONST_0 + i);
-                            } else {
-                                mv.visitIntInsn(BIPUSH, i);
-                            }
-                            mv.visitInsn(Opcodes.AALOAD);
-                            mv.visitTypeInsn(CHECKCAST, convert(types[i]));
-                        }
-                    });
+                                // 循环载入参数
+                                for (int i = 0; i < count; i++) {
+                                    mv.visitVarInsn(Opcodes.ALOAD, 4);
+                                    // 这里注意，访问数组下标0-5和6-无穷是不一样的
+                                    // 访问0-5对应的byte code：  aload | iconst_[0-5] | aaload
+                                    // 访问下标大于5的byte code: aload | bipush [6-无穷] aaload
+                                    if (i <= 5) {
+                                        mv.visitInsn(ICONST_0 + i);
+                                    } else {
+                                        mv.visitIntInsn(BIPUSH, i);
+                                    }
+                                    mv.visitInsn(Opcodes.AALOAD);
+                                    mv.visitTypeInsn(CHECKCAST, convert(types[i]));
+                                }
+                            });
+                        });
                 });
-        });
+            });
     }
 
     /**

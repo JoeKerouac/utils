@@ -26,31 +26,50 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ReflectUtil {
-    private static final Pattern                        superPattern    = Pattern
+    private static final Pattern                             superPattern     = Pattern
         .compile("(.*) super.*");
-    private static final Pattern                        extendsPattern  = Pattern
+    private static final Pattern                             extendsPattern   = Pattern
         .compile("(.*) extends.*");
-    private static final ClassScanner                   CLASS_SCANNER   = ClassScanner
+    private static final ClassScanner                        CLASS_SCANNER    = ClassScanner
         .getInstance();
+
     /**
      * 方法缓存
      */
-    private static final Map<MethodKey, Method>         METHOD_CACHE    = new LRUCacheMap<>();
+    private static final Map<MethodKey, Method>              METHOD_CACHE     = new LRUCacheMap<>();
     /**
      * field缓存
      */
-    private static final Map<FieldKey, Field>           FIELD_CACHE     = new LRUCacheMap<>();
+    private static final Map<FieldKey, Field>                FIELD_CACHE      = new LRUCacheMap<>();
+
     /**
      * 所有field缓存
      */
-    private static final LRUCacheMap<Class<?>, Field[]> ALL_FIELD_CACHE = new LRUCacheMap<>();
+    private static final LRUCacheMap<Class<?>, Field[]>      ALL_FIELD_CACHE  = new LRUCacheMap<>();
+
+    /**
+     * 所有方法缓存
+     */
+    private static final LRUCacheMap<Class<?>, List<Method>> ALL_METHOD_CACHE = new LRUCacheMap<>();
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     private static class MethodKey {
+
+        /**
+         * 方法名
+         */
         private String     methodName;
+
+        /**
+         * 方法声明类
+         */
         private Class<?>   clazz;
+
+        /**
+         * 参数类型
+         */
         private Class<?>[] parameterTypes;
     }
 
@@ -117,6 +136,68 @@ public class ReflectUtil {
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new ReflectException("调用方法[" + method + "]失败", e);
         }
+    }
+
+    /**
+     * 获取指定类型和其父类型、接口中声明的所有方法（除了Object中声明的方法），如果对于方法M，类A中对方法M实现了M1，类B中
+     * 对方法M实现了M2，类A继承了类B，传入参数为类A，那么返回的列表中将包含M1而不包含M2
+     * @param clazz 指定类型
+     * @return 指定类型和其父类型、接口中声明的所有方法（除了Object中声明的方法）
+     */
+    public static List<Method> getAllMethod(Class<?> clazz) {
+        return ALL_METHOD_CACHE.compute(clazz, (key, value) -> {
+            if (value == null) {
+                List<Method> methods = new ArrayList<>();
+                Map<String, Method> methodMap = getAllMethod(key, new HashMap<>());
+
+                methodMap.forEach((k, v) -> methods.add(v));
+                return methods;
+            } else {
+                return value;
+            }
+        });
+    }
+
+    /**
+     * 获取指定类的所有方法（不包含接口方法）
+     * @param clazz Class类型
+     * @param methods 方法集合
+     * @return 方法集合
+     */
+    private static Map<String, Method> getAllMethod(Class<?> clazz, Map<String, Method> methods) {
+        if (clazz == null || clazz == Object.class) {
+            return methods;
+        }
+
+        Arrays.stream(clazz.getDeclaredMethods()).forEach(method -> {
+            String key = String.format("%s:%s", method.getName(),
+                ByteCodeUtils.getMethodDesc(method));
+            Method m = methods.get(key);
+            if (m == null || (m.getDeclaringClass().isInterface()
+                              && !method.getDeclaringClass().isInterface())) {
+                methods.put(key, method);
+            }
+        });
+
+        Arrays.stream(clazz.getInterfaces()).forEach(c -> getAllMethod(c, methods));
+
+        return getAllMethod(clazz.getSuperclass(), methods);
+    }
+
+    /**
+     * 过滤方法，选出最靠近声明类的方法，例如对于方法M，类A中对方法M实现了M1，类A继承了类B，类B中对方法M实现了M2，使用类A作
+     * 为declareClass，集合中包含M1和M2，那么最终将返回M1而不是M2
+     * @param methods 方法集合
+     * @param declareClass 声明类（最底层的子类）
+     * @return 方法集合中最接近声明类的方法
+     */
+    public static Method filter(List<Method> methods, Class<?> declareClass) {
+        if (declareClass == null) {
+            return null;
+        }
+        Optional<Method> optional = methods.stream()
+            .filter(method -> method.getDeclaringClass() == declareClass).limit(1).findFirst();
+        return optional.orElse(filter(methods, declareClass.getSuperclass()));
     }
 
     /**

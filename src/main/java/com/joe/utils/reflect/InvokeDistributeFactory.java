@@ -45,7 +45,7 @@ public interface InvokeDistributeFactory {
      * @return 对target生成的InvokeDistribute代理
      */
     default InvokeDistribute build(Object target, String className) {
-        return build(target, className);
+        return build(target, className, null);
     }
 
     /**
