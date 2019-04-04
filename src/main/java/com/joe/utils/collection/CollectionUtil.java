@@ -16,6 +16,36 @@ import com.joe.utils.math.MathUtil;
 public final class CollectionUtil {
 
     /**
+     * 比较两个数组长度是否一致
+     * @param arg0 数组1
+     * @param arg1 数组2
+     * @return 返回true表示长度相等，该方法会认为null数组的长度为0
+     */
+    public static boolean sizeEquals(Object[] arg0, Object[] arg1) {
+        return safeSizeOf(arg0) == safeSizeOf(arg1);
+    }
+
+    /**
+     * 比较两个数组长度是否一致
+     * @param arg0 集合1
+     * @param arg1 集合2
+     * @return 返回true表示长度相等，该方法会认为null的长度为0
+     */
+    public static boolean sizeEquals(Collection<?> arg0, Collection<?> arg1) {
+        return safeSizeOf(arg0) == safeSizeOf(arg1);
+    }
+
+    /**
+     * 比较两个map长度是否一致
+     * @param arg0 map1
+     * @param arg1 map2
+     * @return 返回true表示长度相等，该方法会认为null的长度为0
+     */
+    public static boolean sizeEquals(Map<?, ?> arg0, Map<?, ?> arg1) {
+        return safeSizeOf(arg0) == safeSizeOf(arg1);
+    }
+
+    /**
      * map转换
      * @param map 要转换的map
      * @param function 转换函数
@@ -135,7 +165,7 @@ public final class CollectionUtil {
      * @return 返回true表示空
      */
     public static boolean safeIsEmpty(Collection collection) {
-        return collection == null || collection.isEmpty();
+        return safeSizeOf(collection) == 0;
     }
 
     /**
@@ -145,7 +175,17 @@ public final class CollectionUtil {
      * @return 返回true表示空
      */
     public static boolean safeIsEmpty(Object[] array) {
-        return array == null || array.length == 0;
+        return safeSizeOf(array) == 0;
+    }
+
+    /**
+     * 安全判断集合是否为空
+     *
+     * @param map map集合
+     * @return 返回true表示空
+     */
+    public static boolean safeIsEmpty(Map<?, ?> map) {
+        return safeSizeOf(map) == 0;
     }
 
     /**
@@ -158,13 +198,21 @@ public final class CollectionUtil {
     }
 
     /**
-     * 安全判断集合是否为空
-     *
-     * @param map map集合
-     * @return 返回true表示空
+     * 安全的获取集合的长度
+     * @param array 集合
+     * @return 集合的长度，为null时返回0
      */
-    public static boolean safeIsEmpty(Map<?, ?> map) {
-        return map == null || map.isEmpty();
+    public static int safeSizeOf(Collection<?> array) {
+        return array == null ? 0 : array.size();
+    }
+
+    /**
+     * 安全的获取map的长度
+     * @param array map
+     * @return map的长度，为null时返回0
+     */
+    public static int safeSizeOf(Map<?, ?> array) {
+        return array == null ? 0 : array.size();
     }
 
     /**

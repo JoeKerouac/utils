@@ -1,5 +1,6 @@
 package com.joe.utils.proxy.cglib;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.ProxyClient;
 import com.joe.utils.proxy.ProxyParent;
@@ -18,6 +19,10 @@ public class CglibProxyClient implements ProxyClient {
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
                         Interception interception, Class<?>[] paramTypes, Object[] params) {
+        if (!CollectionUtil.sizeEquals(params, paramTypes)) {
+            throw new IllegalArgumentException("构造器参数列表paramTypes长度和实际参数params长度不一致");
+        }
+
         Enhancer enhancer = new Enhancer();
         if (parent.isInterface()) {
             enhancer.setInterfaces(new Class[] { ProxyParent.class, parent });
@@ -27,7 +32,11 @@ public class CglibProxyClient implements ProxyClient {
         }
         enhancer.setClassLoader(loader);
         enhancer.setCallback(new MethodInterceptorAdapter(interception, proxy, parent));
-        return (T) enhancer.create(paramTypes, params);
+        if (CollectionUtil.safeIsEmpty(paramTypes)) {
+            return (T) enhancer.create();
+        }else{
+            return (T) enhancer.create(paramTypes, params);
+        }
     }
 
     /**

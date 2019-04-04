@@ -2,6 +2,7 @@ package com.joe.utils.proxy.java;
 
 import java.lang.reflect.Proxy;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.ProxyClient;
 import com.joe.utils.proxy.ProxyException;
@@ -24,6 +25,10 @@ public class JavaProxyClient implements ProxyClient {
     @SuppressWarnings("unchecked")
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
                         Interception interception, Class<?>[] paramTypes, Object[] params) {
+        if (!CollectionUtil.sizeEquals(params, paramTypes)) {
+            throw new IllegalArgumentException("构造器参数列表paramTypes长度和实际参数params长度不一致");
+        }
+
         return (T) Proxy.newProxyInstance(loader, new Class[] { parent, ProxyParent.class },
             new MethodInterceptorAdapter(proxy, parent, interception));
     }

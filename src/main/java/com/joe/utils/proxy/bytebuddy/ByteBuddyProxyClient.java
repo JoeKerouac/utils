@@ -28,6 +28,10 @@ public class ByteBuddyProxyClient implements ProxyClient {
     @Override
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
                         Interception interception, Class<?>[] paramTypes, Object[] params) {
+        if (!CollectionUtil.sizeEquals(params, paramTypes)) {
+            throw new IllegalArgumentException("构造器参数列表paramTypes长度和实际参数params长度不一致");
+        }
+
         return ClassUtils.getInstance(createClass(parent, proxy, loader, name, interception),
             paramTypes, params);
     }
