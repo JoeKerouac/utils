@@ -10,7 +10,8 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
 import com.joe.utils.codec.IBase64;
-import com.joe.utils.pool.ObjectPool;
+import com.joe.utils.pool.ObjectPoolImpl;
+import com.joe.utils.pool.PooledObject;
 import com.joe.utils.secure.CipherUtil;
 import com.joe.utils.secure.exception.SecureException;
 
@@ -27,12 +28,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class AbstractCipher implements CipherUtil {
-    private static final Map<String, ObjectPool<CipherHolder>> CACHE   = new ConcurrentHashMap<>();
-    protected static final IBase64                             BASE_64 = new IBase64();
-    private String                                             id;
-    private Algorithms                                         algorithms;
-    private Key                                                priKey;
-    private Key                                                pubKey;
+    private static final Map<String, ObjectPoolImpl<CipherHolder>> CACHE   = new ConcurrentHashMap<>();
+    protected static final IBase64                                 BASE_64 = new IBase64();
+    private String                                                 id;
+    private Algorithms                                             algorithms;
+    private Key                                                    priKey;
+    private Key                                                    pubKey;
 
     AbstractCipher(String id, Algorithms algorithms, Key priKey, Key pubKey) {
         this.id = id.intern();
@@ -41,7 +42,7 @@ public abstract class AbstractCipher implements CipherUtil {
         this.pubKey = pubKey;
 
         CACHE.computeIfAbsent(this.id, key -> {
-            ObjectPool<CipherHolder> pool = new ObjectPool<>(this::build);
+            ObjectPoolImpl<CipherHolder> pool = new ObjectPoolImpl<>(this::build);
             //快速验证
             pool.get().close();
             return pool;
@@ -96,7 +97,7 @@ public abstract class AbstractCipher implements CipherUtil {
 
     @Override
     public byte[] encrypt(byte[] content) {
-        try (ObjectPool.PoolObjectHolder<CipherHolder> holder = CACHE.get(id).get()) {
+        try (PooledObject<CipherHolder> holder = CACHE.get(id).get()) {
             return encrypt(holder.get(), content);
         }
     }
@@ -108,7 +109,7 @@ public abstract class AbstractCipher implements CipherUtil {
 
     @Override
     public byte[] decrypt(byte[] content) {
-        try (ObjectPool.PoolObjectHolder<CipherHolder> holder = CACHE.get(id).get()) {
+        try (PooledObject<CipherHolder> holder = CACHE.get(id).get()) {
             return decrypt(holder.get(), content);
         }
     }

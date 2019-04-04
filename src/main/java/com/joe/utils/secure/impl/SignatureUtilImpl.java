@@ -11,7 +11,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.joe.utils.codec.IBase64;
-import com.joe.utils.pool.ObjectPool;
+import com.joe.utils.pool.ObjectPoolImpl;
+import com.joe.utils.pool.PooledObject;
 import com.joe.utils.secure.KeyTools;
 import com.joe.utils.secure.SignatureUtil;
 import com.joe.utils.secure.exception.SecureException;
@@ -29,12 +30,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class SignatureUtilImpl implements SignatureUtil {
-    private static final IBase64                                  BASE_64 = new IBase64();
-    private static final Map<String, ObjectPool<SignatureHolder>> CACHE   = new ConcurrentHashMap<>();
+    private static final IBase64                                      BASE_64 = new IBase64();
+    private static final Map<String, ObjectPoolImpl<SignatureHolder>> CACHE   = new ConcurrentHashMap<>();
     /**
      * ID
      */
-    private final String                                          id;
+    private final String                                              id;
 
     /**
      * 默认构造器
@@ -47,7 +48,7 @@ public class SignatureUtilImpl implements SignatureUtil {
         this.id = (privateKey + ":" + publicKey + ":" + algorithms.toString()).intern();
 
         CACHE.computeIfAbsent(this.id, id -> {
-            ObjectPool<SignatureHolder> pool = new ObjectPool<>(
+            ObjectPoolImpl<SignatureHolder> pool = new ObjectPoolImpl<>(
                 () -> buildSignatureHolder(privateKey, publicKey, algorithms));
             //快速验证
             pool.get().close();
@@ -87,7 +88,7 @@ public class SignatureUtilImpl implements SignatureUtil {
      */
     @Override
     public byte[] sign(byte[] content) {
-        try (ObjectPool.PoolObjectHolder<SignatureHolder> holder = CACHE.get(id).get()) {
+        try (PooledObject<SignatureHolder> holder = CACHE.get(id).get()) {
             Signature signature = holder.get().getSign();
             signature.update(content);
             return BASE_64.encrypt(signature.sign());
@@ -117,7 +118,7 @@ public class SignatureUtilImpl implements SignatureUtil {
      */
     @Override
     public boolean checkSign(byte[] content, byte[] data) {
-        try (ObjectPool.PoolObjectHolder<SignatureHolder> holder = CACHE.get(id).get()) {
+        try (PooledObject<SignatureHolder> holder = CACHE.get(id).get()) {
             Signature signature = holder.get().getVerify();
             signature.update(content);
             return signature.verify(BASE_64.decrypt(data));

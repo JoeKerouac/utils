@@ -1,5 +1,6 @@
 package com.joe.utils.reflect;
 
+import static com.joe.utils.reflect.AccessorUtil.isFinal;
 import static com.joe.utils.reflect.ReflectUtil.*;
 
 import java.beans.IntrospectionException;
@@ -530,7 +531,7 @@ public class BeanUtils {
          * @return 返回true表示该字段是八大基本类型
          */
         public boolean isGeneralType() {
-            return ReflectUtil.isGeneralType(type);
+            return JavaTypeUtil.isGeneralType(type);
         }
 
         /**
@@ -539,7 +540,7 @@ public class BeanUtils {
          * @return 返回true表示该字段是八大基本类型的封装类型
          */
         public boolean isBasic() {
-            return ReflectUtil.isBasic(type);
+            return JavaTypeUtil.isBasic(type);
         }
 
         /**

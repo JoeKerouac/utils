@@ -15,11 +15,18 @@ import com.joe.utils.math.MathUtil;
  */
 public final class CollectionUtil {
 
+    /**
+     * map转换
+     * @param map 要转换的map
+     * @param function 转换函数
+     * @param <K> KEY类型
+     * @param <NEW> 转换后的value类型
+     * @param <OLD> 转换前的value类型
+     * @return 转换后的map
+     */
     public static <K, NEW, OLD> Map<K, NEW> convert(Map<K, OLD> map, Function<OLD, NEW> function) {
         Map<K, NEW> newMap = new HashMap<>();
-        map.forEach((k, v) -> {
-            newMap.put(k, function.apply(v));
-        });
+        map.forEach((k, v) -> newMap.put(k, function.apply(v)));
         return newMap;
     }
 

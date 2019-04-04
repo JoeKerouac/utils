@@ -4,6 +4,7 @@ import java.lang.reflect.Proxy;
 
 import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.ProxyClient;
+import com.joe.utils.proxy.ProxyException;
 import com.joe.utils.proxy.ProxyParent;
 
 /**
@@ -20,9 +21,18 @@ public class JavaProxyClient implements ProxyClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
-                        Interception interception) {
+                        Interception interception, Class<?>[] paramTypes, Object[] params) {
         return (T) Proxy.newProxyInstance(loader, new Class[] { parent, ProxyParent.class },
             new MethodInterceptorAdapter(proxy, parent, interception));
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Class<T> createClass(Class<T> parent, T proxy, ClassLoader loader, String name,
+                                    Interception interception) {
+        // java代理返回class对象没有必要，而且构造器是一个特殊构造器，详情参照Proxy#newProxyInstance方法实现
+        throw new ProxyException("不支持的操作");
     }
 }

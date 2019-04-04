@@ -82,7 +82,7 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
         {
             try {
                 Constructor<?> constructor = clazz.getDeclaredConstructor();
-                if (!ReflectUtil.isPublic(constructor)) {
+                if (!AccessorUtil.isPublic(constructor)) {
                     throw new InvokeException(
                         StringUtils.format("给定class[{}]无参构造器不是public", clazz.getName()));
                 }
@@ -176,7 +176,7 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
             for (Method method : allMethod) {
                 // 只处理非静态的public方法和protected方法
                 if (Modifier.isStatic(method.getModifiers())
-                    || (!ReflectUtil.isPublic(method) && !ReflectUtil.isProtected(method))) {
+                    || (!AccessorUtil.isPublic(method) && !AccessorUtil.isProtected(method))) {
                     continue;
                 }
 

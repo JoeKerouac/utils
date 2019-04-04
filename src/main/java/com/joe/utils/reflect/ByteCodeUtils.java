@@ -49,7 +49,7 @@ public class ByteCodeUtils {
         } else if (StringUtils.trim(clazz.getName(), "[").startsWith("L")) {
             // 是对象数组（这里的对象指的是非原生类型）
             return clazz.getName().replace(".", "/");
-        } else if (!ReflectUtil.isGeneralType(clazz)) {
+        } else if (!JavaTypeUtil.isGeneralType(clazz)) {
             // 是对象（这里的对象指的是非原生类型）
             return "L" + clazz.getName().replace(".", "/") + ";";
         } else {

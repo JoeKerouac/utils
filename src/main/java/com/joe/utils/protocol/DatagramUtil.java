@@ -6,7 +6,8 @@ import java.util.Arrays;
 
 import com.joe.utils.collection.ByteArray;
 import com.joe.utils.common.Tools;
-import com.joe.utils.pool.ObjectPool;
+import com.joe.utils.pool.ObjectPoolImpl;
+import com.joe.utils.pool.PooledObject;
 import com.joe.utils.protocol.exception.DataOutOfMemory;
 import com.joe.utils.protocol.exception.IllegalDataException;
 import com.joe.utils.protocol.exception.IllegalRequestException;
@@ -23,23 +24,23 @@ public class DatagramUtil {
     /**
      * 当前系统默认字符集
      */
-    private static final String                CHARSET;
+    private static final String                    CHARSET;
     /**
      * 系统字符集的byte数据（长度10byte，不足的后边补零）
      */
-    private static final byte[]                CHARSET_DATA;
+    private static final byte[]                    CHARSET_DATA;
     /**
      * 对象缓存池
      */
-    private static final ObjectPool<ByteArray> POOL;
+    private static final ObjectPoolImpl<ByteArray> POOL;
     /**
      * 数据报数据除去请求头的最大长度
      */
-    private static final int                   MAX_LENGTH;
+    private static final int                       MAX_LENGTH;
 
     static {
         MAX_LENGTH = Datagram.MAX_LENGTH - Datagram.HEADER_LEN;
-        POOL = new ObjectPool<>(() -> new ByteArray(512));
+        POOL = new ObjectPoolImpl<>(() -> new ByteArray(512));
         CHARSET = Charset.defaultCharset().name();
         byte[] charsetBytes = CHARSET.getBytes();
         int charsetLen = charsetBytes.length;
@@ -85,7 +86,7 @@ public class DatagramUtil {
             throw new DataOutOfMemory(String.format("数据长度超过最大值%d", MAX_LENGTH));
         }
 
-        try (ObjectPool.PoolObjectHolder<ByteArray> holder = POOL.get()) {
+        try (PooledObject<ByteArray> holder = POOL.get()) {
             // 缓存
             ByteArray buffer = holder.get();
             // 一个字节的版本号

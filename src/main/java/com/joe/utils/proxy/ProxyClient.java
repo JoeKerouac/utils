@@ -115,8 +115,38 @@ public interface ProxyClient {
      * @param <T> 代理真实类型
      * @return 代理
      */
+    default <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
+                         Interception interception) {
+        return create(parent, proxy, loader, name, interception, null, null);
+    }
+
+    /**
+     * 构建指定对象的代理Class，稍后可以通过反射构建该class的实例，对象的类必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param proxy 被代理的对象
+     * @param loader 加载生成的对象的class的classloader
+     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception 方法代理
+     * @param <T> 代理真实类型
+     * @return 代理class
+     */
+    <T> Class<? extends T> createClass(Class<T> parent, T proxy, ClassLoader loader, String name,
+                                       Interception interception);
+
+    /**
+     * 构建指定对象的代理，对象的类必须是公共的，同时代理方法也必须是公共的
+     * @param parent 指定接口
+     * @param proxy 被代理的对象
+     * @param loader 加载生成的对象的class的classloader
+     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception 方法代理
+     * @param paramTypes 构造器参数类型，如果构造器是无参构造器那么传null
+     * @param params 构造器参数，如果是无参构造器那么传null
+     * @param <T> 代理真实类型
+     * @return 代理
+     */
     <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
-                 Interception interception);
+                 Interception interception, Class<?>[] paramTypes, Object[] params);
 
     /**
      * 获取代理客户端的类型

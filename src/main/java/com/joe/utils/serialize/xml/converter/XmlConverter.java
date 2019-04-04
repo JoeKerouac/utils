@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.joe.utils.common.StringUtils;
-import com.joe.utils.reflect.ReflectUtil;
+import com.joe.utils.reflect.JavaTypeUtil;
 import com.joe.utils.serialize.xml.XmlParser;
 import com.joe.utils.serialize.xml.XmlTypeConvert;
 
@@ -28,7 +28,7 @@ public interface XmlConverter<T> extends XmlTypeConvert<T> {
         if (String.class.equals(clazz)) {
             logger.info("xml转换器确定的字段类型为String，转到String转换器");
             return (T) data;
-        } else if (ReflectUtil.isBasic(clazz) || ReflectUtil.isGeneralType(clazz)) {
+        } else if (JavaTypeUtil.isBasic(clazz) || JavaTypeUtil.isGeneralType(clazz)) {
             logger.info("xml转换器确定的字段类型为" + clazz.getName() + "，转到基本类型转换器");
             return (T) XmlTypeConverterUtil.converters.get(clazz.getName()).read(element, attrName);
         }

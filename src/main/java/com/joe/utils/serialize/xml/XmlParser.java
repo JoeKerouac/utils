@@ -17,7 +17,7 @@ import com.joe.utils.common.StringUtils;
 import com.joe.utils.exception.ExceptionWraper;
 import com.joe.utils.reflect.BeanUtils;
 import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
-import com.joe.utils.reflect.ReflectUtil;
+import com.joe.utils.reflect.JavaTypeUtil;
 import com.joe.utils.serialize.SerializeException;
 import com.joe.utils.serialize.Serializer;
 import com.joe.utils.serialize.xml.converter.XmlTypeConverterUtil;
@@ -438,7 +438,7 @@ public class XmlParser implements Serializer {
                 node.addAttribute(attrName, attrValue);
             } else if (type == null) {
                 log.debug("当前不知道节点[{}]的类型，忽略该节点", k);
-            } else if (ReflectUtil.isNotPojo(type)) {
+            } else if (JavaTypeUtil.isNotPojo(type)) {
                 //是简单类型或者集合类型
                 if (Map.class.isAssignableFrom(type)) {
                     log.warn("当前字段[{}]是map类型", k);

@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.joe.utils.codec.Hex;
-import com.joe.utils.pool.ObjectPool;
+import com.joe.utils.pool.ObjectPoolImpl;
+import com.joe.utils.pool.PooledObject;
 import com.joe.utils.secure.MessageDigestUtil;
 import com.joe.utils.secure.exception.SecureException;
 
@@ -17,14 +18,15 @@ import com.joe.utils.secure.exception.SecureException;
  * @version 2018.07.11 16:57
  */
 public class MessageDigestUtilImpl implements MessageDigestUtil {
-    private static final Map<String, ObjectPool<MessageDigest>> CACHE = new ConcurrentHashMap<>();
-    private Algorithms                                          algorithms;
+    private static final Map<String, ObjectPoolImpl<MessageDigest>> CACHE = new ConcurrentHashMap<>();
+    private Algorithms                                              algorithms;
 
     private MessageDigestUtilImpl(Algorithms algorithms) {
         this.algorithms = algorithms;
 
         CACHE.computeIfAbsent(algorithms.name(), key -> {
-            ObjectPool<MessageDigest> pool = new ObjectPool<>(() -> getMessageDigest(algorithms));
+            ObjectPoolImpl<MessageDigest> pool = new ObjectPoolImpl<>(
+                () -> getMessageDigest(algorithms));
             //快速验证
             pool.get().close();
             return pool;
@@ -72,10 +74,8 @@ public class MessageDigestUtilImpl implements MessageDigestUtil {
      * @return 对应的摘要
      */
     public byte[] digest(byte[] data) {
-        try (ObjectPool.PoolObjectHolder<MessageDigest> holder = CACHE.get(algorithms.name())
-            .get()) {
-            byte[] result = holder.get().digest(data);
-            return result;
+        try (PooledObject<MessageDigest> holder = CACHE.get(algorithms.name()).get()) {
+            return holder.get().digest(data);
         }
     }
 }

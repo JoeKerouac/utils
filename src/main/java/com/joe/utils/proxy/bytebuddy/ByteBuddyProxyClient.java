@@ -27,7 +27,14 @@ public class ByteBuddyProxyClient implements ProxyClient {
 
     @Override
     public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
-                        Interception interception) {
+                        Interception interception, Class<?>[] paramTypes, Object[] params) {
+        return ClassUtils.getInstance(createClass(parent, proxy, loader, name, interception),
+            paramTypes, params);
+    }
+
+    @Override
+    public <T> Class<? extends T> createClass(Class<T> parent, T proxy, ClassLoader loader,
+                                              String name, Interception interception) {
         DynamicType.Builder<T> builder = new ByteBuddy().subclass(parent)
             .implement(ProxyParent.class);
 
@@ -47,11 +54,10 @@ public class ByteBuddyProxyClient implements ProxyClient {
         } else {
             realLoader = new ProxyClassLoader(loader);
         }
-        Class<? extends T> clazz = builder.make()
+        return builder.make()
             .load(realLoader,
                 (classLoader, types) -> CollectionUtil.convert(types, classLoader::buildClass))
             .getLoaded();
-        return ClassUtils.getInstance(clazz);
     }
 
     @Override

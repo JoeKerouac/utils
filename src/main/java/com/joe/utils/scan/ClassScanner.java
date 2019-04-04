@@ -23,7 +23,7 @@ import com.joe.utils.reflect.ClassUtils;
  * @author joe
  */
 public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
-    private static final Logger                   logger          = LoggerFactory
+    private static final Logger                   LOGGER          = LoggerFactory
         .getLogger(ClassScanner.class);
     private static Map<ClassLoader, ClassScanner> classScannerMap = new ConcurrentHashMap<>();
 
@@ -55,6 +55,9 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
         if (scanner == null) {
             scanner = classScannerMap.get(classLoader);
             scanner.classLoader = classLoader;
+        } else {
+            LOGGER.info("当前ClassLoader [{}] 对应的ClassScanner已存在，直接返回当前已存在的并且忽略设置ClassLoader",
+                classLoader);
         }
 
         return scanner;
@@ -91,7 +94,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
     @Override
     public List<Class<?>> scanByFilter(List<ClassFilter> excludeFilters,
                                        Object... args) throws ScannerException {
-        logger.debug("搜索扫描所有的类，过滤器为：{}，参数为：{}", excludeFilters, args);
+        LOGGER.debug("搜索扫描所有的类，过滤器为：{}，参数为：{}", excludeFilters, args);
 
         if (args == null || args.length == 0) {
             return Collections.emptyList();
@@ -99,7 +102,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
 
         for (Object arg : args) {
             if (!(arg instanceof String)) {
-                logger.debug("参数类型为：{}", args.getClass());
+                LOGGER.debug("参数类型为：{}", args.getClass());
                 throw new ScannerException("参数类型为：" + args.getClass());
             }
         }
@@ -124,7 +127,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      * @return 过滤后的所有Class
      */
     public List<Class<?>> scanByFilter(String pack, List<ClassFilter> filters) {
-        logger.debug("开始扫描包{}下的所有类的集合", pack);
+        LOGGER.debug("开始扫描包{}下的所有类的集合", pack);
         // 第一个class类的集合
         List<Class<?>> classes = new ArrayList<>();
         // 获取包的名字 并进行替换
@@ -132,9 +135,9 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
         // 定义一个枚举的集合 并进行循环来处理这个目录下的things
         Enumeration<URL> dirs;
         try {
-            dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
+            dirs = ClassUtils.getDefaultClassLoader().getResources(packageDirName);
         } catch (IOException e) {
-            logger.error("扫描包{}资源出错", packageDirName);
+            LOGGER.error("扫描包{}资源出错", packageDirName);
             throw new RuntimeException(e);
         }
         // 循环迭代下去
@@ -146,7 +149,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                 String protocol = url.getProtocol();
                 // 如果是以文件的形式保存在服务器上
                 if ("file".equals(protocol)) {
-                    logger.debug("file类型扫描");
+                    LOGGER.debug("file类型扫描");
                     // 获取包的物理路径
                     String filePath = URLDecoder.decode(url.getFile(),
                         Charset.defaultCharset().name());
@@ -158,15 +161,15 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                         .addAll(findAndAddClassesInPackageByFile(jar, packageDirName, pack, true));
                 }
             } catch (Throwable e) {
-                logger.debug("扫描{}时出错", pack, e);
+                LOGGER.debug("扫描{}时出错", pack, e);
             }
         }
 
         if (!filters.isEmpty()) {
-            logger.debug("扫描完毕，扫描出来的Class集合为：{}，发现过滤器，使用过滤器过滤", classes);
+            LOGGER.debug("扫描完毕，扫描出来的Class集合为：{}，发现过滤器，使用过滤器过滤", classes);
             classes = classes.stream().filter(clazz -> filter(clazz, filters))
                 .collect(Collectors.toList());
-            logger.debug("过滤后的Class为：{}", classes);
+            LOGGER.debug("过滤后的Class为：{}", classes);
         }
 
         return classes;
@@ -193,9 +196,9 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      */
     public Set<Class<?>> findAndAddClassesInPackageByFile(JarFile jar, String packageDirName,
                                                           String packageName, boolean recursive) {
-        logger.debug("尝试扫描jar文件{}");
+        LOGGER.debug("尝试扫描jar文件{}");
         Set<Class<?>> classes = new LinkedHashSet<>();
-        logger.debug("jar类型的扫描");
+        LOGGER.debug("jar类型的扫描");
         // 获取jar
         // 从此jar包 得到一个枚举类
         Enumeration<JarEntry> entries = jar.entries();
@@ -226,11 +229,11 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                             name.length() - 6);
                         className = packageName + "." + className;
                         try {
-                            logger.debug("尝试构建class：{}", className);
+                            LOGGER.debug("尝试构建class：{}", className);
                             // 添加到classes
                             classes.add(classLoader.loadClass(className));
                         } catch (Throwable e) {
-                            logger.warn("找不到{}文件", className + ".class", e);
+                            LOGGER.warn("找不到{}文件", className + ".class", e);
                         }
                     }
                 }
@@ -268,13 +271,13 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
      */
     public Set<Class<?>> findAndAddClassesInPackageByFile(String packageName, String packagePath,
                                                           final boolean recursive) {
-        logger.debug("扫描包{}下、目录{}下的所有class", packageName, packagePath);
+        LOGGER.debug("扫描包{}下、目录{}下的所有class", packageName, packagePath);
         Set<Class<?>> classes = new LinkedHashSet<>();
         // 获取此包的目录 建立一个File
         File dir = new File(packagePath);
         // 如果不存在或者 也不是目录就直接返回
         if (!dir.exists() || !dir.isDirectory()) {
-            logger.debug("用户定义包名 " + packageName + " 下没有任何文件");
+            LOGGER.debug("用户定义包名 " + packageName + " 下没有任何文件");
             return Collections.emptySet();
         }
         // 如果存在 就获取包下的所有文件 包括目录
@@ -299,7 +302,7 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                     className = packageName + '.' + className;
                     classes.add(classLoader.loadClass(className));
                 } catch (Throwable e) {
-                    logger.error("添加用户自定义视图类错误 找不到此类的.class文件", e);
+                    LOGGER.error("添加用户自定义视图类错误 找不到此类的.class文件", e);
                 }
             }
         }
