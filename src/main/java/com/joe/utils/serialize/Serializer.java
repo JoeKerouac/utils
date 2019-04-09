@@ -31,7 +31,7 @@ public interface Serializer {
      * 将数据序列化为对象
      *
      * @param data  对象的数据
-     * @param clazz 对象的Class
+     * @param clazz 对象的Class，不允许为空，为空时抛出异常
      * @param <T>   对象的实际类型
      * @return 数据反序列化后的对象
      * @throws SerializeException 序列化异常时应抛出该异常
@@ -42,7 +42,7 @@ public interface Serializer {
      * 将数据序列化为对象
      *
      * @param data  对象的数据
-     * @param clazz 对象的Class
+     * @param clazz 对象的Class，不允许为空，为空时抛出异常
      * @param <T>   对象的实际类型
      * @return 数据反序列化后的对象
      * @throws SerializeException 序列化异常时应抛出该异常

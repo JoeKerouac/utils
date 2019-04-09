@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.joe.utils.common.Assert;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -211,7 +212,9 @@ public class XmlParser implements Serializer {
      */
     @SuppressWarnings("unchecked")
     public <T> T parse(String xml, Class<T> clazz) {
-        if (xml == null || clazz == null || xml.isEmpty()) {
+        Assert.notNull(clazz);
+
+        if (StringUtils.isEmpty(xml)) {
             return null;
         }
         T pojo;

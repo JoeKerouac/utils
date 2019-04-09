@@ -10,6 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.joe.utils.exception.UtilsException;
 import com.joe.utils.function.CustomFunction;
 
 /**
@@ -24,16 +25,35 @@ import com.joe.utils.function.CustomFunction;
 @Configuration
 @EnableAutoConfiguration
 public abstract class WebBaseTest extends BaseTest {
-    private static ThreadLocal<Integer>                        portHolder    = new ThreadLocal<>();
-    private static ThreadLocal<String>                         urlHolder     = new ThreadLocal<>();
-    private static ThreadLocal<ConfigurableApplicationContext> contextHolder = new ThreadLocal<>();
+
+    /**
+     * 当前运行的web程序的端口号
+     */
+    private static ThreadLocal<Integer>                        PORT_THREAD_LOCAL    = new ThreadLocal<>();
+
+    /**
+     * 当前运行的web程序的url
+     */
+    private static ThreadLocal<String>                         URL_THREAD_LOCAL     = new ThreadLocal<>();
+
+    /**
+     * 当前运行的web程序的spring上下文
+     */
+    private static ThreadLocal<ConfigurableApplicationContext> CONTEXT_THREAD_LOCAL = new ThreadLocal<>();
+
+    /**
+     * 是否初始化，true表示已经初始化
+     */
+    private volatile boolean                                   init;
+
+    private final Object                                       lock                 = new Object();
 
     /**
      * 获取端口
      * @return 端口号，需要在(0, 60000)的范围
      */
     protected int getPort() {
-        return portHolder.get();
+        return PORT_THREAD_LOCAL.get();
     }
 
     /**
@@ -41,7 +61,7 @@ public abstract class WebBaseTest extends BaseTest {
      * @return 基础URL，示例：http://127.0.0.1:10/
      */
     protected String getBaseUrl() {
-        return urlHolder.get();
+        return URL_THREAD_LOCAL.get();
     }
 
     /**
@@ -63,7 +83,7 @@ public abstract class WebBaseTest extends BaseTest {
     @Bean
     public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
         TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
-        int port = portHolder.get();
+        int port = PORT_THREAD_LOCAL.get();
         if (port <= 0 || port >= 60000) {
             throw new RuntimeException("端口号不合法:" + port);
         }
@@ -76,14 +96,23 @@ public abstract class WebBaseTest extends BaseTest {
      */
     @Override
     protected void init() {
-        try {
-            Class<?> source = getSource();
-            //初始化端口号和url
-            portHolder.set(randomPort());
-            urlHolder.set("http://127.0.0.1:" + portHolder.get() + "/");
-            contextHolder.set(SpringApplication.run(source));
-        } catch (Throwable e) {
-            throw new RuntimeException("初始化异常", e);
+        if (init) {
+            return;
+        }
+        synchronized (lock) {
+            if (init) {
+                return;
+            }
+            try {
+                Class<?> source = getSource();
+                //初始化端口号和url
+                PORT_THREAD_LOCAL.set(randomPort());
+                URL_THREAD_LOCAL.set("http://127.0.0.1:" + PORT_THREAD_LOCAL.get() + "/");
+                CONTEXT_THREAD_LOCAL.set(SpringApplication.run(source));
+            } catch (Throwable e) {
+                throw new UtilsException("初始化异常", e);
+            }
+            init = true;
         }
     }
 
@@ -92,11 +121,14 @@ public abstract class WebBaseTest extends BaseTest {
      */
     @Override
     protected void destroy() {
-        try {
-            contextHolder.get().close();
-            portHolder.remove();
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
+        PORT_THREAD_LOCAL.remove();
+        if (CONTEXT_THREAD_LOCAL.get() != null) {
+            synchronized (lock) {
+                if (CONTEXT_THREAD_LOCAL.get() != null) {
+                    CONTEXT_THREAD_LOCAL.get().close();
+                    CONTEXT_THREAD_LOCAL.remove();
+                }
+            }
         }
     }
 }

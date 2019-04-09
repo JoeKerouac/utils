@@ -299,7 +299,6 @@ public class ReflectUtil {
      * @param <T>       字段类型
      * @return 指定对象中指定字段名对应字段的值
      */
-    @SuppressWarnings("unchecked")
     public static <T extends Object> T getFieldValue(Object obj, String fieldName) {
         Assert.notNull(obj, "obj不能为空");
         Assert.notNull(fieldName, "fieldName不能为空");
@@ -311,13 +310,28 @@ public class ReflectUtil {
             field = getField(obj.getClass(), fieldName);
         }
 
+        return getFieldValue(obj, field);
+    }
+
+    /**
+     * 获取指定对象中指定字段对应的字段的值
+     * @param obj 对象，不能为空
+     * @param field 字段
+     * @param <T> 字段类型
+     * @return 字段值
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends Object> T getFieldValue(Object obj, Field field) {
+        Assert.notNull(obj, "obj不能为空");
+        Assert.notNull(field, "field不能为空");
+
         try {
             return (T) field.get(obj);
         } catch (IllegalArgumentException e) {
-            //不可能有这种情况
             throw new ReflectException(e);
         } catch (IllegalAccessException e) {
-            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许访问", obj.getClass(), fieldName);
+            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许访问", obj.getClass(),
+                field.getName());
             log.error(msg);
             throw new ReflectException(msg, e);
         }
@@ -342,10 +356,26 @@ public class ReflectUtil {
             field = getField(obj.getClass(), fieldName);
         }
 
+        return setFieldValue(obj, field, fieldValue);
+    }
+
+    /**
+     * 设置field值
+     * @param obj 对象
+     * @param field 对象的字段
+     * @param fieldValue 字段值
+     * @param <T> 字段值泛型
+     * @return 字段值
+     */
+    public static <T extends Object> T setFieldValue(Object obj, Field field, T fieldValue) {
+        Assert.notNull(obj, "obj不能为空");
+        Assert.notNull(field, "field不能为空");
+
         try {
             field.set(obj, fieldValue);
         } catch (IllegalAccessException e) {
-            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许设置", obj.getClass(), fieldName);
+            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许设置", obj.getClass(),
+                field.getName());
             log.error(msg);
             throw new ReflectException(msg, e);
         }

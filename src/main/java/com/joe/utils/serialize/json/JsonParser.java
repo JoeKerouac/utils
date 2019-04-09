@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.fasterxml.jackson.databind.type.MapType;
+import com.joe.utils.common.Assert;
+import com.joe.utils.common.StringUtils;
 import com.joe.utils.exception.ExceptionWraper;
 import com.joe.utils.serialize.SerializeException;
 import com.joe.utils.serialize.Serializer;
@@ -111,9 +113,10 @@ public class JsonParser implements Serializer {
      */
     @SuppressWarnings("unchecked")
     public <T> T readAsObject(String content, Class<T> type) {
+        Assert.notNull(type);
         try {
-            if (content == null || content.isEmpty() || type == null) {
-                log.debug("content为{}，type为：{}", content, type);
+            if (StringUtils.isEmpty(content)) {
+                log.debug("content为空，返回null", content, type);
                 return null;
             } else if (type.equals(String.class)) {
                 return (T) content;

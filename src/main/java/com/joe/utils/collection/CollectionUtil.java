@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.joe.utils.function.ArrayCreater;
 import com.joe.utils.math.MathUtil;
@@ -324,9 +325,7 @@ public final class CollectionUtil {
      * @return 合并结果
      */
     public static <T> List<T> merge(List<List<T>> list) {
-        List<T> result = new ArrayList<>();
-        list.stream().forEach(result::addAll);
-        return result;
+        return list.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     /**
@@ -378,7 +377,7 @@ public final class CollectionUtil {
         }
         List<List<T>> result = new ArrayList<>((int) size);
         permutations(result, list, 0);
-        return null;
+        return result;
     }
 
     /**
