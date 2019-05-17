@@ -254,7 +254,7 @@ public class JavaTypeUtil {
     }
 
     /**
-     * 判断指定数组名称是否是java八大基本类型（int[]、short[]等，不包含对应的封装类型）
+     * 判断指定数组名称是否是java八大基本类型（int[]、short[]、int[][]等，不包含对应的封装类型）
      *
      * @param clazz 指定数组名称
      * @return 如果是基本类型则返回<code>true</code>
@@ -262,20 +262,8 @@ public class JavaTypeUtil {
      */
     public static boolean isGeneralArrayType(Class<?> clazz) throws NullPointerException {
         Assert.notNull(clazz, "clazz不能为null");
-        String name = clazz.getName();
-        return isGeneralArrayType(name);
-    }
-
-    /**
-     * 判断指定数组是否是java八大基本类型（int[]、short[]等，不包含对应的封装类型）
-     *
-     * @param name 指定数组名称
-     * @return 如果是基本类型则返回<code>true</code>
-     */
-    public static boolean isGeneralArrayType(String name) {
-        return "byte[]".equals(name) || "short[]".equals(name) || "int[]".equals(name)
-               || "long[]".equals(name) || "double[]".equals(name) || "float[]".equals(name)
-               || "boolean[]".equals(name) || "char[]".equals(name);
+        Class<?> componentType = clazz.getComponentType();
+        return componentType != null && isGeneralType(componentType);
     }
 
     /**

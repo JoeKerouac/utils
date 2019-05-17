@@ -1,12 +1,12 @@
 package com.joe.utils.collection;
 
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.joe.utils.function.ArrayCreater;
 import com.joe.utils.math.MathUtil;
 
 /**
@@ -62,7 +62,7 @@ public final class CollectionUtil {
     }
 
     /**
-     * 将边长数组返回
+     * 将变长数组返回
      * @param args 边长数组
      * @param <T> 数组类型
      * @return 数组
@@ -72,15 +72,25 @@ public final class CollectionUtil {
     }
 
     /**
-     * 将数据添加到指定数组的末尾
+     * 生成指定类型指定长度的一维数组
+     * @param arrayType 数组类型
+     * @param len 长度
+     * @return 指定类型指定长度的一维数组
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T[] createArray(Class<?> arrayType, int len) {
+        return (T[]) Array.newInstance(arrayType, len);
+    }
+
+    /**
+     * 将数组长度加1并且将指定数据添加到数组末尾
      * @param target 要添加的数据
      * @param array 目标数组
-     * @param creater 数组生成器
      * @param <T> 数组类型
      * @return 新数组
      */
-    public static <T> T[] addTo(T target, T[] array, ArrayCreater<T> creater) {
-        T[] newArray = creater.create(array.length + 1);
+    public static <T> T[] addTo(T target, T[] array) {
+        T[] newArray = createArray(target.getClass(), array.length + 1);
         System.arraycopy(array, 0, newArray, 0, array.length);
         newArray[array.length] = target;
         return newArray;

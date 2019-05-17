@@ -20,9 +20,7 @@ public class CustomObjectImpl<T> implements CustomObject<T> {
 
     @Override
     public boolean in(T... args) {
-        if (args == null) {
-            return false;
-        }
-        return Stream.of(args).filter(arg -> Objects.equals(arg, object)).limit(1).count() > 0;
+        return args != null
+               && Stream.of(args).filter(arg -> Objects.equals(arg, object)).limit(1).count() > 0;
     }
 }

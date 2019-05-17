@@ -1,8 +1,8 @@
 package com.joe.utils.concurrent;
 
-import com.joe.utils.reflect.ReflectUtil;
-
 import java.lang.reflect.Field;
+
+import com.joe.utils.reflect.ReflectUtil;
 
 /**
  * 如果当前线程ThreadLocal没有值可以配合{@link CustomThread}从父线程中取出值，前提是此时父线程仍然在运行中，如果父线程已经结束那么是无法获取的

@@ -55,12 +55,14 @@ public class JsonParser implements Serializer {
 
     @Override
     public <T> T read(byte[] data, Class<T> clazz) throws SerializeException {
-        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz),
+            SerializeException::new);
     }
 
     @Override
     public <T> T read(String data, Class<T> clazz) throws SerializeException {
-        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz),
+            SerializeException::new);
     }
 
     /**

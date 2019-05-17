@@ -4,7 +4,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.joe.utils.common.Assert;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -14,6 +13,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.joe.utils.collection.CollectionUtil;
+import com.joe.utils.common.Assert;
 import com.joe.utils.common.StringUtils;
 import com.joe.utils.exception.ExceptionWraper;
 import com.joe.utils.reflect.BeanUtils;
