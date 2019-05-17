@@ -670,7 +670,7 @@ public class XmlParser implements Serializer {
 
     @Override
     public <T> String writeToString(T t) throws SerializeException {
-        return ExceptionWraper.convert(() -> toXml(t), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> toXml(t), SerializeException::new);
     }
 
     @Override
@@ -680,7 +680,7 @@ public class XmlParser implements Serializer {
 
     @Override
     public <T> T read(String data, Class<T> clazz) throws SerializeException {
-        return ExceptionWraper.convert(() -> parse(data, clazz), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> parse(data, clazz), SerializeException::new);
     }
 
     /**

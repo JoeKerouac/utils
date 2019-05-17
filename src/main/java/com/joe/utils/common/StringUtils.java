@@ -180,6 +180,16 @@ public class StringUtils {
     }
 
     /**
+     * 判断字符串是否不为空（为null时也是空，字符串全是空白符时也是空）
+     *
+     * @param arg 指定字符串
+     * @return 如果不为空则返回true
+     */
+    public static boolean isNotEmpty(String arg) {
+        return !isEmpty(arg);
+    }
+
+    /**
      * 判断参数列表是否有空值
      *
      * @param args 参数列表

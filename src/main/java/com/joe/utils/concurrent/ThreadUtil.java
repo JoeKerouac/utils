@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.joe.utils.exception.ExceptionWraper;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -16,6 +18,15 @@ import lombok.extern.slf4j.Slf4j;
 public class ThreadUtil {
     private static final Map<PoolType, ExecutorService> cache           = new HashMap<>();
     private static final RejectedExecutionHandler       DEFAULT_HANDLER = new ThreadPoolExecutor.AbortPolicy();
+
+    /**
+     * {@link Thread#join()}操作，屏蔽InterruptedException异常，会将InterruptedException异常转换为WrapedInterruptedException异常
+     * @param thread thread
+     */
+    public static void join(Thread thread) {
+        ExceptionWraper.run(thread::join,
+            e -> new WrapedInterruptedException((InterruptedException) e));
+    }
 
     /**
      * 当前线程睡眠一段时间，当线程被中断时会抛出RuntimeException而不是InterruptedException，如果

@@ -45,22 +45,22 @@ public class JsonParser implements Serializer {
 
     @Override
     public <T> byte[] write(T t) throws SerializeException {
-        return ExceptionWraper.convert(() -> toJson(t).getBytes(), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> toJson(t).getBytes(), SerializeException::new);
     }
 
     @Override
     public <T> String writeToString(T t) throws SerializeException {
-        return ExceptionWraper.convert(() -> toJson(t), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> toJson(t), SerializeException::new);
     }
 
     @Override
     public <T> T read(byte[] data, Class<T> clazz) throws SerializeException {
-        return ExceptionWraper.convert(() -> readAsObject(data, clazz), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz), SerializeException::new);
     }
 
     @Override
     public <T> T read(String data, Class<T> clazz) throws SerializeException {
-        return ExceptionWraper.convert(() -> readAsObject(data, clazz), SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz), SerializeException::new);
     }
 
     /**
