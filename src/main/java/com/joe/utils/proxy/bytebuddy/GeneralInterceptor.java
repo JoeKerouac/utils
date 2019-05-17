@@ -43,7 +43,7 @@ public class GeneralInterceptor {
         this.interception = interception;
         this.target = target;
         this.proxyParent = new ProxyParent.InternalProxyParent(target, parent,
-            CollectionUtil.addTo(ProxyParent.class, parent.getInterfaces(), Class<?>[]::new));
+            CollectionUtil.addTo(ProxyParent.class, parent.getInterfaces()), interception);
     }
 
     /**
@@ -56,7 +56,7 @@ public class GeneralInterceptor {
     @RuntimeType
     public Object interceptClass(@AllArguments Object[] params, @Origin Method method,
                                  @SuperCall Callable<Object> callable) throws Throwable {
-        return Interception.invokeWrap(interception, this.target, method, null, params,
+        return Interception.invokeWrap(interception, target, method, null, params,
             callable::call);
     }
 
@@ -73,7 +73,7 @@ public class GeneralInterceptor {
             return Interception.invokeWrap(interception, null, method, null, params,
                 () -> ProxyParent.invoke(method, proxyParent));
         } else {
-            return Interception.invokeWrap(interception, null, method, null, params, null);
+            return Interception.invokeWrap(interception, target, method, null, params, null);
         }
     }
 }

@@ -34,7 +34,7 @@ public class CglibProxyClient implements ProxyClient {
         enhancer.setCallback(new MethodInterceptorAdapter(interception, proxy, parent));
         if (CollectionUtil.safeIsEmpty(paramTypes)) {
             return (T) enhancer.create();
-        }else{
+        } else {
             return (T) enhancer.create(paramTypes, params);
         }
     }

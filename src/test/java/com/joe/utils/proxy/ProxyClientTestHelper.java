@@ -21,7 +21,7 @@ public class ProxyClientTestHelper {
         doCreate(false);
         doObjectMethodTest(client);
         doProxyParentMethodTest(client);
-
+        doMultiProxy(client);
     }
 
     /**
@@ -29,23 +29,24 @@ public class ProxyClientTestHelper {
      * @param client
      */
     public static void doProxyParentMethodTest(ProxyClient client) {
-        Interception interception = (target, params, invoker,
-                                     method) -> method.getName().equals("say") ? null
+        Interception interception = (target, params, method,
+                                     invoker) -> method.getName().equals("say") ? null
                                          : invoker.call();
         Say say = client.create(Say.class, interception);
         Assert.assertTrue(say instanceof ProxyParent);
         ProxyParent parent = (ProxyParent) say;
-        Assert.assertNull(parent.getTarget());
-        Assert.assertEquals(parent.getInterfaces().length, 1);
-        Assert.assertEquals(parent.getTargetClass(), Say.class);
+        Assert.assertNull(parent.GET_TARGET());
+        Assert.assertEquals(parent.GET_INTERFACES().length, 1);
+        Assert.assertEquals(parent.GET_TARGET_CLASS(), Say.class);
+        Assert.assertEquals(parent.GET_INTERCEPTION(), interception);
     }
 
     /**
      * 测试Object方法行为（只对toString、hashCode、equals方法的行为测试，主要是防止递归）
      */
     public static void doObjectMethodTest(ProxyClient client) {
-        Interception interception = (target, params, invoker,
-                                     method) -> method.getName().equals("say") ? null
+        Interception interception = (target, params, method,
+                                     invoker) -> method.getName().equals("say") ? null
                                          : invoker.call();
         Say say1 = client.create(Say.class, interception);
 
@@ -57,6 +58,79 @@ public class ProxyClientTestHelper {
 
         // 不保证不同对象getClass返回的值相同
         Assert.assertNotNull(say1.getClass());
+    }
+
+    /**
+     * 测试多重代理
+     * @param client 代理客户端
+     */
+    public static void doMultiProxy(ProxyClient client) {
+        String testContent = "testContent";
+
+        Convert convert1 = new Convert() {
+            @Override
+            public String convert1(String content) {
+                return "1:convert1:" + content;
+            }
+
+            @Override
+            public String convert2(String content) {
+                return "1:convert2:" + content;
+            }
+        };
+
+        // 对convert1进行代理
+        Convert convert2 = client.create(Convert.class, convert1,
+            (target, params, method, invoker) -> {
+                if (method.getName().equals("convert1")) {
+                    // 校验父调用和代理对象一致
+                    Assert.assertEquals(invoker.call(),
+                        ((Convert) target).convert1((String) params[0]));
+                    return invoker.call();
+                } else if (method.getName().equals("convert2")) {
+                    // 对此方法进行代理
+                    return "2:convert2:" + params[0];
+                } else {
+                    return invoker.call();
+                }
+            });
+
+        // 对convert2进行代理
+        Convert convert3 = client.create(Convert.class, convert2,
+            (target, params, method, invoker) -> {
+                if (method.getName().equals("convert1")) {
+                    // 校验父调用和代理对象一致
+                    Assert.assertEquals(invoker.call(),
+                        ((Convert) target).convert1((String) params[0]));
+                    return invoker.call();
+                } else if (method.getName().equals("convert2")) {
+                    // 对此方法进行代理
+                    return "3:convert2:" + params[0];
+                } else {
+                    return invoker.call();
+                }
+            });
+
+        Convert convert4 = client.create(Convert.class, convert3,
+            (target, params, method, invoker) -> {
+                if (method.getName().equals("convert1")) {
+                    // 校验父调用和代理对象一致
+                    Assert.assertEquals(invoker.call(),
+                        ((Convert) target).convert1((String) params[0]));
+                    return invoker.call();
+                } else if (method.getName().equals("convert2")) {
+                    // 对此方法进行代理
+                    return "4:convert2:" + params[0];
+                } else {
+                    return invoker.call();
+                }
+            });
+
+        // 因为convert1方法没有代理，所以应该与最顶层的父对象一致
+        Assert.assertEquals(convert4.convert1(testContent), convert1.convert1(testContent));
+
+        // convert2进行代理，应该与指定行为一致
+        Assert.assertEquals(convert4.convert2(testContent), "4:convert2:" + testContent);
     }
 
     /**
@@ -104,6 +178,13 @@ public class ProxyClientTestHelper {
         }
     }
 
+    public interface Convert {
+
+        String convert1(String content);
+
+        String convert2(String content);
+    }
+
     private static class Environment {
         Interception         hiMethodProxy;
         Interception         helloMethodProxy;
@@ -112,7 +193,7 @@ public class ProxyClientTestHelper {
         Environment(boolean flag) {
             clazz = flag ? Say.class : SayDefault.class;
 
-            hiMethodProxy = (target, params, callable, method) -> {
+            hiMethodProxy = (target, params, method, callable) -> {
                 if (method.getName().equals("say")) {
                     if (flag) {
                         Assert.assertNull(callable);
@@ -125,7 +206,7 @@ public class ProxyClientTestHelper {
                 }
 
             };
-            helloMethodProxy = (target, params, callable, method) -> {
+            helloMethodProxy = (target, params, method, callable) -> {
                 if (method.getName().equals("say")) {
                     if (flag) {
                         Assert.assertNull(callable);

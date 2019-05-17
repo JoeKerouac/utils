@@ -16,42 +16,54 @@ import com.joe.utils.reflect.ReflectUtil;
 public interface ProxyParent {
 
     /**
-     * {@link #getTarget()}方法说明
+     * {@link #GET_TARGET()}方法说明
      */
-    MethodMetadata GET_TARGET       = new MethodMetadata("getTarget", ProxyParent.class,
-        ReflectUtil.getMethod(ProxyParent.class, "getTarget"));
+    MethodMetadata GET_TARGET              = new MethodMetadata("GET_TARGET", ProxyParent.class,
+        ReflectUtil.getMethod(ProxyParent.class, "GET_TARGET"));
 
     /**
-     * {@link #getTargetClass()}方法说明
+     * {@link #GET_TARGET_CLASS()}方法说明
      */
-    MethodMetadata GET_TARGET_CLASS = new MethodMetadata("getTargetClass", ProxyParent.class,
-        ReflectUtil.getMethod(ProxyParent.class, "getTargetClass"));
+    MethodMetadata GET_TARGET_CLASS        = new MethodMetadata("GET_TARGET_CLASS",
+        ProxyParent.class, ReflectUtil.getMethod(ProxyParent.class, "GET_TARGET_CLASS"));
 
     /**
-     * {@link #getInterfaces()}方法说明
+     * {@link #GET_INTERFACES()}方法说明
      */
-    MethodMetadata GET_INTERFACES   = new MethodMetadata("getInterfaces", ProxyParent.class,
-        ReflectUtil.getMethod(ProxyParent.class, "getInterfaces"));
+    MethodMetadata GET_INTERFACES          = new MethodMetadata("GET_INTERFACES", ProxyParent.class,
+        ReflectUtil.getMethod(ProxyParent.class, "GET_INTERFACES"));
+
+    /**
+     * {@link #GET_INTERCEPTION()}方法说明
+     */
+    MethodMetadata GET_LINKED_INTERCEPTION = new MethodMetadata("GET_INTERCEPTION",
+        ProxyParent.class, ReflectUtil.getMethod(ProxyParent.class, "GET_INTERCEPTION"));
 
     /**
      * 获取代理的对象
      * @param <T> 代理对象类型
      * @return 代理的对象，如果是直接生成的代理类的实例而不是对指定对象生成代理则返回null
      */
-    <T> T getTarget();
+    <T> T GET_TARGET();
 
     /**
      * 实际代理的类型
      * @param <T> 实际代理的类型
      * @return 实际代理的类型的class对象
      */
-    <T> Class<T> getTargetClass();
+    <T> Class<T> GET_TARGET_CLASS();
 
     /**
      * 获取实现的接口，不会返回代理类本身
      * @return 实现的接口集合
      */
-    Class<?>[] getInterfaces();
+    Class<?>[] GET_INTERFACES();
+
+    /**
+     * 获取Interception
+     * @return Interception
+     */
+    Interception GET_INTERCEPTION();
 
     /**
      * 是否可以执行，即方法是否是{@link ProxyParent}声明的
@@ -60,7 +72,7 @@ public interface ProxyParent {
      */
     static boolean canInvoke(Method method) {
         return CustomObject.of(MethodMetadata.build(method)).in(GET_TARGET, GET_TARGET_CLASS,
-            GET_INTERFACES);
+            GET_INTERFACES, GET_LINKED_INTERCEPTION);
     }
 
     /**
@@ -90,27 +102,36 @@ public interface ProxyParent {
 
         private final Class<?>[] interfaces;
 
-        public InternalProxyParent(Object target, Class<?> targetClass, Class<?>[] interfaces) {
+        private Interception     interception;
+
+        public InternalProxyParent(Object target, Class<?> targetClass, Class<?>[] interfaces,
+                                   Interception interception) {
             this.target = target;
             this.targetClass = targetClass;
             this.interfaces = interfaces;
+            this.interception = interception;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> T getTarget() {
+        public <T> T GET_TARGET() {
             return (T) target;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public <T> Class<T> getTargetClass() {
+        public <T> Class<T> GET_TARGET_CLASS() {
             return (Class<T>) targetClass;
         }
 
         @Override
-        public Class<?>[] getInterfaces() {
+        public Class<?>[] GET_INTERFACES() {
             return interfaces;
+        }
+
+        @Override
+        public Interception GET_INTERCEPTION() {
+            return interception;
         }
     }
 }

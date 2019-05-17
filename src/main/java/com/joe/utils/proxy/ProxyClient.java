@@ -31,7 +31,7 @@ public interface ProxyClient {
     }
 
     /**
-     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的，支持多重代理
      * @param parent 指定接口
      * @param proxy 被代理的对象
      * @param interception 方法代理
@@ -55,7 +55,7 @@ public interface ProxyClient {
     }
 
     /**
-     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的，支持多重代理
      * @param parent 指定接口
      * @param proxy 被代理的对象
      * @param name 生成的对象的class名字，不一定支持（java代理不支持）
@@ -80,7 +80,7 @@ public interface ProxyClient {
     }
 
     /**
-     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
+     * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的，支持多重代理
      * @param parent 指定接口
      * @param proxy 被代理的对象
      * @param loader 加载生成的对象的class的classloader
@@ -106,7 +106,7 @@ public interface ProxyClient {
     }
 
     /**
-     * 构建指定对象的代理，对象的类必须是公共的，同时代理方法也必须是公共的
+     * 构建指定对象的代理，对象的类必须是公共的，同时代理方法也必须是公共的，支持多重代理
      * @param parent 指定接口
      * @param proxy 被代理的对象
      * @param loader 加载生成的对象的class的classloader

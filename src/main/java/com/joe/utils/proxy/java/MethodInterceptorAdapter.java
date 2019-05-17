@@ -33,7 +33,7 @@ public class MethodInterceptorAdapter implements InvocationHandler {
         this.target = target;
         this.interception = interception;
         this.proxyParent = new ProxyParent.InternalProxyParent(target, targetClass,
-            CollectionUtil.addTo(ProxyParent.class, targetClass.getInterfaces(), Class<?>[]::new));
+            CollectionUtil.addTo(ProxyParent.class, targetClass.getInterfaces()), interception);
     }
 
     @Override

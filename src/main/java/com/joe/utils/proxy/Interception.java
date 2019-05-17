@@ -16,17 +16,17 @@ public interface Interception {
      * 拦截点执行，可以使用invoker对父类方法发起调用
      * @param target 代理的对象（如果是静态方法那么该target为null）
      * @param params 方法调用参数
-     * @param invoker 父类方法调用（可能为null，为null时表示无法调用父类方法）
      * @param method 拦截的方法
+     * @param invoker 父类方法调用（可能为null，为null时表示无法调用父类方法）
      * @return 拦截点执行结果
      * @throws Throwable 执行异常
      */
-    Object invoke(Object target, Object[] params, Invoker invoker, Method method) throws Throwable;
+    Object invoke(Object target, Object[] params, Method method, Invoker invoker) throws Throwable;
 
     /**
      * 拦截方法包装执行
      * @param interception 拦截的方法的代理，不能为null
-     * @param target 代理对象，可以为null
+     * @param target 被代理的对象，只有对指定对象代理时才会有值，其他情况为null
      * @param method 被代理的方法，不能为null
      * @param realTarget 代理target，可以为null
      * @param params 执行方法的参数，可以为null
@@ -46,7 +46,7 @@ public interface Interception {
         if (target == null) {
             invoker = superCall;
         } else {
-            invoker = () -> method.invoke(target, params);
+            invoker = buildInvoker(target, method, params);
         }
 
         Object invokeObj = target == null ? realTarget : target;
@@ -56,7 +56,25 @@ public interface Interception {
             invoker = buildObjectMethod(invokeObj, method, params);
         }
 
-        return interception.invoke(invokeObj, params, invoker, method);
+        return interception.invoke(invokeObj, params, method, invoker);
+    }
+
+    /**
+     * 构建指定对象指定方法的父调用，如果指定对象是代理对象，那么将会调用该对象的代理方法，否则将会直接使用指定对象反射调用指定方法
+     * @param obj 指定对象
+     * @param method 指定方法
+     * @param params 参数
+     * @return 指定方法的父调用
+     */
+    static Invoker buildInvoker(Object obj, Method method, Object[] params) {
+        if (obj instanceof ProxyParent) {
+            ProxyParent proxyParent = (ProxyParent) obj;
+            Object target = proxyParent.GET_TARGET();
+            Interception parentInterception = proxyParent.GET_INTERCEPTION();
+            return () -> parentInterception.invoke(target, params, method,
+                buildInvoker(target, method, params));
+        }
+        return () -> method.invoke(obj, params);
     }
 
     /**

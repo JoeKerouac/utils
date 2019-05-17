@@ -16,7 +16,7 @@ public class JavaProxyClientTest {
     public void doTest() {
         ProxyClient client = ProxyClient.getInstance(ProxyClient.ClientType.JAVA);
 
-        Interception interception = (target, params, invoker, method) -> {
+        Interception interception = (target, params, method, invoker) -> {
             if (method.getName().equals("say")) {
                 return new Hello().hi((String) params[0]);
             } else {
@@ -31,6 +31,7 @@ public class JavaProxyClientTest {
 
         ProxyClientTestHelper.doObjectMethodTest(client);
         ProxyClientTestHelper.doProxyParentMethodTest(client);
+        ProxyClientTestHelper.doMultiProxy(client);
     }
 
     public interface Say {

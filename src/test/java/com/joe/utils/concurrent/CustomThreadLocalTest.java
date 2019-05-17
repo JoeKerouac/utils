@@ -23,10 +23,10 @@ public class CustomThreadLocalTest {
         threadLocal.set("123");
 
         AtomicBoolean flag = new AtomicBoolean(false);
-//        Thread t1 = new CustomThread(() -> flag.set(StringUtils.isNotEmpty(threadLocal.get())));
-//        t1.start();
-//        ThreadUtil.join(t1);
-//        Assert.assertTrue(flag.get());
+        //        Thread t1 = new CustomThread(() -> flag.set(StringUtils.isNotEmpty(threadLocal.get())));
+        //        t1.start();
+        //        ThreadUtil.join(t1);
+        //        Assert.assertTrue(flag.get());
 
         flag.set(false);
         // 测试多层

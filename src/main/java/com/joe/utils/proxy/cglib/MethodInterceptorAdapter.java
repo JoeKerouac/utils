@@ -41,7 +41,7 @@ public class MethodInterceptorAdapter implements MethodInterceptor {
         this.parent = parent;
 
         this.proxyParent = new ProxyParent.InternalProxyParent(target, parent,
-            CollectionUtil.addTo(ProxyParent.class, parent.getInterfaces(), Class<?>[]::new));
+            CollectionUtil.addTo(ProxyParent.class, parent.getInterfaces()), proxy);
     }
 
     @Override
