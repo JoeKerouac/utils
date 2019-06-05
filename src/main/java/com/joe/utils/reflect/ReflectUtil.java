@@ -137,8 +137,10 @@ public class ReflectUtil {
             } else {
                 return (R) method.invoke(obj, args);
             }
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException e) {
             throw new ReflectException("调用方法[" + method + "]失败", e);
+        } catch (InvocationTargetException e) {
+            throw new ReflectException("调用方法[" + method + "]失败", e.getTargetException());
         }
     }
 
