@@ -19,7 +19,7 @@ import org.objectweb.asm.Opcodes;
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
 import com.joe.utils.common.IOUtils;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.exception.InvokeException;
 import com.joe.utils.reflect.*;
 

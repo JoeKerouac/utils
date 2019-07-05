@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.joe.utils.common.Assert;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 

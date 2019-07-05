@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 
 /**
  * @author JoeKerouac

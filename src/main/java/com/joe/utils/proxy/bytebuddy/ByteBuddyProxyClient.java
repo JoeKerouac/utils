@@ -1,7 +1,7 @@
 package com.joe.utils.proxy.bytebuddy;
 
 import com.joe.utils.collection.CollectionUtil;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.ProxyClassLoader;
 import com.joe.utils.proxy.ProxyClient;

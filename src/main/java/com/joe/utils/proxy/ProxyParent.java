@@ -3,7 +3,7 @@ package com.joe.utils.proxy;
 import java.lang.reflect.Method;
 
 import com.joe.utils.common.Assert;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.object.CustomObject;
 import com.joe.utils.reflect.ReflectUtil;
 

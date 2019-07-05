@@ -1,5 +1,7 @@
 package com.joe.utils.common;
 
+import com.joe.utils.common.string.StringUtils;
+
 import java.util.Objects;
 
 /**
@@ -121,6 +123,25 @@ public class Assert {
         notNull(objs, msg);
         for (Object obj : objs) {
             notNull(obj, msg);
+        }
+    }
+
+    /**
+     * 断言字符串肯定不是空，""和"  "都认为是空
+     * @param data data
+     */
+    public static void notBlank(String data) {
+        notBlank(data, "data must not be blank");
+    }
+
+    /**
+     * 断言字符串肯定不是空，""和"  "都认为是空
+     * @param data data
+     * @param msg msg
+     */
+    public static void notBlank(String data, String msg) {
+        if (StringUtils.isEmpty(data)) {
+            throw new IllegalArgumentException(msg);
         }
     }
 }

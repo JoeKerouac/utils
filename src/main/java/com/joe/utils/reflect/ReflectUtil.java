@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.collection.LRUCacheMap;
 import com.joe.utils.common.Assert;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.scan.ClassScanner;
 
 import lombok.AllArgsConstructor;
@@ -104,7 +104,6 @@ public class ReflectUtil {
      * @param <R> 结果类型
      * @return 调用结果
      */
-    @SuppressWarnings("unchecked")
     public static <R> R invoke(Object obj, String methodName, Class<?>[] parameterTypes,
                                Object... args) {
         Assert.isFalse(
@@ -211,9 +210,11 @@ public class ReflectUtil {
      * @param clazz 类型
      * @param methodName 方法名
      * @param parameterTypes 方法参数类型
+     * @throws ReflectException 指定方法获取不到时会抛出异常
      * @return 指定方法，获取不到时会抛出异常
      */
-    public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
+    public static Method getMethod(Class<?> clazz, String methodName,
+                                   Class<?>... parameterTypes) throws ReflectException {
         Assert.notNull(clazz, "类型不能为空");
         Assert.notNull(methodName, "方法名不能为空");
 
@@ -299,19 +300,13 @@ public class ReflectUtil {
      * @param obj       对象，如果要获取的字段是静态字段那么需要传入Class
      * @param fieldName 字段名
      * @param <T>       字段类型
-     * @return 指定对象中指定字段名对应字段的值
+     * @return 指定对象中指定字段名对应字段的值，字段不存在时返回null而不是抛异常
      */
-    public static <T extends Object> T getFieldValue(Object obj, String fieldName) {
-        Assert.notNull(obj, "obj不能为空");
-        Assert.notNull(fieldName, "fieldName不能为空");
-
-        Field field;
-        if (obj instanceof Class) {
-            field = getField((Class) obj, fieldName);
-        } else {
-            field = getField(obj.getClass(), fieldName);
+    public static <T> T getFieldValue(Object obj, String fieldName) {
+        Field field = getField(obj, fieldName, true);
+        if (field == null) {
+            return null;
         }
-
         return getFieldValue(obj, field);
     }
 
@@ -323,7 +318,7 @@ public class ReflectUtil {
      * @return 字段值
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Object> T getFieldValue(Object obj, Field field) {
+    public static <T> T getFieldValue(Object obj, Field field) {
         Assert.notNull(obj, "obj不能为空");
         Assert.notNull(field, "field不能为空");
 
@@ -347,16 +342,8 @@ public class ReflectUtil {
      * @param <T> 字段值的类型
      * @return fieldValue参数原样返回（无论当前字段是否有值都会返回调用本方法传入的fieldValue）
      */
-    public static <T extends Object> T setFieldValue(Object obj, String fieldName, T fieldValue) {
-        Assert.notNull(obj, "obj不能为空");
-        Assert.notNull(fieldName, "fieldName不能为空");
-
-        Field field;
-        if (obj instanceof Class) {
-            field = getField((Class) obj, fieldName);
-        } else {
-            field = getField(obj.getClass(), fieldName);
-        }
+    public static <T> T setFieldValue(Object obj, String fieldName, T fieldValue) {
+        Field field = getField(obj, fieldName);
 
         return setFieldValue(obj, field, fieldValue);
     }
@@ -369,7 +356,7 @@ public class ReflectUtil {
      * @param <T> 字段值泛型
      * @return 字段值
      */
-    public static <T extends Object> T setFieldValue(Object obj, Field field, T fieldValue) {
+    public static <T> T setFieldValue(Object obj, Field field, T fieldValue) {
         Assert.notNull(obj, "obj不能为空");
         Assert.notNull(field, "field不能为空");
 
@@ -386,21 +373,49 @@ public class ReflectUtil {
 
     /**
      * 从指定Class中获取指定Field，并尝试将其accessible属性设置为true（并不能获取到父类声明的字段）
-     * @param clazz Class
+     * @param obj 字段所属的对象或者class
      * @param fieldName fieldName
      * @return Field，不会为null，只会抛出异常
+     * @throws ReflectException 字段不存在时抛出异常
      */
-    public static Field getField(Class<?> clazz, String fieldName) {
-        Assert.notNull(clazz, "clazz不能为空");
+    public static Field getField(Object obj, String fieldName) throws ReflectException {
+        Field field = getField(obj, fieldName, false);
+        if (field == null) {
+            throw new ReflectException(StringUtils.format("[{0}]中不存在字段[{1}]", obj, fieldName));
+        }
+        return field;
+    }
+
+    /**
+     * 从指定Class中获取指定Field，并尝试将其accessible属性设置为true
+     * @param obj 字段所属的对象或者class
+     * @param fieldName 字段名
+     * @param isRecursive 是否递归获取父类中的字段，为true时表示当前类查找不到指定字段时允许递归从父类获取
+     * @return 要获取的Field，不存在时返回null
+     */
+    public static Field getField(Object obj, String fieldName, boolean isRecursive) {
+        Assert.notNull(obj, "obj不能为空");
         Assert.notNull(fieldName, "fieldName不能为空");
+
+        Class<?> clazz;
+        if (obj instanceof Class) {
+            clazz = (Class<?>) obj;
+        } else {
+            clazz = obj.getClass();
+        }
+
         return FIELD_CACHE.compute(new FieldKey(fieldName, clazz), (k, v) -> {
             if (v == null) {
                 try {
                     return allowAccess(clazz.getDeclaredField(fieldName));
                 } catch (NoSuchFieldException e) {
-                    log.error(StringUtils.format("类[{0}]中不存在字段[{1}]", clazz, fieldName));
-                    throw new ReflectException(
-                        StringUtils.format("类[{0}]中不存在字段[{1}]", clazz, fieldName), e);
+                    Class<?> superClass = clazz.getSuperclass();
+                    // 判断父类是否是Object
+                    if (superClass.equals(Object.class) || !isRecursive) {
+                        return null;
+                    } else {
+                        return getField(superClass, fieldName);
+                    }
                 }
             } else {
                 return v;

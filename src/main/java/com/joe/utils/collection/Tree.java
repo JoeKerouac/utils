@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 
 /**
  * 树结构，非线程安全

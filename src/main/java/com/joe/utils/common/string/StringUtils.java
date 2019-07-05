@@ -1,10 +1,11 @@
-package com.joe.utils.common;
+package com.joe.utils.common.string;
 
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import com.joe.utils.common.Assert;
 import com.joe.utils.pattern.PatternUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +17,109 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class StringUtils {
-    private static final String charsets[] = new String[] { "UTF-8", "UTF-16", "UTF-16LE",
-                                                            "UTF-16BE", "UTF-32", "ISO-8859-1",
-                                                            "US-ASCII", "GBK", "GB2312" };
+
+    private static final String                            charsets[]       = new String[] { "UTF-8",
+                                                                                             "UTF-16",
+                                                                                             "UTF-16LE",
+                                                                                             "UTF-16BE",
+                                                                                             "UTF-32",
+                                                                                             "ISO-8859-1",
+                                                                                             "US-ASCII",
+                                                                                             "GBK",
+                                                                                             "GB2312" };
+
+    private static final StringGroupWraperFunction<String> DEFAULT_FUNCTION = String::toString;
+
+    /**
+     * 正则提取，从字符串中正则提取出指定表达式，默认提取第一个括号中的内容，没有则报错，并且将结果使用指定分隔符拼接
+     * @param source 数据源
+     * @param pattern 正则表达式，不能为空
+     * @param separator 分隔符
+     * @return 提取到的数组
+     */
+    public static String patternCollectAndReduce(String source, String pattern, String separator) {
+        List<String> result = patternCollect(source, pattern, new int[] { 1 }, DEFAULT_FUNCTION);
+        return result.stream().reduce((arg0, arg1) -> arg0 + separator + arg1).get();
+    }
+
+    /**
+     * 正则提取，从字符串中正则提取出指定表达式，默认提取第一个括号中的内容，没有则报错
+     * @param source 数据源
+     * @param pattern 正则表达式，不能为空
+     * @return 提取到的数组
+     */
+    public static List<String> patternCollect(String source, String pattern) {
+        return patternCollect(source, pattern, new int[] { 1 }, DEFAULT_FUNCTION);
+    }
+
+    /**
+     * 正则提取，从字符串中正则提取出指定表达式，默认提取第一个括号中的内容，没有则报错
+     * @param source 数据源
+     * @param pattern 正则表达式，不能为空
+     * @param function 转换函数，不能为空，将提取到的数据转换为指定数据
+     * @param <T> 转换后的数据类型
+     * @return 提取到的数组
+     */
+    public static <T> List<T> patternCollect(String source, String pattern,
+                                             StringGroupFunction<T> function) {
+        return patternCollect(source, pattern, new int[] { 1 }, function);
+    }
+
+    /**
+     * 正则提取，从字符串中正则提取出指定表达式
+     * @param source 数据源
+     * @param pattern 正则表达式，不能为空
+     * @param groups 要提取的匹配到的group列表，不能为空
+     * @return 提取到的数组
+     */
+    public static List<String> patternCollect(String source, String pattern, int[] groups) {
+        return patternCollect(source, pattern, groups, DEFAULT_FUNCTION);
+    }
+
+    /**
+     * 正则提取，从字符串中正则提取出指定表达式，例：
+     * 
+     * <li>source:"#123,12#,#456,45#,#789,78#"</li>
+     * <li>pattern:".*?#([0-9]*),([0-9]*)#.*?"</li>
+     * <li>groups:[1,2]</li>
+     * 对于以上入参，提供给function的入参分别是：
+     * <li>[123,12]</li>
+     * <li>[456,45]</li>
+     * <li>[789,78]</li>
+     * 会循环调用function三次，每次入参数组长度为2
+     * 
+     * 
+     * @param source 数据源
+     * @param pattern 正则表达式，不能为空
+     * @param groups 要提取的匹配到的group，不能为空。注意：groups必须不能超过正则表达式所能提取的最大值，例如正则中一个括号是一个group，正则本身也是一个group，详情参照测试用例
+     * @param function 转换函数，不能为空，将提取到的数据转换为指定数据
+     * @param <T> 转换后的数据类型
+     * @return 提取到的数组
+     */
+    public static <T> List<T> patternCollect(String source, String pattern, int[] groups,
+                                             StringGroupFunction<T> function) {
+        Assert.notBlank(pattern, "pattern must not be blank");
+        Assert.notNull(function, "function must not be null");
+        Assert.isTrue(groups != null && groups.length > 0, "groups must not empty");
+
+        if (isEmpty(source)) {
+            return Collections.emptyList();
+        }
+
+        Pattern p = Pattern.compile(pattern);
+        Matcher matcher = p.matcher(source);
+        List<T> list = new ArrayList<>();
+        while (matcher.find()) {
+            List<String> patternGroup = new ArrayList<>(groups.length);
+
+            for (int group : groups) {
+                patternGroup.add(matcher.group(group));
+            }
+
+            list.add(function.apply(patternGroup));
+        }
+        return list;
+    }
 
     /**
      * 比较两个字符串是否相等（调用equals方法）
@@ -27,7 +128,7 @@ public class StringUtils {
      * @return
      */
     public static boolean equals(String arg0, String arg1) {
-        return arg0 == arg1 || (arg0 != null && arg0.equals(arg1));
+        return Objects.equals(arg0, arg1);
     }
 
     /**

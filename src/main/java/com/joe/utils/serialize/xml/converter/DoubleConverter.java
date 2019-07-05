@@ -2,7 +2,7 @@ package com.joe.utils.serialize.xml.converter;
 
 import org.dom4j.Element;
 
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 
 /**
  * Double转换器

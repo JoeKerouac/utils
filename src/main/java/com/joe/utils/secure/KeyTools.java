@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.joe.utils.codec.IBase64;
 import com.joe.utils.common.IOUtils;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.secure.exception.SecureException;
 import com.joe.utils.secure.impl.AbstractCipher;
 

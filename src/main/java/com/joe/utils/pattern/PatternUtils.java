@@ -3,7 +3,7 @@ package com.joe.utils.pattern;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 
 /**
  * 正则工具类

@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.collection.LRUCacheMap;
 import com.joe.utils.common.Assert;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.serialize.xml.XmlNode;
 
 import lombok.Getter;

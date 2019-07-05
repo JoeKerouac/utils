@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
 
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
-import com.joe.utils.common.StringUtils;
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.exception.ExceptionWraper;
 import com.joe.utils.reflect.BeanUtils;
 import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
