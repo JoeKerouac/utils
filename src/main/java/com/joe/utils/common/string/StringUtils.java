@@ -1,6 +1,5 @@
 package com.joe.utils.common.string;
 
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,16 +16,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class StringUtils {
-
-    private static final String                            charsets[]       = new String[] { "UTF-8",
-                                                                                             "UTF-16",
-                                                                                             "UTF-16LE",
-                                                                                             "UTF-16BE",
-                                                                                             "UTF-32",
-                                                                                             "ISO-8859-1",
-                                                                                             "US-ASCII",
-                                                                                             "GBK",
-                                                                                             "GB2312" };
 
     private static final StringGroupWraperFunction<String> DEFAULT_FUNCTION = String::toString;
 
@@ -159,16 +148,6 @@ public class StringUtils {
             sb.append(str);
         }
         return sb.toString();
-    }
-
-    /**
-     * 将字符串中的{}依次替换为指定数据
-     * @param templet 字符串模板
-     * @param args 变量
-     * @return 字符串
-     */
-    public static String format(String templet, Object... args) {
-        return MessageFormat.format(templet, args);
     }
 
     /**

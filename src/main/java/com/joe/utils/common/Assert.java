@@ -1,8 +1,8 @@
 package com.joe.utils.common;
 
-import com.joe.utils.common.string.StringUtils;
-
 import java.util.Objects;
+
+import com.joe.utils.common.string.StringUtils;
 
 /**
  * @author joe

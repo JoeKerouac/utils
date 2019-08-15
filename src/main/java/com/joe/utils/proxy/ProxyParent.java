@@ -3,7 +3,7 @@ package com.joe.utils.proxy;
 import java.lang.reflect.Method;
 
 import com.joe.utils.common.Assert;
-import com.joe.utils.common.string.StringUtils;
+import com.joe.utils.common.string.StringFormater;
 import com.joe.utils.object.CustomObject;
 import com.joe.utils.reflect.ReflectUtil;
 
@@ -90,7 +90,8 @@ public interface ProxyParent {
         if (canInvoke(method)) {
             return metadata.invoke(proxyParent);
         } else {
-            throw new ProxyException(StringUtils.format("方法[{0}]不是ProxyParent中声明的", method));
+            throw new ProxyException(
+                StringFormater.simpleFormat("方法[{0}]不是ProxyParent中声明的", method));
         }
     }
 

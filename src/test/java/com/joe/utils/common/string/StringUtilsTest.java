@@ -86,11 +86,6 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void doFormat() {
-        Assert.assertTrue("你好啊:JoeKerouac".equals(StringUtils.format("你好啊:{0}", "JoeKerouac")));
-    }
-
-    @Test
     public void doReplaceBefor() {
         Assert.assertEquals("***Kerouac", StringUtils.replaceBefor("JoeKerouac", 2, "***"));
     }

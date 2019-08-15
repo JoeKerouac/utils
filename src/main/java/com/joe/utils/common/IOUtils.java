@@ -3,8 +3,8 @@ package com.joe.utils.common;
 import java.io.*;
 
 import com.joe.utils.collection.ByteArray;
-
 import com.joe.utils.common.string.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**

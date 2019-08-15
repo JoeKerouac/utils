@@ -19,6 +19,7 @@ import org.objectweb.asm.Opcodes;
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
 import com.joe.utils.common.IOUtils;
+import com.joe.utils.common.string.StringFormater;
 import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.exception.InvokeException;
 import com.joe.utils.reflect.*;
@@ -74,7 +75,7 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
             int modifier = clazz.getModifiers();
             if (!Modifier.isPublic(modifier)) {
                 throw new InvokeException(
-                    StringUtils.format("给定class[{0}]不是public的", clazz.getName()));
+                    StringFormater.simpleFormat("给定class[{0}]不是public的", clazz.getName()));
             }
         }
 
@@ -84,17 +85,17 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
                 Constructor<?> constructor = clazz.getDeclaredConstructor();
                 if (!AccessorUtil.isPublic(constructor)) {
                     throw new InvokeException(
-                        StringUtils.format("给定class[{}]无参构造器不是public", clazz.getName()));
+                        StringFormater.simpleFormat("给定class[{}]无参构造器不是public", clazz.getName()));
                 }
             } catch (NoSuchMethodException e) {
-                throw new InvokeException(StringUtils.format("给定class[{}]没有无参构造器", clazz.getName()),
-                    e);
+                throw new InvokeException(
+                    StringFormater.simpleFormat("给定class[{}]没有无参构造器", clazz.getName()), e);
             }
 
             try {
                 clazz.getDeclaredConstructor(clazz);
-                throw new InvokeException(StringUtils.format("给定class[{}]不能包含只有一个[{}]类型参数的构造器",
-                    clazz.getName(), clazz.getName()));
+                throw new InvokeException(StringFormater.simpleFormat(
+                    "给定class[{}]不能包含只有一个[{}]类型参数的构造器", clazz.getName(), clazz.getName()));
             } catch (NoSuchMethodException e) {
                 // 没有该构造器是正常的
             }

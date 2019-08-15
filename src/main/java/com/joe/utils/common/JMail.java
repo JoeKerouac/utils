@@ -12,10 +12,10 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import com.joe.utils.common.string.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.concurrent.ThreadUtil;
 
 import lombok.Data;

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.collection.LRUCacheMap;
 import com.joe.utils.common.Assert;
-import com.joe.utils.common.string.StringUtils;
+import com.joe.utils.common.string.StringFormater;
 import com.joe.utils.scan.ClassScanner;
 
 import lombok.AllArgsConstructor;
@@ -88,9 +88,9 @@ public class ReflectUtil {
         try {
             return type.getConstructor(parameterTypes);
         } catch (NoSuchMethodException e) {
-            log.error(StringUtils.format("类[{0}]中不存在参数列表为[{1}]的构造器", type,
+            log.error(StringFormater.simpleFormat("类[{0}]中不存在参数列表为[{1}]的构造器", type,
                 parameterTypes == null ? "null" : Arrays.toString(parameterTypes)));
-            throw new ReflectException(StringUtils.format("类[{0}]中不存在参数列表为[{1}]的构造器", type,
+            throw new ReflectException(StringFormater.simpleFormat("类[{0}]中不存在参数列表为[{1}]的构造器", type,
                 parameterTypes == null ? "null" : Arrays.toString(parameterTypes)), e);
         }
     }
@@ -223,13 +223,12 @@ public class ReflectUtil {
                 try {
                     return allowAccess(clazz.getDeclaredMethod(methodName, parameterTypes));
                 } catch (NoSuchMethodException e) {
-                    log.error(
-                        StringUtils.format("类[{0}]中不存在方法名为[{1}]、方法列表为[{2}]的方法", clazz, methodName,
-                            parameterTypes == null ? "null" : Arrays.toString(parameterTypes)));
-                    throw new ReflectException(
-                        StringUtils.format("类[{0}]中不存在方法名为[{1}]、方法列表为[{2}]的方法", clazz, methodName,
-                            parameterTypes == null ? "null" : Arrays.toString(parameterTypes)),
-                        e);
+                    log.error(StringFormater.simpleFormat("类[{0}]中不存在方法名为[{1}]、方法列表为[{2}]的方法",
+                        clazz, methodName,
+                        parameterTypes == null ? "null" : Arrays.toString(parameterTypes)));
+                    throw new ReflectException(StringFormater.simpleFormat(
+                        "类[{0}]中不存在方法名为[{1}]、方法列表为[{2}]的方法", clazz, methodName,
+                        parameterTypes == null ? "null" : Arrays.toString(parameterTypes)), e);
                 }
             } else {
                 return v;
@@ -327,7 +326,7 @@ public class ReflectUtil {
         } catch (IllegalArgumentException e) {
             throw new ReflectException(e);
         } catch (IllegalAccessException e) {
-            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许访问", obj.getClass(),
+            String msg = StringFormater.simpleFormat("类型[{0}]的字段[{1}]不允许访问", obj.getClass(),
                 field.getName());
             log.error(msg);
             throw new ReflectException(msg, e);
@@ -363,7 +362,7 @@ public class ReflectUtil {
         try {
             field.set(obj, fieldValue);
         } catch (IllegalAccessException e) {
-            String msg = StringUtils.format("类型[{0}]的字段[{1}]不允许设置", obj.getClass(),
+            String msg = StringFormater.simpleFormat("类型[{0}]的字段[{1}]不允许设置", obj.getClass(),
                 field.getName());
             log.error(msg);
             throw new ReflectException(msg, e);
@@ -381,7 +380,8 @@ public class ReflectUtil {
     public static Field getField(Object obj, String fieldName) throws ReflectException {
         Field field = getField(obj, fieldName, false);
         if (field == null) {
-            throw new ReflectException(StringUtils.format("[{0}]中不存在字段[{1}]", obj, fieldName));
+            throw new ReflectException(
+                StringFormater.simpleFormat("[{0}]中不存在字段[{1}]", obj, fieldName));
         }
         return field;
     }
