@@ -1,4 +1,4 @@
-package com.joe.utils.common.telnet;
+package com.joe.utils.telnet;
 
 import java.io.File;
 import java.util.HashMap;
