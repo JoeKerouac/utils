@@ -65,10 +65,11 @@ public enum MemoryUnit {
      * @param source 要转换的数值
      * @param srcUnit 要转换的数值的单位
      * @param descUnit 要转换的目标单位
-     * @return 转换结果
+     * @return 转换结果，最终会保留20位小数
      */
     public static BigDecimal convert(long source, MemoryUnit srcUnit, MemoryUnit descUnit) {
+        // 保留20位小数
         return new BigDecimal(source).multiply(new BigDecimal(srcUnit.radix))
-            .divide(new BigDecimal(descUnit.radix));
+            .divide(new BigDecimal(descUnit.radix), 20, BigDecimal.ROUND_HALF_EVEN);
     }
 }
