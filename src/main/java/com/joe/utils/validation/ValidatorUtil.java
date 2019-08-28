@@ -1,4 +1,4 @@
-package com.joe.utils.validator;
+package com.joe.utils.validation;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
