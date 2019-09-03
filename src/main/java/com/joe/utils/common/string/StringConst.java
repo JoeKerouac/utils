@@ -9,6 +9,11 @@ package com.joe.utils.common.string;
 public class StringConst {
 
     /**
+     * 空字符
+     */
+    public static final String EMPTY         = "";
+
+    /**
      * 四个空格
      */
     public static final String TAB           = "    ";
@@ -21,7 +26,7 @@ public class StringConst {
     /**
      * 换行符
      */
-    public static final char   LINE_BREAK         = '\n';
+    public static final char   LINE_BREAK    = '\n';
 
     /**
      * 左大括号
