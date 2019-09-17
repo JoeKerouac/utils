@@ -165,6 +165,10 @@
             <artifactId>cglib</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.JoeKerouac</groupId>
+            <artifactId>threadx</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

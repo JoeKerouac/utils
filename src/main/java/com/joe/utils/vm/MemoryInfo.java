@@ -14,7 +14,7 @@ import com.joe.utils.common.enums.unit.MemoryUnit;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * 内存区使用情况
@@ -38,7 +38,7 @@ import lombok.Data;
  * @author JoeKerouac
  * @version 2019年08月27日 17:34
  */
-@Data
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemoryInfo {
 
@@ -109,5 +109,13 @@ public class MemoryInfo {
             memoryInfoList.add(info);
         }
         return memoryInfoList;
+    }
+
+    @Override
+    public String toString() {
+        return "MemoryInfo{" + "name='" + name + '\'' + ", init=" + MemoryUtils.toString(init, unit)
+               + ", used=" + MemoryUtils.toString(used, unit) + ", committed="
+               + MemoryUtils.toString(committed, unit) + ", max=" + MemoryUtils.toString(max, unit)
+               + '}';
     }
 }

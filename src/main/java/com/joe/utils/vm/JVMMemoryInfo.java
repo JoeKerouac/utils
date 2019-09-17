@@ -6,7 +6,7 @@ import com.joe.utils.common.enums.unit.MemoryUnit;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * JVM内存信息
@@ -14,7 +14,7 @@ import lombok.Data;
  * @author JoeKerouac
  * @version 2019年08月27日 17:29
  */
-@Data
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JVMMemoryInfo {
 
@@ -52,5 +52,12 @@ public class JVMMemoryInfo {
         return new JVMMemoryInfo(MemoryUnit.convert(freeMemory, MemoryUnit.BYTE, unit),
             MemoryUnit.convert(maxMemory, MemoryUnit.BYTE, unit),
             MemoryUnit.convert(totalMemory, MemoryUnit.BYTE, unit), unit);
+    }
+
+    @Override
+    public String toString() {
+        return "JVMMemoryInfo{" + "freeMemory=" + MemoryUtils.toString(freeMemory, unit)
+               + ", maxMemory=" + MemoryUtils.toString(maxMemory, unit) + ", totalMemory="
+               + MemoryUtils.toString(totalMemory, unit) + '}';
     }
 }

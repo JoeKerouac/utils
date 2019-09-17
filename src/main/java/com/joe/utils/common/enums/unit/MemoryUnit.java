@@ -61,7 +61,7 @@ public enum MemoryUnit {
     private final String desc;
 
     /**
-     * 单位转换，例如
+     * 单位转换
      * @param source 要转换的数值
      * @param srcUnit 要转换的数值的单位
      * @param descUnit 要转换的目标单位
@@ -70,6 +70,7 @@ public enum MemoryUnit {
     public static BigDecimal convert(long source, MemoryUnit srcUnit, MemoryUnit descUnit) {
         // 保留20位小数
         return new BigDecimal(source).multiply(new BigDecimal(srcUnit.radix))
-            .divide(new BigDecimal(descUnit.radix), 20, BigDecimal.ROUND_HALF_EVEN);
+            .divide(new BigDecimal(descUnit.radix), 20, BigDecimal.ROUND_HALF_EVEN)
+            .stripTrailingZeros();
     }
 }
