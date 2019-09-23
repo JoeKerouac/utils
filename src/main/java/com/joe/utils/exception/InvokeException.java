@@ -7,6 +7,9 @@ package com.joe.utils.exception;
  * @version $Id: joe, v 0.1 2019年02月21日 19:25 JoeKerouac Exp $
  */
 public class InvokeException extends UtilsException {
+
+    private static final long serialVersionUID = 5078472212951684350L;
+
     public InvokeException() {
     }
 
@@ -15,7 +18,7 @@ public class InvokeException extends UtilsException {
     }
 
     public InvokeException(String message, Throwable cause) {
-        super(message, cause);
+        super(cause, message);
     }
 
     public InvokeException(Throwable cause) {
@@ -24,6 +27,6 @@ public class InvokeException extends UtilsException {
 
     public InvokeException(String message, Throwable cause, boolean enableSuppression,
                            boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(cause, enableSuppression, writableStackTrace, message);
     }
 }

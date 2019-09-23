@@ -96,6 +96,17 @@ public class ReflectUtil {
     }
 
     /**
+     * 调用指定对象的指定无参数方法
+     * @param obj 指定对象，不能为空，如果要调用的方法为静态方法那么传入Class对象
+     * @param methodName 要调用的方法名，不能为空
+     * @param <R> 结果类型
+     * @return 调用结果
+     */
+    public static <R> R invoke(Object obj, String methodName) {
+        return invoke(obj, methodName, null);
+    }
+
+    /**
      * 调用指定对象的指定方法
      * @param obj 指定对象，不能为空，如果要调用的方法为静态方法那么传入Class对象
      * @param methodName 要调用的方法名，不能为空

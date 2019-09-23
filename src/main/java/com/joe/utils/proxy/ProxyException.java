@@ -9,6 +9,9 @@ import com.joe.utils.exception.UtilsException;
  * @version $Id: joe, v 0.1 2018年11月08日 19:56 JoeKerouac Exp $
  */
 public class ProxyException extends UtilsException {
+
+    private static final long serialVersionUID = -8445040102390079092L;
+
     public ProxyException() {
     }
 
@@ -17,7 +20,7 @@ public class ProxyException extends UtilsException {
     }
 
     public ProxyException(String message, Throwable cause) {
-        super(message, cause);
+        super(cause, message);
     }
 
     public ProxyException(Throwable cause) {
@@ -26,6 +29,6 @@ public class ProxyException extends UtilsException {
 
     public ProxyException(String message, Throwable cause, boolean enableSuppression,
                           boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(cause, enableSuppression, writableStackTrace, message);
     }
 }

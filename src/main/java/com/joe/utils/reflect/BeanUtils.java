@@ -15,6 +15,7 @@ import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.collection.LRUCacheMap;
 import com.joe.utils.common.Assert;
 import com.joe.utils.common.string.StringUtils;
+import com.joe.utils.exception.UtilsException;
 import com.joe.utils.serialize.xml.XmlNode;
 
 import lombok.Getter;
@@ -91,7 +92,7 @@ public class BeanUtils {
 
                 map.put(name, value);
             } catch (Exception e) {
-                log.error("获取字段[{}]值失败，忽略字段[{}]", name, name);
+                log.debug("获取字段[{}]值失败，忽略字段[{}]", name, name);
             }
         }
         log.debug("获取[{}]的字段映射map为[{}]", pojo, map);
@@ -135,7 +136,7 @@ public class BeanUtils {
      * @param source      被复制的源对象
      * @param targetClass 要复制的目标对象的class对象
      * @param <E>         目标对象的实际类型
-     * @return targetClass的实例，当targetClass或者source的class为接口、抽象类或者不是public时返回null
+     * @return targetClass的实例，如果该class不能实例化将会抛出异常
      */
     public static <E> E copy(Object source, Class<E> targetClass) {
         if (source == null || targetClass == null) {
@@ -149,7 +150,7 @@ public class BeanUtils {
             target = targetClass.newInstance();
         } catch (Exception e) {
             log.error("target生成失败，请检查代码；失败原因：", e);
-            return null;
+            throw new UtilsException("target生成失败，请检查代码；失败原因:{0}", e);
         }
 
         return copy(target, source);
@@ -215,7 +216,7 @@ public class BeanUtils {
                 names.addAll(Arrays.asList(alias.value()));
             }
 
-            log.error("开始将source中的字段[{}]的值复制到dest中，别名列表为：[{}]", fields, names);
+            log.debug("开始将source中的字段[{}]的值复制到dest中，别名列表为：[{}]", fields, names);
 
             try {
                 Object value = getFieldValue(source, fieldName);
@@ -226,7 +227,7 @@ public class BeanUtils {
                     }
                 }
             } catch (Exception e) {
-                log.warn("copy中复制{}时发生错误，忽略该字段", fieldName, e);
+                log.debug("copy中复制{}时发生错误，忽略该字段", fieldName, e);
             }
         }
 
@@ -338,7 +339,7 @@ public class BeanUtils {
             }
         } catch (IntrospectionException e) {
             //挣扎一下，尝试自己构建（针对继承方法有效）
-            log.info("尝试自定义构建PropertyDescriptor");
+            log.debug("尝试自定义构建PropertyDescriptor");
             Method readMethod;
             Method writeMethod = null;
             String methodName = StringUtils.toFirstUpperCase(name);
@@ -353,14 +354,14 @@ public class BeanUtils {
             }
 
             if (writeMethod == null) {
-                log.warn("说明构建失败，忽略{}字段", field.getName(), e);
+                log.debug("说明构建失败，忽略{}字段", field.getName(), e);
             } else {
-                log.info("自定义构建PropertyDescriptor成功");
+                log.debug("自定义构建PropertyDescriptor成功");
                 try {
                     customPropertyDescriptor = convert(field,
                         new PropertyDescriptor(name, readMethod, writeMethod), clazz);
                 } catch (IntrospectionException e1) {
-                    log.info("构建失败，忽略字段[{}]", field.getName(), e1);
+                    log.debug("构建失败，忽略字段[{}]", field.getName(), e1);
                 }
             }
         }

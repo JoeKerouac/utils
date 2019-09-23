@@ -12,7 +12,7 @@ public class SerializeException extends UtilsException {
     private static final long serialVersionUID = 6354099068931120268L;
 
     public SerializeException(Throwable ex) {
-        super("序列化异常", ex);
+        super(ex, "序列化异常");
     }
 
     public SerializeException(String message) {

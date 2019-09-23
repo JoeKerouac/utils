@@ -13,27 +13,37 @@ public enum LogLevel {
                       /**
                        * DEBUG级别日志
                        */
-                      DEBUG(1, "debug"),
+                      DEBUG(0, "debug"),
 
                       /**
                        * INFO级别日志
                        */
-                      INFO(1, "info"),
+                      INFO(100, "info"),
 
                       /**
                        * WARN级别日志
                        */
-                      WARN(1, "warn"),
+                      WARN(200, "warn"),
 
                       /**
                        * ERROR级别日志
                        */
-                      ERROR(1, "error");
+                      ERROR(300, "error"),
+
+                      /**
+                       * 所有都打印
+                       */
+                      ALL(400, "all"),
+
+                      /**
+                       * 关闭
+                       */
+                      OFF(Integer.MAX_VALUE, "off");
 
     /**
      * 日志级别
      */
-    private int    level;
+    private int    code;
 
     /**
      * 级别名

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class IOUtils {
+
     /**
      * 将流中的数据读取为字符串（缓冲区大小为256byte）
      *

@@ -2,11 +2,10 @@ package com.joe.utils.reflect;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.joe.utils.common.Assert;
 
@@ -28,6 +27,25 @@ public class JavaTypeUtil {
      * extends泛型，匹配? extends Object这种泛型
      */
     private static final Pattern EXTENDS_PATTERN = Pattern.compile("(.*) extends.*");
+
+    /**
+     * 获取指定类上声明的泛型列表，例如有如下类：
+     * <p>
+     * <code>public class Test<String></code>
+     * <p>
+     * 对该类使用该方法将会获得String的class
+     * 
+     * @param clazz 类型
+     * @return 类上声明的泛型列表
+     */
+    public static List<JavaType> getGenericSuperclasses(Class<?> clazz) {
+        Assert.notNull(clazz, "clazz不能为null");
+        Type genericSuperclass = clazz.getGenericSuperclass();
+        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        return Arrays.stream(actualTypeArguments).map(JavaTypeUtil::createJavaType)
+            .collect(Collectors.toList());
+    }
 
     /**
      * /**

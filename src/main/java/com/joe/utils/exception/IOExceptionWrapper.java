@@ -7,6 +7,9 @@ package com.joe.utils.exception;
  * @version 2018.07.19 18:02
  */
 public class IOExceptionWrapper extends UtilsException {
+
+    private static final long serialVersionUID = -3222997623900804631L;
+
     public IOExceptionWrapper() {
         super();
     }
@@ -16,7 +19,7 @@ public class IOExceptionWrapper extends UtilsException {
     }
 
     public IOExceptionWrapper(String message, Throwable cause) {
-        super(message, cause);
+        super(cause, message);
     }
 
     public IOExceptionWrapper(Throwable cause) {
@@ -25,6 +28,6 @@ public class IOExceptionWrapper extends UtilsException {
 
     protected IOExceptionWrapper(String message, Throwable cause, boolean enableSuppression,
                                  boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(cause, enableSuppression, writableStackTrace, message);
     }
 }

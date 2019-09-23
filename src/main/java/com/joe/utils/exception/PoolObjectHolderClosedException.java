@@ -1,6 +1,9 @@
 package com.joe.utils.exception;
 
 public class PoolObjectHolderClosedException extends UtilsException {
+
+    private static final long serialVersionUID = -8618479485878902136L;
+
     public PoolObjectHolderClosedException() {
         super();
     }
@@ -10,7 +13,7 @@ public class PoolObjectHolderClosedException extends UtilsException {
     }
 
     public PoolObjectHolderClosedException(String message, Throwable cause) {
-        super(message, cause);
+        super(cause, message);
     }
 
     public PoolObjectHolderClosedException(Throwable cause) {
@@ -20,6 +23,6 @@ public class PoolObjectHolderClosedException extends UtilsException {
     protected PoolObjectHolderClosedException(String message, Throwable cause,
                                               boolean enableSuppression,
                                               boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(cause, enableSuppression, writableStackTrace, message);
     }
 }

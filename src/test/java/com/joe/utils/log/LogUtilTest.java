@@ -21,8 +21,9 @@ public class LogUtilTest {
     public void test() {
         // 顺便搞下MDC，不过这个只能肉眼看打印结果，不能直接断言
         MDC.put("USER", "-JoeKerouac-");
-        LogUtil.log(JUL_LOGGER, LogLevel.INFO, "JUL_LOGGER test log");
-        LogUtil.log(log, LogLevel.INFO, "SLF4J test log");
+        LogUtil util = new LogUtil();
+        util.log(JUL_LOGGER, LogLevel.INFO, "JUL_LOGGER test log");
+        util.log(log, LogLevel.INFO, "SLF4J test log");
         ThreadUtil.sleep(1);
     }
 

@@ -110,7 +110,7 @@ public abstract class WebBaseTest extends BaseTest {
                 URL_THREAD_LOCAL.set("http://127.0.0.1:" + PORT_THREAD_LOCAL.get() + "/");
                 CONTEXT_THREAD_LOCAL.set(SpringApplication.run(source));
             } catch (Throwable e) {
-                throw new UtilsException("初始化异常", e);
+                throw new UtilsException(e, "初始化异常");
             }
             init = true;
         }

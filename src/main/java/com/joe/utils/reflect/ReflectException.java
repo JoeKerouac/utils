@@ -9,6 +9,9 @@ import com.joe.utils.exception.UtilsException;
  * @version 2018.07.18 10:26
  */
 public class ReflectException extends UtilsException {
+
+    private static final long serialVersionUID = 6066042051846843924L;
+
     public ReflectException() {
         super();
     }
@@ -18,7 +21,7 @@ public class ReflectException extends UtilsException {
     }
 
     public ReflectException(String message, Throwable cause) {
-        super(message, cause);
+        super(cause, message);
     }
 
     public ReflectException(Throwable cause) {
@@ -27,6 +30,6 @@ public class ReflectException extends UtilsException {
 
     protected ReflectException(String message, Throwable cause, boolean enableSuppression,
                                boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+        super(cause, enableSuppression, writableStackTrace, message);
     }
 }
