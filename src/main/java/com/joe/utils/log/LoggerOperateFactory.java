@@ -28,7 +28,7 @@ public class LoggerOperateFactory {
      * @return 对应的LogOperate
      * @throws NoSupportLoggerException 不支持时抛出该异常
      */
-    public static LogOperate<?, ?> getConverter(Object logger) {
+    public static <LOGGER, LEVEL> LogOperate<LOGGER, LEVEL> getConverter(Object logger) {
         Assert.notNull(logger, "logger对象不能为空");
         LogImplemention implemention;
 
@@ -50,7 +50,7 @@ public class LoggerOperateFactory {
      * @param implemention implemention
      * @return LogOperate
      */
-    public static LogOperate<?, ?> getConverter(LogImplemention implemention) {
+    public static <LOGGER, LEVEL> LogOperate<LOGGER, LEVEL> getConverter(LogImplemention implemention) {
         Assert.notNull(implemention, "implemention对象不能为空");
         return ClassUtils.getInstance(implemention.getConverterClass());
     }
