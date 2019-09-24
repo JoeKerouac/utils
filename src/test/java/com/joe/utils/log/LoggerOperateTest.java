@@ -35,9 +35,12 @@ public class LoggerOperateTest {
 
         Object logbackLogger = getLogger(logbackClassLoader);
         Object log4jLogger = getLogger(log4jClassLoader);
+        // 系统日志对象
+        Object systemLogger = getLogger(LoggerOperateTest.class.getClassLoader());
 
         invokeTest(logbackLogger);
         invokeTest(log4jLogger);
+        invokeTest(systemLogger);
     }
 
     private void invokeTest(Object logger) {
@@ -78,7 +81,7 @@ public class LoggerOperateTest {
      * @param classLoader ClassLoader
      * @return Logger
      */
-    private static Object getLogger(LogClassLoader classLoader) {
+    private static Object getLogger(ClassLoader classLoader) {
         Class<?> clazz = ClassUtils.loadClass(LoggerFactory.class.getName(), classLoader);
         return ReflectUtil.invoke(clazz, "getLogger", new Class[] { String.class }, LOGGER_NAME);
     }
