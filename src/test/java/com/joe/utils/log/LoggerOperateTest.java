@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +24,13 @@ import com.joe.utils.reflect.ReflectUtil;
  */
 public class LoggerOperateTest {
 
+    private static final String LOGGER_NAME = "com.joe";
+
     @Test
     public void testLoggerOperate() {
+        // logback的ClassLoader
         LogClassLoader logbackClassLoader = new LogClassLoader("logback");
+        // log4j的ClassLoader
         LogClassLoader log4jClassLoader = new LogClassLoader("log4j");
 
         Object logbackLogger = getLogger(logbackClassLoader);
@@ -36,10 +41,12 @@ public class LoggerOperateTest {
     }
 
     private void invokeTest(Object logger) {
-        LogOperate<Object, Object> logOperate = LoggerOperateFactory.getConverter(logger);
+        LogOperate logOperate = LoggerOperateFactory.getConverter(logger);
         logOperate.setLevel(logger, LogLevel.ERROR);
         LogLevel level = logOperate.getLevel(logger);
-        System.out.println(level);
+        Assert.assertEquals(LogLevel.ERROR, level);
+        Assert.assertEquals(LOGGER_NAME, logOperate.getName(logger));
+        Assert.assertTrue(!logOperate.getAllLogger(logger.getClass().getClassLoader()).isEmpty());
     }
 
     /**
@@ -73,7 +80,7 @@ public class LoggerOperateTest {
      */
     private static Object getLogger(LogClassLoader classLoader) {
         Class<?> clazz = ClassUtils.loadClass(LoggerFactory.class.getName(), classLoader);
-        return ReflectUtil.invoke(clazz, "getLogger", new Class[] { String.class }, "com.joe");
+        return ReflectUtil.invoke(clazz, "getLogger", new Class[] { String.class }, LOGGER_NAME);
     }
 
     /**

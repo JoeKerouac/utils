@@ -28,18 +28,18 @@ public class LoggerOperateFactory {
      * @return 对应的LogOperate
      * @throws NoSupportLoggerException 不支持时抛出该异常
      */
-    public static <LOGGER, LEVEL> LogOperate<LOGGER, LEVEL> getConverter(Object logger) {
+    public static LogOperate getConverter(Object logger) {
         Assert.notNull(logger, "logger对象不能为空");
         LogImplemention implemention;
 
         if (logger.getClass().getName().startsWith("ch.qos.logback")) {
             // logback的日志
-            implemention = LogImplemention.LOGBACK;
-        } else if (logger.getClass().getName().startsWith("org.apache.logging.log4j")) {
+            implemention = LogImplemention.SL4J_LOGBACK;
+        } else if (logger.getClass().getName().startsWith("org.apache.logging")) {
             // log4j的日志（slf4j门面）
-            implemention = LogImplemention.LOG4J;
+            implemention = LogImplemention.SLF4J_LOG4J;
         } else {
-            throw new NoSupportLoggerException("不支持的logger[{0}]", logger);
+            throw new NoSupportLoggerException("不支持的logger[{0}:{1}]", logger.getClass(), logger);
         }
 
         return getConverter(implemention);
@@ -50,7 +50,7 @@ public class LoggerOperateFactory {
      * @param implemention implemention
      * @return LogOperate
      */
-    public static <LOGGER, LEVEL> LogOperate<LOGGER, LEVEL> getConverter(LogImplemention implemention) {
+    public static LogOperate getConverter(LogImplemention implemention) {
         Assert.notNull(implemention, "implemention对象不能为空");
         return ClassUtils.getInstance(implemention.getConverterClass());
     }

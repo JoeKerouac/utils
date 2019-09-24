@@ -1,14 +1,11 @@
 package com.joe.utils.log.logback;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.ILoggerFactory;
-import org.slf4j.LoggerFactory;
 
 import com.joe.utils.log.LogLevel;
 import com.joe.utils.log.Slf4jOperate;
 import com.joe.utils.log.exception.NoSupportLoggerException;
+import com.joe.utils.reflect.ReflectUtil;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -20,42 +17,24 @@ import ch.qos.logback.classic.LoggerContext;
  * @author JoeKerouac
  * @version 2019年09月18日 14:59
  */
-public class LogbackOperate extends Slf4jOperate<Level> {
-
-    /**
-     * 类加载的时候就获取LoggerContext
-     */
-    private final static LoggerContext CONTEXT;
-
-    static {
-        ILoggerFactory factory = LoggerFactory.getILoggerFactory();
-        if (factory instanceof LoggerContext) {
-            CONTEXT = (LoggerContext) factory;
-        } else {
-            CONTEXT = null;
-        }
-    }
+public class LogbackOperate extends Slf4jOperate {
 
     @Override
-    public LogLevel getLevel(org.slf4j.Logger logger) {
-        if (logger instanceof Logger) {
-            return convertToSystem(((Logger) logger).getLevel());
+    public void setLevel(Object logger, LogLevel level) {
+        if (isSameName(logger, Logger.class)) {
+            setLevel(logger, level, Level.class);
         } else {
             throw new NoSupportLoggerException("不支持的日志对象:{0}", logger);
         }
     }
 
     @Override
-    public void setLevel(org.slf4j.Logger logger, LogLevel level) {
-        if (logger instanceof Logger) {
-            ((Logger) logger).setLevel(convert(level));
+    public List<Object> getAllLogger(ClassLoader loader) {
+        Object factory = getLogFactory(loader);
+        if (isSameName(factory, LoggerContext.class)) {
+            return ReflectUtil.invoke(factory, "getLoggerList");
         } else {
-            throw new NoSupportLoggerException("不支持的日志对象:{0}", logger);
+            throw new NoSupportLoggerException("不支持的日志工厂对象:{0}", factory);
         }
-    }
-
-    @Override
-    public List<org.slf4j.Logger> getAllLogger() {
-        return new ArrayList<>(CONTEXT.getLoggerList());
     }
 }

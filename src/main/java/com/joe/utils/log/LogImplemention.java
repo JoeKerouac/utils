@@ -14,15 +14,15 @@ import lombok.Data;
 public class LogImplemention {
 
     /**
-     * log4j
+     * slf4j门面的log4j
      */
-    public static final LogImplemention LOG4J   = new LogImplemention("log4j",
+    public static final LogImplemention SLF4J_LOG4J = new LogImplemention("log4j",
         "com.joe.utils.log.log4j2.Log4jOperate");
 
     /**
-     * logback
+     * slf4j门面的logback
      */
-    public static final LogImplemention LOGBACK = new LogImplemention("logback",
+    public static final LogImplemention SL4J_LOGBACK = new LogImplemention("logback",
         "com.joe.utils.log.logback.LogbackOperate");
 
     /**
