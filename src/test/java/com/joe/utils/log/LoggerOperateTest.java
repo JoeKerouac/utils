@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -90,12 +88,9 @@ public class LoggerOperateTest {
      * 自定义加载器，用于突破双亲委托
      */
     static class LogClassLoader extends URLClassLoader {
+        private String      logName;
 
-        private Map<String, Class<?>> classMap = new ConcurrentHashMap<>();
-
-        private String                logName;
-
-        private ClassLoader           parent;
+        private ClassLoader parent;
 
         public LogClassLoader(String logName) {
             super(new URL[] {}, LogClassLoader.class.getClassLoader());
@@ -140,7 +135,11 @@ public class LoggerOperateTest {
         @Override
         protected Class<?> findClass(String name) throws ClassNotFoundException {
             if (name.startsWith("org.slf4j.LoggerFactory")) {
-                return classMap.get(name);
+                Class<?> clazz = findLoadedClass(name);
+                if (clazz == null) {
+                    throw new ClassNotFoundException(name);
+                }
+                return clazz;
             }
             return super.findClass(name);
         }
@@ -203,7 +202,6 @@ public class LoggerOperateTest {
                 if (resolve) {
                     resolveClass(clazz);
                 }
-                classMap.put(name, clazz);
                 return clazz;
             } catch (IOException e) {
                 throw new RuntimeException(e);
