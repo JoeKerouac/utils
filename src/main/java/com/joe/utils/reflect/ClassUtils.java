@@ -56,6 +56,20 @@ public class ClassUtils {
     }
 
     /**
+     * 使用给定的ClassLoader重新加载class
+     *
+     * @param clazz class
+     * @param loader 重加加载class的ClassLoader
+     * @param <T>       class实际类型
+     * @return class
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Class<T> reloadClass(Class<T> clazz, ClassLoader loader) {
+        Assert.notNull(clazz, "class不能为空");
+        return (Class<T>) loadClass(clazz.getName(), loader);
+    }
+
+    /**
      * 使用默认ClassLoader加载class
      *
      * @param className class名字
