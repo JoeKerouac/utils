@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 
 import com.joe.utils.common.Assert;
 import com.joe.utils.log.exception.NoSupportLoggerException;
-import com.joe.utils.reflect.ClassUtils;
+import com.joe.utils.reflect.clazz.ClassUtils;
 
 import lombok.Data;
 

@@ -1,10 +1,12 @@
-package com.joe.utils.reflect;
+package com.joe.utils.reflect.clazz;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
+import com.joe.utils.reflect.ReflectException;
+import com.joe.utils.reflect.ReflectUtil;
 
 /**
  * Class工具类
@@ -24,6 +26,7 @@ public class ClassUtils {
      * @return 对应的输入流
      */
     public static InputStream getClassAsStream(Class<?> clazz) {
+        Assert.notNull(clazz, "class不能为空");
         return clazz.getResourceAsStream(getClassFileName(clazz));
     }
 

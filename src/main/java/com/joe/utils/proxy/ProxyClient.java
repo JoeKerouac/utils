@@ -1,6 +1,6 @@
 package com.joe.utils.proxy;
 
-import com.joe.utils.reflect.ClassUtils;
+import com.joe.utils.reflect.clazz.ClassUtils;
 
 /**
  * 代理客户端，代理的class必须是公共可访问的（如果是内部类那么必须是静态内部类）

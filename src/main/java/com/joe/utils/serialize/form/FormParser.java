@@ -9,7 +9,7 @@ import java.util.Map;
 import com.joe.utils.common.Assert;
 import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.exception.NoSupportException;
-import com.joe.utils.reflect.ClassUtils;
+import com.joe.utils.reflect.clazz.ClassUtils;
 import com.joe.utils.reflect.JavaTypeUtil;
 import com.joe.utils.reflect.ReflectUtil;
 import com.joe.utils.serialize.SerializeException;

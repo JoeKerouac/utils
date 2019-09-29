@@ -6,7 +6,7 @@ import com.joe.utils.proxy.Interception;
 import com.joe.utils.proxy.ProxyClassLoader;
 import com.joe.utils.proxy.ProxyClient;
 import com.joe.utils.proxy.ProxyParent;
-import com.joe.utils.reflect.ClassUtils;
+import com.joe.utils.reflect.clazz.ClassUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.ByteBuddy;

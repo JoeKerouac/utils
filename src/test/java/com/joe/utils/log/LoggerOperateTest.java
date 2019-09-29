@@ -20,6 +20,9 @@ public class LoggerOperateTest extends LogBaseTest {
         Object logbackLogger = getLogbackLogger(LOGGER_NAME);
         Object log4jLogger = getLog4jLogger(LOGGER_NAME);
 
+        Assert.assertTrue(logbackLogger.getClass().getName().contains("logback"));
+        Assert.assertTrue(log4jLogger.getClass().getName().contains("apache"));
+
         invokeTest(logbackLogger);
         invokeTest(log4jLogger);
         LogOperate logOperate = LoggerOperateFactory.getConverter(log);

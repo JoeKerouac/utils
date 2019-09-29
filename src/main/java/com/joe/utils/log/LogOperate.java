@@ -3,7 +3,7 @@ package com.joe.utils.log;
 import java.util.List;
 
 import com.joe.utils.log.exception.NoSupportLoggerException;
-import com.joe.utils.reflect.ClassUtils;
+import com.joe.utils.reflect.clazz.ClassUtils;
 
 /**
  * 日志操作组件

@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory;
 
 import com.joe.utils.common.Assert;
 import com.joe.utils.log.exception.NoSupportLoggerException;
-import com.joe.utils.reflect.ClassUtils;
+import com.joe.utils.reflect.clazz.ClassUtils;
 import com.joe.utils.reflect.ReflectUtil;
 import org.slf4j.MDC;
 
