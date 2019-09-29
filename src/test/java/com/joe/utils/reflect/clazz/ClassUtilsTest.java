@@ -15,11 +15,24 @@ import com.joe.utils.common.IOUtils;
  */
 public class ClassUtilsTest {
 
+    private static final JClassLoader LOADER = new JClassLoader(new String[] { ".*" },
+        name -> ClassUtils.getClassAsStream(ClassUtils.loadClass(name)));
+
     @Test
     public void doTestGetClassAsStream() throws Exception {
         InputStream stream = ClassUtils.getClassAsStream(ClassUtils.class);
-        Class<?> clazz = new JClassLoader(null).defineClass(ClassUtils.class.getName(),
-            IOUtils.read(stream));
+        Class<?> clazz = LOADER.defineClass(ClassUtils.class.getName(), IOUtils.read(stream));
+        Assert.assertNotNull(clazz);
+    }
+
+    @Test
+    public void doTestGetDefaultClassLoader() {
+        Assert.assertNotNull(ClassUtils.getDefaultClassLoader());
+    }
+
+    @Test
+    public void doTestReloadClass() {
+        Class<?> clazz = ClassUtils.reloadClass(ClassUtilsTest.class, LOADER);
         Assert.assertNotNull(clazz);
     }
 }
