@@ -56,7 +56,8 @@ public class Log4jOperate extends Slf4jOperate {
     public List<Object> getAllLogger(ClassLoader loader) {
         Object iLoggerFactory = getLogFactory(loader);
         if (!isSameName(iLoggerFactory, Log4jLoggerFactory.class)) {
-            throw new NoSupportLoggerException("不支持的日志工厂：{0}", iLoggerFactory);
+            throw new NoSupportLoggerException("不支持的日志工厂：[{0}:{1}]", iLoggerFactory.getClass(),
+                iLoggerFactory);
         }
         Map<LoggerContext, ConcurrentMap<String, Object>> registry = ReflectUtil
             .getFieldValue(iLoggerFactory, "registry");

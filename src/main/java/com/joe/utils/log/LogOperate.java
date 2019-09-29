@@ -3,6 +3,7 @@ package com.joe.utils.log;
 import java.util.List;
 
 import com.joe.utils.log.exception.NoSupportLoggerException;
+import com.joe.utils.reflect.ClassUtils;
 
 /**
  * 日志操作组件
@@ -63,4 +64,30 @@ public interface LogOperate {
      * @throws NoSupportLoggerException 不支持时抛出该异常
      */
     List<Object> getAllLogger(ClassLoader loader) throws NoSupportLoggerException;
+
+    /**
+     * 获取当前日志系统所有logger，默认使用当前ClassLoader
+     *
+     * @return 当前日志系统所有logger
+     * @throws NoSupportLoggerException 不支持时抛出该异常
+     */
+    default List<Object> getAllLogger() throws NoSupportLoggerException {
+        return getAllLogger(ClassUtils.getDefaultClassLoader());
+    }
+
+    /**
+     * mdc中放置内容，相当于{@link org.slf4j.MDC#put(String, String)}
+     * @param key key
+     * @param value value
+     */
+    default void mdcPut(String key, String value) {
+        mdcPut(ClassUtils.getDefaultClassLoader(), key, value);
+    }
+
+    /**
+     * mdc中放置内容，相当于{@link org.slf4j.MDC#put(String, String)}，只不过会使用指定ClassLoader加载的MDC对象
+     * @param key key
+     * @param value value
+     */
+    void mdcPut(ClassLoader loader, String key, String value);
 }

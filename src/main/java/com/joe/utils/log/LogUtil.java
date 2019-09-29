@@ -168,14 +168,21 @@ public class LogUtil {
      */
     private void logSubmit(Object logger, LogLevel level, Throwable throwable,
                            Supplier<String> msgSupplier, Object[] args) {
-        level = level == null ? LogLevel.DEBUG : level;
-        LogTask task = new LogTask(logger, level, throwable, msgSupplier, args);
-        for (LogFilter filter : filters) {
-            // 如果返回false或者null则拦截
-            if (Boolean.TRUE != filter.apply(task)) {
-                return;
+        ClassLoader old = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(logger.getClass().getClassLoader());
+        try{
+            level = level == null ? LogLevel.DEBUG : level;
+            LogTask task = new LogTask(logger, level, throwable, msgSupplier, args);
+            for (LogFilter filter : filters) {
+                // 如果返回false或者null则拦截
+                if (Boolean.TRUE != filter.apply(task)) {
+                    return;
+                }
             }
+            service.submit(task);
+        }finally {
+            Thread.currentThread().setContextClassLoader(old);
         }
-        service.submit(task);
+
     }
 }

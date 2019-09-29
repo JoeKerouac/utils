@@ -6,6 +6,7 @@ import com.joe.utils.common.Assert;
 import com.joe.utils.log.exception.NoSupportLoggerException;
 import com.joe.utils.reflect.ClassUtils;
 import com.joe.utils.reflect.ReflectUtil;
+import org.slf4j.MDC;
 
 /**
  * slf4j日志适配器(可用于logback和log4j实现)
@@ -52,6 +53,13 @@ public abstract class Slf4jOperate implements LogOperate {
             throw new NoSupportLoggerException("不支持的日志级别：{0}:{1}", level.getClass(), level);
         }
         return logLevel;
+    }
+
+    @Override
+    public void mdcPut(ClassLoader loader, String key, String value) {
+            Assert.notNull(loader, "loader不能为空");
+        Class<?> mdcClass = ClassUtils.reloadClass(MDC.class, loader);
+        ReflectUtil.invoke(mdcClass, "put", new Class[]{String.class, String.class}, key, value);
     }
 
     /**
