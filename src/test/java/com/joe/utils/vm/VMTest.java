@@ -3,7 +3,7 @@ package com.joe.utils.vm;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.joe.utils.common.enums.unit.MemoryUnit;
+import com.joe.utils.common.unit.impl.MemoryUnitDefinition;
 
 public class VMTest {
 
@@ -19,7 +19,7 @@ public class VMTest {
 
     @Test
     public void doTestJVMMemoryInfo() {
-        Assert.assertNotNull(JVMMemoryInfo.getInstance(MemoryUnit.MB));
+        Assert.assertNotNull(JVMMemoryInfo.getInstance(MemoryUnitDefinition.MB));
     }
 
     @Test
@@ -29,6 +29,6 @@ public class VMTest {
 
     @Test
     public void doTestMemoryInfo() {
-        Assert.assertNotNull(MemoryInfo.getMemoryInfos(MemoryUnit.MB));
+        Assert.assertNotNull(MemoryInfo.getMemoryInfos(MemoryUnitDefinition.MB));
     }
 }

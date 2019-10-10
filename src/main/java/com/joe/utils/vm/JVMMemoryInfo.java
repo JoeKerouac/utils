@@ -1,8 +1,7 @@
 package com.joe.utils.vm;
 
-import java.math.BigDecimal;
-
-import com.joe.utils.common.enums.unit.MemoryUnit;
+import com.joe.utils.common.unit.impl.MemoryValue;
+import com.joe.utils.common.unit.impl.MemoryUnitDefinition;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,22 +20,17 @@ public class JVMMemoryInfo {
     /**
      * 当前空闲内存
      */
-    private final BigDecimal freeMemory;
+    private final MemoryValue freeMemory;
 
     /**
      * 虚拟机可用最大内存
      */
-    private final BigDecimal maxMemory;
+    private final MemoryValue maxMemory;
 
     /**
      * 当前总内存
      */
-    private final BigDecimal totalMemory;
-
-    /**
-     * 内存单位
-     */
-    private final MemoryUnit unit;
+    private final MemoryValue totalMemory;
 
     /**
      * 获取JVM虚拟机内存信息
@@ -44,20 +38,19 @@ public class JVMMemoryInfo {
      * @param unit 结果单位
      * @return JVM虚拟机内存信息
      */
-    public static JVMMemoryInfo getInstance(MemoryUnit unit) {
+    public static JVMMemoryInfo getInstance(MemoryUnitDefinition unit) {
         Runtime runtime = Runtime.getRuntime();
         long freeMemory = runtime.freeMemory();
         long maxMemory = runtime.maxMemory();
         long totalMemory = runtime.totalMemory();
-        return new JVMMemoryInfo(MemoryUnit.convert(freeMemory, MemoryUnit.BYTE, unit),
-            MemoryUnit.convert(maxMemory, MemoryUnit.BYTE, unit),
-            MemoryUnit.convert(totalMemory, MemoryUnit.BYTE, unit), unit);
+        return new JVMMemoryInfo(MemoryUtils.build(freeMemory, MemoryUnitDefinition.BYTE, unit),
+            MemoryUtils.build(maxMemory, MemoryUnitDefinition.BYTE, unit),
+            MemoryUtils.build(totalMemory, MemoryUnitDefinition.BYTE, unit));
     }
 
     @Override
     public String toString() {
-        return "JVMMemoryInfo{" + "freeMemory=" + MemoryUtils.toString(freeMemory, unit)
-               + ", maxMemory=" + MemoryUtils.toString(maxMemory, unit) + ", totalMemory="
-               + MemoryUtils.toString(totalMemory, unit) + '}';
+        return "JVMMemoryInfo{" + "freeMemory=" + freeMemory + ", maxMemory=" + maxMemory
+               + ", totalMemory=" + totalMemory + '}';
     }
 }

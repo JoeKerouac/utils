@@ -4,13 +4,13 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.joe.utils.common.enums.unit.MemoryUnit;
+import com.joe.utils.common.unit.impl.MemoryValue;
+import com.joe.utils.common.unit.impl.MemoryUnitDefinition;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -45,32 +45,27 @@ public class MemoryInfo {
     /**
      * 内存区名字
      */
-    private final String     name;
+    private final String       name;
 
     /**
      * 内存区初始化大小
      */
-    private final BigDecimal init;
+    private final MemoryValue init;
 
     /**
      * 内存区已使用大小
      */
-    private final BigDecimal used;
+    private final MemoryValue used;
 
     /**
      * 内存区现在可用大小
      */
-    private final BigDecimal committed;
+    private final MemoryValue committed;
 
     /**
      * 内存区最大可用大小
      */
-    private final BigDecimal max;
-
-    /**
-     * 内存单位
-     */
-    private final MemoryUnit unit;
+    private final MemoryValue max;
 
     /**
      * 获取各个内存区的使用情况
@@ -78,7 +73,7 @@ public class MemoryInfo {
      * @param unit 结果单位
      * @return 各个内存区的使用情况
      */
-    public static List<MemoryInfo> getMemoryInfos(MemoryUnit unit) {
+    public static List<MemoryInfo> getMemoryInfos(MemoryUnitDefinition unit) {
         Map<String, MemoryUsage> map = new TreeMap<>();
         List<MemoryPoolMXBean> memoryPoolMXBeanList = ManagementFactory.getMemoryPoolMXBeans();
         List<MemoryInfo> memoryInfoList = new ArrayList<>();
@@ -102,10 +97,10 @@ public class MemoryInfo {
             long used = memoryUsage.getUsed();
             long committed = memoryUsage.getCommitted();
 
-            MemoryInfo info = new MemoryInfo(name, MemoryUnit.convert(init, MemoryUnit.BYTE, unit),
-                MemoryUnit.convert(used, MemoryUnit.BYTE, unit),
-                MemoryUnit.convert(committed, MemoryUnit.BYTE, unit),
-                MemoryUnit.convert(max, MemoryUnit.BYTE, unit), unit);
+            MemoryInfo info = new MemoryInfo(name, MemoryUtils.build(init, MemoryUnitDefinition.BYTE, unit),
+                MemoryUtils.build(used, MemoryUnitDefinition.BYTE, unit),
+                MemoryUtils.build(committed, MemoryUnitDefinition.BYTE, unit),
+                MemoryUtils.build(max, MemoryUnitDefinition.BYTE, unit));
             memoryInfoList.add(info);
         }
         return memoryInfoList;
@@ -113,9 +108,7 @@ public class MemoryInfo {
 
     @Override
     public String toString() {
-        return "MemoryInfo{" + "name='" + name + '\'' + ", init=" + MemoryUtils.toString(init, unit)
-               + ", used=" + MemoryUtils.toString(used, unit) + ", committed="
-               + MemoryUtils.toString(committed, unit) + ", max=" + MemoryUtils.toString(max, unit)
-               + '}';
+        return "MemoryInfo{" + "name='" + name + '\'' + ", init=" + init + ", used=" + used
+               + ", committed=" + committed + ", max=" + max + '}';
     }
 }
