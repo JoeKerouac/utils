@@ -1,100 +1,85 @@
 package com.joe.utils.common;
 
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.joe.utils.area.Area;
+import com.joe.utils.area.AreaUtil;
+import com.joe.utils.common.string.StringConst;
+import com.joe.utils.common.string.StringFormater;
+
+/**
+ * 身份证工具，只适用于18位身份证
+ *
+ * @author JoeKerouac
+ * @version 2019年10月10日 15:36
+ */
 public class IDCard {
-    private static final Logger        logger          = LoggerFactory.getLogger(IDCard.class);
-    /**
-     * 地区表
-     */
-    private static Map<String, String> AREA            = new TreeMap<>((o1, o2) -> {
-                                                           Integer i1 = Integer.parseInt(o1);
-                                                           Integer i2 = Integer.parseInt(o2);
-                                                           return i1 - i2;
-                                                       });
+
+    private static final Logger  logger          = LoggerFactory.getLogger(IDCard.class);
+
     /**
      * 加权表
      */
-    private static int[]               POWER           = new int[] { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3,
-                                                                     7, 9, 10, 5, 8, 4, 2 };
+    private static int[]         POWER           = new int[] { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9,
+                                                               10, 5, 8, 4, 2 };
     /**
      * 加权因子
      */
-    private static char[]              DIVISOR         = new char[] { '1', '0', 'X', '9', '8', '7',
-                                                                      '6', '5', '4', '3', '2' };
-    /**
-     * 香港及特别行政区的前缀
-     */
-    private static String[]            HK              = { "710000", "810000", "820000" };
-    /**
-     * 区域正则
-     */
-    private static final Pattern       AREA_PATTERN    = Pattern.compile("(.*)?市");
+    private static char[]        DIVISOR         = new char[] { '1', '0', 'X', '9', '8', '7', '6',
+                                                                '5', '4', '3', '2' };
+
     /**
      * 身份证正则
      */
-    private static final Pattern       ID_CARD_PATTERN = Pattern.compile("[0-9]{17}[0-9|x|X]");
-
-    static {
-        // 初始化地区
-        try {
-            InputStream input = IDCard.class.getClassLoader().getResourceAsStream("text");
-            String areaStr = IOUtils.read(input, "UTF8");
-            input.close();
-            String data = areaStr.replaceAll("(\\s)+", ";");
-            String[] areas = data.split(";");
-
-            for (String str : areas) {
-                String[] entity = str.split("=");
-                AREA.put(entity[0], entity[1]);
-            }
-        } catch (Exception e) {
-            logger.error("地区初始化失败", e);
-        }
-    }
+    private static final Pattern ID_CARD_PATTERN = Pattern.compile("[0-9]{17}[0-9|x|X]");
 
     /**
      * 根据出生日期随机生成一个身份证号
      *
-     * @param borthday 出生日期，格式为yyyyMMdd（本方法不严格验证参数准确性，只会验证长度和是否数字）
+     * @param birthday 出生日期，格式为yyyyMMdd（本方法不严格验证参数准确性，只会验证长度和是否数字）
      * @return 根据指定出生日期生成的身份证号，参数格式错误时返回null
      */
-    public static String create(String borthday) {
-        if (!Pattern.matches("[0-9]{8}", borthday)) {
+    public static String create(String birthday) {
+        if (!Pattern.matches("[0-9]{8}", birthday)) {
             return null;
         }
-        // 随机挑出一个省市
-        String card = "";
-        int r1 = (int) (Math.random() * AREA.size());
-        int i = 0;
-        for (String befor : AREA.keySet()) {
-            if (r1 == i) {
-                card += befor;
-                break;
-            } else {
-                i++;
+        // 身份证号
+        String card = StringConst.EMPTY;
+
+        {
+            // 随机挑出一个省市
+            Map<String, Area> areaMap = getAreaMap(birthday);
+            int r1 = (int) (Math.random() * areaMap.size());
+            int i = 0;
+            for (String befor : areaMap.keySet()) {
+                if (r1 == i) {
+                    card += befor;
+                    break;
+                } else {
+                    i++;
+                }
             }
         }
-        card += borthday;
-        // 生成三位随机数
-        int r2 = (int) (Math.random() * 899 + 100);
-        card += r2;
+
+        {
+            // 拼接生日
+            card += birthday;
+        }
+
+        {
+            // 生成三位随机数
+            int r2 = (int) (Math.random() * 899 + 100);
+            card += r2;
+        }
 
         // 生成最后一位校验码
-        byte[] idCardByte = card.getBytes();
-        int sum = 0;
-        for (int j = 0; j < 17; j++) {
-            sum += (((int) idCardByte[j]) - 48) * POWER[j];
-        }
-        int mod = sum % 11;
+        int mod = calcMod(card);
         char calcLast = DIVISOR[mod];
         card += calcLast;
         return card;
@@ -118,11 +103,7 @@ public class IDCard {
 
         // 验证最后一位加权码
         byte[] idCardByte = idCard.getBytes();
-        int sum = 0;
-        for (int i = 0; i < 17; i++) {
-            sum += (((int) idCardByte[i]) - 48) * POWER[i];
-        }
-        int mod = sum % 11;
+        int mod = calcMod(idCard);
         int calcLast = DIVISOR[mod];
         char last;
         if (idCardByte[17] == 'x' || idCardByte[17] == 'X') {
@@ -139,53 +120,61 @@ public class IDCard {
     }
 
     /**
-     * 获取用户所属省份
+     * 获取用户所属省份，可能不准（因为有些人出生后很久才上户口，此时可能行政区划代码已经更改了）
      *
      * @param idCard 用户身份证号
      * @return 用户所属省份
      */
     public static String getProvince(String idCard) {
-        return AREA.get(idCard.substring(0, 2) + "0000");
+        String birthday = getBirthday(idCard);
+        String code = getAreaCode(idCard);
+        Map<String, Area> areaMap = getAreaMap(birthday, code);
+        Area area = areaMap == null ? null : areaMap.get(code);
+
+        if (area == null) {
+            logger.warn(StringFormater.simpleFormat("地区[{0}]不存在或者地区已不在最新行政区划代码中，无法获取所属省份", code));
+            return null;
+        }
+
+        return AreaUtil.getProvince(area, areaMap).getName();
     }
 
     /**
-     * 获取用户所属县市
+     * 获取用户所属县市，可能不准（因为有些人出生后很久才上户口，此时可能行政区划代码已经更改了）
      *
      * @param idCard 用户身份证号
      * @return 用户所属县市
      */
     public static String getArea(String idCard) {
-        // 用户所属省份
-        String province;
+        String code = getAreaCode(idCard);
+        Map<String, Area> areaMap = getAreaMap(getBirthday(idCard), code);
         // 用户所属地区
-        String area;
-        String pre = idCard.substring(0, 6);
+        Area area = areaMap == null ? null : areaMap.get(code);
 
-        if (AREA.get(pre) == null) {
-            logger.warn("地区不存在或者地区已不在最新行政区划代码中");
+        if (area == null) {
+            logger.warn(StringFormater.simpleFormat("地区[{0}]不存在或者地区已不在最新行政区划代码中", code));
+            return null;
         }
 
-        // 判断是否输入台湾省和特别行政区
-        if (Tools.contains(pre, HK)) {
-            // 台湾省和特别行政区
-            area = AREA.get(pre + "0000");
-        } else {
-            // 查询用户所属省份
-            province = AREA.get(idCard.substring(0, 2) + "0000");
-            // 判断用户所属地区是否是直辖市
+        return AreaUtil.getFullName(area, areaMap);
+    }
 
-            Matcher areamM = AREA_PATTERN.matcher(province);
-            StringBuilder sb = new StringBuilder();
-            if (!areamM.matches()) {
-                // 不是直辖市，加上用户所属市区名
-                sb.append(AREA.get(idCard.substring(0, 4) + "00"));
-            }
+    /**
+     * 获取用于生日
+     * @param idCard 身份证号
+     * @return 生日，格式yyyyMMdd
+     */
+    public static String getBirthday(String idCard) {
+        return idCard.substring(6, 14);
+    }
 
-            sb.append(AREA.get(idCard.substring(0, 6)));
-            // 用户的地址
-            area = sb.toString();
-        }
-        return area;
+    /**
+     * 获取身份证的区域编码
+     * @param idCard 身份证
+     * @return 区域编码
+     */
+    public static String getAreaCode(String idCard) {
+        return idCard.substring(0, 6);
     }
 
     /**
@@ -224,5 +213,65 @@ public class IDCard {
             logger.warn("身份证年龄应该大于等于0，但是实际年龄为{}", age);
         }
         return age;
+    }
+
+    /**
+     * 计算校验和
+     * @param card 身份证号，长度不得低于17位，使用前17位计算校验和
+     * @return 校验和
+     */
+    private static int calcMod(String card) {
+        // 生成最后一位校验码
+        byte[] idCardByte = card.getBytes();
+        int sum = 0;
+        for (int j = 0; j < 17; j++) {
+            sum += (((int) idCardByte[j]) - 48) * POWER[j];
+        }
+        return sum % 11;
+    }
+
+    /**
+     * 获取指定年份指定code对应的区域集合
+     *
+     * @param birthday 年份
+     * @param code 区域编码
+     * @return 指定年份指定code对应的区域集合
+     */
+    private static Map<String, Area> getAreaMap(String birthday, String code) {
+        // 老区域
+        Map<String, Area> oldAreaMap = getAreaMap(birthday);
+        Area oldArea = oldAreaMap == null ? null : oldAreaMap.get(code);
+
+        // 年份加1计算新区域
+        int year = Integer.parseInt(birthday.substring(0, 4));
+        year += 1;
+        birthday = year + birthday.substring(4, 8);
+
+        // 新区域
+        Map<String, Area> newAreaMap = getAreaMap(birthday);
+        Area newArea = newAreaMap == null ? null : newAreaMap.get(code);
+
+        // 决策使用哪个
+        if (oldArea == null && newArea == null) {
+            return null;
+        } else if (oldArea == null) {
+            return newAreaMap;
+        } else if (newArea == null) {
+            return oldAreaMap;
+        } else if (oldArea.getName().equals(newArea.getName())) {
+            return oldAreaMap;
+        } else {
+            return newAreaMap;
+        }
+    }
+
+    /**
+     * 获取指定年份的区域集合
+     * @param birthday 生日
+     * @return 该生日对应的区域集合
+     */
+    private static Map<String, Area> getAreaMap(String birthday) {
+        return AreaUtil.getArea(birthday.substring(0, 4) + "." + birthday.substring(4, 6) + "."
+                                + birthday.substring(6, 8));
     }
 }
