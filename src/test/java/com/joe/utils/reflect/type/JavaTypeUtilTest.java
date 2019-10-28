@@ -1,4 +1,4 @@
-package com.joe.utils.reflect;
+package com.joe.utils.reflect.type;
 
 import java.util.ArrayList;
 import java.util.HashMap;

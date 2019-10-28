@@ -1,4 +1,4 @@
-package com.joe.utils.reflect;
+package com.joe.utils.reflect.type;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import com.joe.utils.common.Assert;
 
+import com.joe.utils.reflect.BeanUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**

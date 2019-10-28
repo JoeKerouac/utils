@@ -1,4 +1,4 @@
-package com.joe.utils.reflect;
+package com.joe.utils.reflect.type;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

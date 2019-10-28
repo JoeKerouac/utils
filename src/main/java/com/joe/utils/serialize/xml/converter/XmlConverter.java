@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.joe.utils.common.string.StringUtils;
-import com.joe.utils.reflect.JavaTypeUtil;
+import com.joe.utils.reflect.type.JavaTypeUtil;
 import com.joe.utils.serialize.xml.XmlParser;
 import com.joe.utils.serialize.xml.XmlTypeConvert;
 

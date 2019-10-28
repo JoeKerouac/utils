@@ -18,7 +18,7 @@ import com.joe.utils.common.string.StringUtils;
 import com.joe.utils.exception.ExceptionWraper;
 import com.joe.utils.reflect.BeanUtils;
 import com.joe.utils.reflect.BeanUtils.CustomPropertyDescriptor;
-import com.joe.utils.reflect.JavaTypeUtil;
+import com.joe.utils.reflect.type.JavaTypeUtil;
 import com.joe.utils.serialize.SerializeException;
 import com.joe.utils.serialize.Serializer;
 import com.joe.utils.serialize.xml.converter.XmlTypeConverterUtil;
