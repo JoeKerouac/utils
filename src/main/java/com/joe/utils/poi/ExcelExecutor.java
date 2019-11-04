@@ -267,7 +267,7 @@ public class ExcelExecutor {
     /**
      * 将pojo集合写入excel（处理数据，不写入）
      *
-     * @param datas    pojo集合，空元素将被忽略
+     * @param datas    pojo集合，空元素将被忽略，集合中必须是都是同种对象
      * @param hasTitle 是否需要title
      * @param workbook 工作簿
      * @param transverse 是否横向写入（一列对应一个pojo，标题在第一列），默认false（一行一个pojo，标题在第一行）
@@ -279,7 +279,7 @@ public class ExcelExecutor {
             log.warn("给定数据集合为空");
             return workbook;
         }
-        datas = datas.parallelStream().filter(data -> data != null).collect(Collectors.toList());
+        datas = datas.parallelStream().filter(Objects::nonNull).collect(Collectors.toList());
         if (datas.isEmpty()) {
             log.warn("给定数据集合里的数据全是空");
             return workbook;
@@ -287,19 +287,18 @@ public class ExcelExecutor {
         //获取所有字段（包括父类的）
         Field[] fields = ReflectUtil.getAllFields(datas.get(0).getClass());
 
-        log.info("获取可写入excel的字段");
+        // 过滤可以写入的字段
         List<Field> writeFields = new ArrayList<>();
         for (Field field : fields) {
             String name = field.getName();
-            log.debug("检查字段[{}]是否可以写入", name);
             Class<?> type = field.getType();
 
+            // 查找该字段类型的数据处理器
             List<ExcelDataWriter<?>> data = writers.values().stream()
                 .filter(excelData -> excelData.writeable(type)).collect(Collectors.toList());
             if (data.isEmpty()) {
                 log.info("字段[{}]不能写入", name);
             } else {
-                log.info("字段[{}]可以写入excel");
                 ExcelColumn column = field.getAnnotation(ExcelColumn.class);
 
                 if (column == null || !column.ignore()) {
@@ -307,19 +306,15 @@ public class ExcelExecutor {
                 }
             }
         }
-        log.debug("可写入excel的字段集合为：[{}]", writeFields);
-        log.debug("对可写入excel的字段集合排序");
 
-        Collections.sort(writeFields, COMPARATOR);
-
-        log.debug("可写入excel的字段集合排序完毕，构建标题列表");
+        log.debug("可写入excel的字段集合为：[{}]，对可写入excel的字段集合排序", writeFields);
+        writeFields.sort(COMPARATOR);
 
         List<Writer<?>> titles = null;
         if (hasTitle) {
             log.info("当前需要标题列表，构建...");
             titles = new ArrayList<>(writeFields.size());
-            for (int i = 0; i < writeFields.size(); i++) {
-                Field field = writeFields.get(i);
+            for (Field field : writeFields) {
                 ExcelColumn column = field.getAnnotation(ExcelColumn.class);
                 if (column == null || StringUtils.isEmpty(column.value())) {
                     titles.add(build(field.getName()));
@@ -329,18 +324,14 @@ public class ExcelExecutor {
             }
         }
 
-        log.debug("构建单元格数据");
         List<List<Writer<?>>> writeDatas = new ArrayList<>(datas.size());
-        for (int i = 0; i < datas.size(); i++) {
-            Object dataValue = datas.get(i);
+        for (Object dataValue : datas) {
             //构建一行数据
             List<Writer<?>> columnDatas = new ArrayList<>(writeFields.size());
             //加入
             writeDatas.add(columnDatas);
-            for (int j = 0; j < writeFields.size(); j++) {
-                Field field = writeFields.get(j);
+            for (Field field : writeFields) {
                 try {
-                    log.debug("获取[{}]中字段[{}]的值", dataValue, field.getName());
                     Object value = field.get(dataValue);
                     columnDatas.add(build(value));
                 } catch (IllegalAccessException e) {
@@ -351,9 +342,7 @@ public class ExcelExecutor {
         }
 
         log.debug("要写入的数据为：[{}]", writeDatas);
-        log.info("准备写入数据");
         writeToExcel(titles, writeDatas, hasTitle, workbook, transverse);
-        log.info("标题列表为：[{}]", titles);
         return workbook;
     }
 
@@ -374,7 +363,7 @@ public class ExcelExecutor {
             return workbook;
         }
 
-        log.info("写入excel，{}标题", hasTitle ? "需要" : "不需要");
+        log.debug("写入excel，{}标题", hasTitle ? "需要" : "不需要");
         Sheet sheet = workbook.createSheet();
         int rowNum = 0;
 
@@ -414,6 +403,7 @@ public class ExcelExecutor {
      * @param data 要写入单元格的数据
      * @return 返回不为空表示能写入，并返回单元格数据，返回空表示无法写入
      */
+    @SuppressWarnings("unchecked")
     private Writer<?> build(Object data) {
         Optional<ExcelDataWriter<?>> dataBuilder = writers.values().parallelStream()
             .filter(excelData -> excelData.writeable(data)).limit(1).findFirst();
