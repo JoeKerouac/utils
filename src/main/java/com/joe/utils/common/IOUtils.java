@@ -25,7 +25,7 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static byte[] read(File file) throws IOException {
-        return read(new FileInputStream(file));
+        return read(new FileInputStream(file), DEFAULT_BUF_SIZE, true);
     }
 
     /**
@@ -37,7 +37,7 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static String read(File file, String charset) throws IOException {
-        return read(new FileInputStream(file), charset);
+        return read(file, charset, DEFAULT_BUF_SIZE);
     }
 
     /**
@@ -50,7 +50,7 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static String read(File file, String charset, int bufSize) throws IOException {
-        return read(new FileInputStream(file), charset, bufSize);
+        return read(new FileInputStream(file), charset, bufSize, true);
     }
 
     /**
@@ -86,10 +86,25 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static String read(InputStream in, String charset, int bufSize) throws IOException {
+        return read(in, charset, bufSize, false);
+    }
+
+    /**
+     * 将流中的数据读取为字符串（缓冲区大小为256byte）
+     *
+     * @param in      输入流
+     * @param charset 字符串编码
+     * @param bufSize 自定义缓冲区大小
+     * @param close 读取完毕是否关闭流
+     * @return 流中的数据
+     * @throws IOException IO异常
+     */
+    public static String read(InputStream in, String charset, int bufSize,
+                              boolean close) throws IOException {
         log.debug("开始从流中读取内容");
         charset = charset == null ? "UTF8" : charset;
         log.debug("文本编码为：{}，缓冲区大小为{}byte", charset, bufSize);
-        return new String(read(in, bufSize), charset);
+        return new String(read(in, bufSize, close), charset);
     }
 
     /**
@@ -101,6 +116,19 @@ public class IOUtils {
      * @throws IOException IO异常
      */
     public static byte[] read(InputStream in, int bufSize) throws IOException {
+        return read(in, bufSize, false);
+    }
+
+    /**
+     * 将流读取为byte数组
+     *
+     * @param in      输入流
+     * @param bufSize 自定义缓冲区大小
+     * @param close 是否关闭流
+     * @return 字节数组
+     * @throws IOException IO异常
+     */
+    public static byte[] read(InputStream in, int bufSize, boolean close) throws IOException {
         log.debug("开始从流中读取数据，缓冲区大小为{}byte", bufSize);
         ByteArray array = new ByteArray();
         int len;
@@ -109,6 +137,9 @@ public class IOUtils {
             array.append(buffer, 0, len);
         }
         log.debug("读取完毕");
+        if (close) {
+            in.close();
+        }
         return array.getData();
     }
 
