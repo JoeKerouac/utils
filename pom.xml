@@ -117,6 +117,7 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- redisson必要的依赖 -->
         <dependency>
