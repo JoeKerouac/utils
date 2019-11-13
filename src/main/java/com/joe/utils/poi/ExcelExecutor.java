@@ -31,42 +31,45 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ExcelExecutor {
+
     /**
      * 默认内存中最多多少行单元格
      */
-    private static final int                        IN_MEMORY  = 100;
+    private static final int               IN_MEMORY = 100;
+
     /**
      * 排序器
      */
-    private static final Comparator<Field>          COMPARATOR = (f1, f2) -> {
-                                                                   ExcelColumn c1 = f1
-                                                                       .getAnnotation(
-                                                                           ExcelColumn.class);
-                                                                   ExcelColumn c2 = f2
-                                                                       .getAnnotation(
-                                                                           ExcelColumn.class);
-                                                                   if (c1 == null && c2 == null) {
-                                                                       return f1.getName()
-                                                                           .compareTo(f2.getName());
-                                                                   }
+    private static final Comparator<Field> COMPARATOR;
 
-                                                                   if (c1 == null) {
-                                                                       return 1;
-                                                                   }
-
-                                                                   if (c2 == null) {
-                                                                       return -1;
-                                                                   }
-                                                                   return c1.sort() - c2.sort();
-                                                               };
     /**
      * 默认实例
      */
-    private static final ExcelExecutor              UTILS      = new ExcelExecutor();
+    private static final ExcelExecutor     UTILS     = new ExcelExecutor();
+
+    static {
+        COMPARATOR = (f1, f2) -> {
+            ExcelColumn c1 = f1.getAnnotation(ExcelColumn.class);
+            ExcelColumn c2 = f2.getAnnotation(ExcelColumn.class);
+            if (c1 == null && c2 == null) {
+                return f1.getName().compareTo(f2.getName());
+            }
+
+            if (c1 == null) {
+                return 1;
+            }
+
+            if (c2 == null) {
+                return -1;
+            }
+            return c1.sort() - c2.sort();
+        };
+    }
+
     /**
      * 所有的Excel单元格数据类型
      */
-    private final Map<Class<?>, ExcelDataWriter<?>> writers    = new HashMap<>();
+    private final Map<Class<?>, ExcelDataWriter<?>> writers = new HashMap<>();
 
     private ExcelExecutor() {
         init();
