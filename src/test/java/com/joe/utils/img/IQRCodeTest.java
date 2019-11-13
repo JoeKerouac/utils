@@ -4,9 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import reactor.core.support.Assert;
 
 /**
  * 二维码工具类测试
@@ -23,6 +22,6 @@ public class IQRCodeTest {
     @Test
     public void createImg() throws IOException {
         BufferedImage image = IQRCode.createImg("123456", 100, 100);
-        Assert.notNull(image);
+        Assert.assertNotNull(image);
     }
 }

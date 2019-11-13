@@ -302,7 +302,8 @@ public class ClassScanner implements Scanner<Class<?>, ClassFilter> {
                     className = packageName + '.' + className;
                     classes.add(classLoader.loadClass(className));
                 } catch (Throwable e) {
-                    LOGGER.error("添加用户自定义视图类错误 找不到此类的.class文件", e);
+                    // 有可能是类加载不到
+                    LOGGER.warn("添加用户自定义视图类错误 找不到此类的.class文件", e);
                 }
             }
         }

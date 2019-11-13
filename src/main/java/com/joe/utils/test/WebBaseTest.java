@@ -4,8 +4,8 @@ import java.util.concurrent.Callable;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerFactory;
-import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -81,8 +81,8 @@ public abstract class WebBaseTest extends BaseTest {
     }
 
     @Bean
-    public EmbeddedServletContainerFactory embeddedServletContainerFactory() {
-        TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
+    public ServletWebServerFactory embeddedServletContainerFactory() {
+        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
         int port = PORT_THREAD_LOCAL.get();
         if (port <= 0 || port >= 60000) {
             throw new RuntimeException("端口号不合法:" + port);
@@ -108,7 +108,8 @@ public abstract class WebBaseTest extends BaseTest {
                 //初始化端口号和url
                 PORT_THREAD_LOCAL.set(randomPort());
                 URL_THREAD_LOCAL.set("http://127.0.0.1:" + PORT_THREAD_LOCAL.get() + "/");
-                CONTEXT_THREAD_LOCAL.set(SpringApplication.run(source));
+                CONTEXT_THREAD_LOCAL.set(SpringApplication
+                    .run(new Class[] { source, WebBaseTest.class }, new String[0]));
             } catch (Throwable e) {
                 throw new UtilsException(e, "初始化异常");
             }
