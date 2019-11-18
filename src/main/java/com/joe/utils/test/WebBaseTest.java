@@ -10,6 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.exception.UtilsException;
 import com.joe.utils.function.CustomFunction;
 
@@ -68,8 +69,8 @@ public abstract class WebBaseTest extends BaseTest {
      * 获取Source
      * @return 默认为当前class
      */
-    protected Class<?> getSource() {
-        return this.getClass();
+    protected Class<?>[] getSource() {
+        return new Class[] { this.getClass() };
     }
 
     /**
@@ -104,12 +105,12 @@ public abstract class WebBaseTest extends BaseTest {
                 return;
             }
             try {
-                Class<?> source = getSource();
+                Class<?>[] source = getSource();
                 //初始化端口号和url
                 PORT_THREAD_LOCAL.set(randomPort());
                 URL_THREAD_LOCAL.set("http://127.0.0.1:" + PORT_THREAD_LOCAL.get() + "/");
                 CONTEXT_THREAD_LOCAL.set(SpringApplication
-                    .run(new Class[] { source, WebBaseTest.class }, new String[0]));
+                    .run(CollectionUtil.addTo(WebBaseTest.class, source), new String[0]));
             } catch (Throwable e) {
                 throw new UtilsException(e, "初始化异常");
             }

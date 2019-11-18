@@ -1,5 +1,7 @@
 package com.joe.utils.scan;
 
+import com.joe.utils.exception.UtilsException;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +33,7 @@ public class MethodScanner implements Scanner<Method, MethodFilter> {
 
     @Override
     public List<Method> scan(Object... args) {
-        return null;
+        throw new UtilsException("未实现该方法");
     }
 
     @Override
