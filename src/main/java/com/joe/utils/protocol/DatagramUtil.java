@@ -4,14 +4,14 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import com.joe.utils.collection.ByteArray;
 import com.joe.utils.common.Tools;
-import com.joe.utils.pool.ObjectPoolImpl;
-import com.joe.utils.pool.PooledObject;
 import com.joe.utils.protocol.exception.DataOutOfMemory;
 import com.joe.utils.protocol.exception.IllegalDataException;
 import com.joe.utils.protocol.exception.IllegalRequestException;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.PooledByteBufAllocator;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,26 +21,24 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class DatagramUtil {
+
     /**
      * 当前系统默认字符集
      */
-    private static final String                    CHARSET;
+    private static final String CHARSET;
+
     /**
      * 系统字符集的byte数据（长度10byte，不足的后边补零）
      */
-    private static final byte[]                    CHARSET_DATA;
-    /**
-     * 对象缓存池
-     */
-    private static final ObjectPoolImpl<ByteArray> POOL;
+    private static final byte[] CHARSET_DATA;
+
     /**
      * 数据报数据除去请求头的最大长度
      */
-    private static final int                       MAX_LENGTH;
+    private static final int    MAX_LENGTH;
 
     static {
         MAX_LENGTH = Datagram.MAX_LENGTH - Datagram.HEADER_LEN;
-        POOL = new ObjectPoolImpl<>(() -> new ByteArray(512));
         CHARSET = Charset.defaultCharset().name();
         byte[] charsetBytes = CHARSET.getBytes();
         int charsetLen = charsetBytes.length;
@@ -86,39 +84,40 @@ public class DatagramUtil {
             throw new DataOutOfMemory(String.format("数据长度超过最大值%d", MAX_LENGTH));
         }
 
-        try (PooledObject<ByteArray> holder = POOL.get()) {
-            // 缓存
-            ByteArray buffer = holder.get();
-            // 一个字节的版本号
-            buffer.append(version);
-            // 四个字节的body长度
-            buffer.append(convert(dataLen));
-            // 一个字节的数据类型
-            buffer.append(type);
-            // 十个字节的字符集，字符集为当前系统默认字符集不可更改，不足十个字节的用0填充
-            buffer.append(CHARSET_DATA);
+        ByteBuf buffer = PooledByteBufAllocator.DEFAULT.buffer(dataLen + Datagram.HEADER_LEN,
+            dataLen + Datagram.HEADER_LEN);
 
-            //添加ID字段
-            byte[] idDatas = Tools.createUUID().getBytes();
-            int idLen = idDatas.length;
-            buffer.append(idDatas);
-            //ID不足40byte的补0
-            for (int i = idLen; i < 40; i++) {
-                buffer.append((byte) 0);
-            }
+        // 一个字节的版本号
+        buffer.writeByte(Byte.toUnsignedInt(version));
+        // 四个字节的body长度
+        buffer.writeBytes(convert(dataLen));
+        // 一个字节的数据类型
+        buffer.writeByte(Byte.toUnsignedInt(type));
+        // 十个字节的字符集，字符集为当前系统默认字符集不可更改，不足十个字节的用0填充
+        buffer.writeBytes(CHARSET_DATA);
 
-            if (dataLen != 0) {
-                // 填充数据
-                buffer.append(body);
-            }
-
-            Datagram datagram = new Datagram(buffer.getData(), dataLen, body, version, CHARSET,
-                type, idDatas);
-            if (log.isDebugEnabled()) {
-                log.debug("转换后的数据报是：{}", datagram);
-            }
-            return datagram;
+        //添加ID字段
+        byte[] idDatas = Tools.createUUID().getBytes();
+        int idLen = idDatas.length;
+        buffer.writeBytes(idDatas);
+        //ID不足40byte的补0
+        for (int i = idLen; i < 40; i++) {
+            buffer.writeByte(0);
         }
+
+        if (dataLen != 0) {
+            // 填充数据
+            buffer.writeBytes(body);
+        }
+
+        Datagram datagram = new Datagram(ByteBufUtil.getBytes(buffer), dataLen, body, version, CHARSET, type,
+            idDatas);
+        // 最后要释放
+        buffer.release();
+        if (log.isDebugEnabled()) {
+            log.debug("转换后的数据报是：{}", datagram);
+        }
+        return datagram;
     }
 
     /**
@@ -206,7 +205,7 @@ public class DatagramUtil {
             }
             return datagram;
         } catch (Exception e) {
-            log.error("数据报解析错误，错误原因：{}", e);
+            log.error("数据报解析错误，错误原因：", e);
             throw new IllegalRequestException(e);
         }
     }

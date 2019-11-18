@@ -130,6 +130,13 @@
             <groupId>com.github.JoeKerouac</groupId>
             <artifactId>threadx</artifactId>
         </dependency>
+
+        <!-- 使用netty的缓冲区 -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
