@@ -4,7 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import com.joe.utils.common.Assert;
 import com.joe.utils.common.Tools;
+import com.joe.utils.common.string.StringFormater;
 import com.joe.utils.protocol.exception.DataOutOfMemory;
 import com.joe.utils.protocol.exception.IllegalDataException;
 import com.joe.utils.protocol.exception.IllegalRequestException;
@@ -90,7 +92,7 @@ public class DatagramUtil {
         // 一个字节的版本号
         buffer.writeByte(Byte.toUnsignedInt(version));
         // 四个字节的body长度
-        buffer.writeBytes(convert(dataLen));
+        buffer.writeBytes(splitToByte(dataLen));
         // 一个字节的数据类型
         buffer.writeByte(Byte.toUnsignedInt(type));
         // 十个字节的字符集，字符集为当前系统默认字符集不可更改，不足十个字节的用0填充
@@ -110,8 +112,8 @@ public class DatagramUtil {
             buffer.writeBytes(body);
         }
 
-        Datagram datagram = new Datagram(ByteBufUtil.getBytes(buffer), dataLen, body, version,
-            CHARSET, type, idDatas);
+        Datagram datagram = new Datagram(ByteBufUtil.getBytes(buffer), dataLen, version, CHARSET,
+            type, idDatas);
         // 最后要释放
         buffer.release();
         if (log.isDebugEnabled()) {
@@ -160,7 +162,7 @@ public class DatagramUtil {
             // 数据报数据类型
             final byte type = data[Datagram.TYPE_INDEX];
             // 长度
-            final int len = readLen(data);
+            final int len = mergeToInt(data);
             log.debug("要解析的数据报的字符集为：{}，版本号为：{}，数据报类型为：{}", charset, version, type);
 
             byte[] buffer;
@@ -193,12 +195,12 @@ public class DatagramUtil {
             Datagram datagram;
             if (len == 0) {
                 log.debug("要解析的数据中head标志body长度为0，直接返回一个空body的datagram对象");
-                datagram = new Datagram(buffer, len, null, version, charset, type, idByte);
+                datagram = new Datagram(buffer, len, version, charset, type, idByte);
             } else {
                 // 真实的业务数据
                 byte[] body = new byte[len];
                 System.arraycopy(buffer, Datagram.HEADER_LEN, body, 0, body.length);
-                datagram = new Datagram(buffer, len, body, version, charset, type, idByte);
+                datagram = new Datagram(buffer, len, version, charset, type, idByte);
             }
             if (log.isDebugEnabled()) {
                 log.debug("封装好的数据报body为：{}", datagram);
@@ -211,27 +213,27 @@ public class DatagramUtil {
     }
 
     /**
-     * 读取数据报长度
+     * 读取合并数据报的长度字段
      *
      * @param data 数据
-     * @return 长度，返回小于0时表示数据报报头不完整
+     * @return 长度
      */
-    public static int readLen(byte[] data) {
+    public static int mergeToInt(byte[] data) {
         if (data.length < Datagram.HEADER_LEN) {
             log.warn("要读取长度的数据报报头不完整");
-            return -1;
+            throw new IllegalDataException("要读取长度的数据报报头不完整:" + Arrays.toString(data));
         } else {
-            return convert(data, Datagram.LEN_OFFSET);
+            return mergeToInt(data, Datagram.LEN_OFFSET);
         }
     }
 
     /**
-     * 将一个int类型转换为四个字节的byte数组
+     * 将一个int拆分为四个byte
      *
      * @param data int类型的参数
      * @return byte类型的数组
      */
-    public static byte[] convert(int data) {
+    public static byte[] splitToByte(int data) {
         long len = Integer.toUnsignedLong(data);
         byte[] b = new byte[Datagram.LEN_LIMIT];
         for (int i = 0; i < b.length; i++) {
@@ -241,23 +243,15 @@ public class DatagramUtil {
     }
 
     /**
-     * 将四个字节转换为一个int类型的数字，从data中下标为0的数据开始
+     * 将四个byte合并为一个int
      *
-     * @param data 四个字节的byte数组
-     * @return 四个byte数组转换为的一个int
-     */
-    public static int convert(byte[] data) {
-        return convert(data, 0);
-    }
-
-    /**
-     * 将四个字节转换为一个int类型的数字
-     *
-     * @param data  data数据
-     * @param start 四个字节长度开始的位置
+     * @param data  数据源
+     * @param start 要合并的byte数据的起始位置
      * @return 四个byte转换为的一个int
      */
-    public static int convert(byte[] data, int start) {
+    public static int mergeToInt(byte[] data, int start) {
+        Assert.isTrue(data.length >= start + 4,
+            StringFormater.simpleFormat("合并数据错误，数据：{0}", Arrays.toString(data)));
         return (Byte.toUnsignedInt(data[start]) << 24) | (Byte.toUnsignedInt(data[start + 1]) << 16)
                | (Byte.toUnsignedInt(data[start + 2]) << 8) | Byte.toUnsignedInt(data[start + 3]);
     }

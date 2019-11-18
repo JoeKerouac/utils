@@ -117,11 +117,6 @@ public class Datagram {
     private final String        charset;
 
     /**
-     * 数据报body
-     */
-    private final byte[]        body;
-
-    /**
      * 数据报数据类型（0：心跳包；1：内置MVC数据处理器数据类型；2：文件传输；3：ACK；4：后端主动发往前端的数据；
      * <p>
      * 除了0、1、2、3、4外可以自己定义数据类型）
@@ -134,30 +129,21 @@ public class Datagram {
     private final byte[]        id;
 
     /**
-     * 初始化数据报
+     * 初始化数据报，不会对入参进行校验，默认认为入参是正确的
      *
      * @param data    包含头信息的data
      * @param size    该长度不包含头信息的长度，只有body的长度
-     * @param body    数据报数据实体类
      * @param version 数据报版本号
      * @param charset 字符集
      * @param type    数据报数据类型（1：接口请求）
      * @param id      数据报的ID
      */
-    public Datagram(byte[] data, int size, byte[] body, byte version, String charset, byte type,
-                    byte[] id) {
+    Datagram(byte[] data, int size, byte version, String charset, byte type, byte[] id) {
         if (data == null) {
             this.data = EMPTY_DATA;
         } else {
             this.data = new byte[data.length];
             System.arraycopy(data, 0, this.data, 0, data.length);
-        }
-
-        if (body == null) {
-            this.body = EMPTY_DATA;
-        } else {
-            this.body = new byte[body.length];
-            System.arraycopy(body, 0, this.body, 0, body.length);
         }
 
         this.size = size;
@@ -177,11 +163,11 @@ public class Datagram {
     }
 
     public byte[] getBody() {
-        if (this.body == null || this.body.length == 0) {
+        if (this.size <= 0) {
             return EMPTY_DATA;
         }
-        byte[] body = new byte[this.body.length];
-        System.arraycopy(this.body, 0, body, 0, body.length);
+        byte[] body = new byte[size];
+        System.arraycopy(this.data, HEADER_LEN, body, 0, size);
         return body;
     }
 
