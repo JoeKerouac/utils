@@ -110,8 +110,8 @@ public class DatagramUtil {
             buffer.writeBytes(body);
         }
 
-        Datagram datagram = new Datagram(ByteBufUtil.getBytes(buffer), dataLen, body, version, CHARSET, type,
-            idDatas);
+        Datagram datagram = new Datagram(ByteBufUtil.getBytes(buffer), dataLen, body, version,
+            CHARSET, type, idDatas);
         // 最后要释放
         buffer.release();
         if (log.isDebugEnabled()) {
