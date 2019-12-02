@@ -27,22 +27,22 @@ public class DatagramUtil {
     /**
      * 当前系统默认字符集
      */
-    private static final String CHARSET;
+    private static final String DEFAULT_CHARSET;
 
     /**
      * 系统字符集的byte数据（长度10byte，不足的后边补零）
      */
-    private static final byte[] CHARSET_DATA;
+    private static final byte[] DEFAULT_CHARSET_DATA;
 
     /**
      * 数据报数据除去请求头的最大长度
      */
-    private static final int    MAX_LENGTH;
+    private static final int    BODY_MAX_LENGTH;
 
     static {
-        MAX_LENGTH = Datagram.MAX_LENGTH - Datagram.HEADER_LEN;
-        CHARSET = Charset.defaultCharset().name();
-        byte[] charsetBytes = CHARSET.getBytes();
+        BODY_MAX_LENGTH = DatagramConst.Position.MAX_LENGTH - DatagramConst.Position.HEADER_LEN;
+        DEFAULT_CHARSET = Charset.defaultCharset().name();
+        byte[] charsetBytes = DEFAULT_CHARSET.getBytes();
         int charsetLen = charsetBytes.length;
         if (charsetLen > 10) {
             throw new DataOutOfMemory("数据报字符集长度最大为10byte，当前系统默认字符集超过该长度");
@@ -53,7 +53,7 @@ public class DatagramUtil {
             charsetLen++;
             stream.write(0);
         }
-        CHARSET_DATA = stream.toByteArray();
+        DEFAULT_CHARSET_DATA = stream.toByteArray();
     }
 
     /**
@@ -80,14 +80,15 @@ public class DatagramUtil {
         if (log.isDebugEnabled()) {
             log.debug("要发送的数据为：{}", Arrays.toString(body));
         }
-        if (dataLen > MAX_LENGTH) {
+        if (dataLen > BODY_MAX_LENGTH) {
             // 数据报超出最大值
-            log.error("数据报数据长度超过最大值：{}", MAX_LENGTH);
-            throw new DataOutOfMemory(String.format("数据长度超过最大值%d", MAX_LENGTH));
+            log.error("数据报数据长度超过最大值：{}", BODY_MAX_LENGTH);
+            throw new DataOutOfMemory(String.format("数据长度超过最大值%d", BODY_MAX_LENGTH));
         }
 
-        ByteBuf buffer = PooledByteBufAllocator.DEFAULT.buffer(dataLen + Datagram.HEADER_LEN,
-            dataLen + Datagram.HEADER_LEN);
+        ByteBuf buffer = PooledByteBufAllocator.DEFAULT.buffer(
+            dataLen + DatagramConst.Position.HEADER_LEN,
+            dataLen + DatagramConst.Position.HEADER_LEN);
 
         // 一个字节的版本号
         buffer.writeByte(Byte.toUnsignedInt(version));
@@ -96,7 +97,7 @@ public class DatagramUtil {
         // 一个字节的数据类型
         buffer.writeByte(Byte.toUnsignedInt(type));
         // 十个字节的字符集，字符集为当前系统默认字符集不可更改，不足十个字节的用0填充
-        buffer.writeBytes(CHARSET_DATA);
+        buffer.writeBytes(DEFAULT_CHARSET_DATA);
 
         //添加ID字段
         byte[] idDatas = Tools.createUUID().getBytes();
@@ -112,8 +113,8 @@ public class DatagramUtil {
             buffer.writeBytes(body);
         }
 
-        Datagram datagram = new Datagram(ByteBufUtil.getBytes(buffer), dataLen, version, CHARSET,
-            type, idDatas);
+        Datagram datagram = new Datagram(ByteBufUtil.getBytes(buffer), dataLen, version,
+            DEFAULT_CHARSET, type, idDatas);
         // 最后要释放
         buffer.release();
         if (log.isDebugEnabled()) {
@@ -148,39 +149,40 @@ public class DatagramUtil {
                 log.debug("要解析的数据为：{}", Arrays.toString(data));
             }
             // 字符集数据
-            int end = Datagram.CHARSET_OFFSET;
-            for (int i = 0; i < Datagram.CHARSET_MAX; end += i, i++) {
+            int end = DatagramConst.Position.CHARSET_OFFSET;
+            for (int i = 0; i < DatagramConst.Position.CHARSET_MAX; end += i, i++) {
                 if (data[end] == 0) {
                     break;
                 }
             }
             // 字符集
-            final String charset = new String(data, Datagram.CHARSET_OFFSET,
-                end - Datagram.CHARSET_OFFSET);
+            final String charset = new String(data, DatagramConst.Position.CHARSET_OFFSET,
+                end - DatagramConst.Position.CHARSET_OFFSET);
             // 版本号
-            final byte version = data[Datagram.VERSION_INDEX];
+            final byte version = data[DatagramConst.Position.VERSION_INDEX];
             // 数据报数据类型
-            final byte type = data[Datagram.TYPE_INDEX];
+            final byte type = data[DatagramConst.Position.TYPE_INDEX];
             // 长度
             final int len = mergeToInt(data);
             log.debug("要解析的数据报的字符集为：{}，版本号为：{}，数据报类型为：{}", charset, version, type);
 
             byte[] buffer;
-            if ((data.length - Datagram.HEADER_LEN) > len) {
+            if ((data.length - DatagramConst.Position.HEADER_LEN) > len) {
                 log.warn("数据报head中的长度字段为：{}，数据报body的实际长度为：{}", len,
-                    data.length - Datagram.HEADER_LEN);
+                    data.length - DatagramConst.Position.HEADER_LEN);
                 if (allowErr) {
-                    buffer = new byte[len + Datagram.HEADER_LEN];
+                    buffer = new byte[len + DatagramConst.Position.HEADER_LEN];
                     System.arraycopy(data, 0, buffer, 0, buffer.length);
                 } else {
                     throw new IllegalDataException("数据报head中的长度字段为：" + len + "，数据报body的实际长度为："
-                                                   + (data.length - Datagram.HEADER_LEN));
+                                                   + (data.length
+                                                      - DatagramConst.Position.HEADER_LEN));
                 }
-            } else if ((data.length - Datagram.HEADER_LEN) < len) {
+            } else if ((data.length - DatagramConst.Position.HEADER_LEN) < len) {
                 log.error("数据报head中的长度字段为：{}，数据报body的实际长度为：{}", len,
-                    data.length - Datagram.HEADER_LEN);
+                    data.length - DatagramConst.Position.HEADER_LEN);
                 throw new IllegalDataException("数据报head中的长度字段为：" + len + "，数据报body的实际长度为："
-                                               + (data.length - Datagram.HEADER_LEN));
+                                               + (data.length - DatagramConst.Position.HEADER_LEN));
             } else {
                 buffer = data;
             }
@@ -199,7 +201,7 @@ public class DatagramUtil {
             } else {
                 // 真实的业务数据
                 byte[] body = new byte[len];
-                System.arraycopy(buffer, Datagram.HEADER_LEN, body, 0, body.length);
+                System.arraycopy(buffer, DatagramConst.Position.HEADER_LEN, body, 0, body.length);
                 datagram = new Datagram(buffer, len, version, charset, type, idByte);
             }
             if (log.isDebugEnabled()) {
@@ -219,11 +221,11 @@ public class DatagramUtil {
      * @return 长度
      */
     public static int mergeToInt(byte[] data) {
-        if (data.length < Datagram.HEADER_LEN) {
+        if (data.length < DatagramConst.Position.HEADER_LEN) {
             log.warn("要读取长度的数据报报头不完整");
             throw new IllegalDataException("要读取长度的数据报报头不完整:" + Arrays.toString(data));
         } else {
-            return mergeToInt(data, Datagram.LEN_OFFSET);
+            return mergeToInt(data, DatagramConst.Position.LEN_OFFSET);
         }
     }
 
@@ -235,7 +237,7 @@ public class DatagramUtil {
      */
     public static byte[] splitToByte(int data) {
         long len = Integer.toUnsignedLong(data);
-        byte[] b = new byte[Datagram.LEN_LIMIT];
+        byte[] b = new byte[DatagramConst.Position.LEN_LIMIT];
         for (int i = 0; i < b.length; i++) {
             b[i] = (byte) (len >> ((b.length - i - 1) * 8));
         }
