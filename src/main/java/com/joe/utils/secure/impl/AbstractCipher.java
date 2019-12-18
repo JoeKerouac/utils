@@ -9,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 
-import com.joe.utils.codec.IBase64;
 import com.joe.utils.pool.ObjectPoolImpl;
 import com.joe.utils.pool.PooledObject;
 import com.joe.utils.secure.CipherUtil;
@@ -28,8 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public abstract class AbstractCipher implements CipherUtil {
-    private static final Map<String, ObjectPoolImpl<CipherHolder>> CACHE   = new ConcurrentHashMap<>();
-    protected static final IBase64                                 BASE_64 = new IBase64();
+    private static final Map<String, ObjectPoolImpl<CipherHolder>> CACHE = new ConcurrentHashMap<>();
     private String                                                 id;
     private Algorithms                                             algorithms;
     private Key                                                    priKey;

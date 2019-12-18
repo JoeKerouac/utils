@@ -7,6 +7,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 
+import com.joe.utils.codec.IBase64;
 import com.joe.utils.secure.CipherUtil;
 import com.joe.utils.secure.KeyTools;
 import com.joe.utils.secure.exception.SecureException;
@@ -89,7 +90,7 @@ public class SymmetryCipher extends AbstractCipher {
     @Override
     protected byte[] encrypt(CipherHolder holder, byte[] data) {
         try {
-            return BASE_64.encrypt(holder.getEncrypt().doFinal(data));
+            return IBase64.encrypt(holder.getEncrypt().doFinal(data));
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             throw new SecureException("加密算法[" + holder.getAlgorithms() + "]加密数据失败", e);
         }
@@ -98,7 +99,7 @@ public class SymmetryCipher extends AbstractCipher {
     @Override
     protected byte[] decrypt(CipherHolder holder, byte[] data) {
         try {
-            return holder.getDecrypt().doFinal(BASE_64.decrypt(data));
+            return holder.getDecrypt().doFinal(IBase64.decrypt(data));
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             throw new SecureException("解密算法[" + holder.getAlgorithms() + "]解密数据失败", e);
         }

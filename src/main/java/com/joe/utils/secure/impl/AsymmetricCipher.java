@@ -13,6 +13,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 
+import com.joe.utils.codec.IBase64;
 import com.joe.utils.common.IOUtils;
 import com.joe.utils.secure.CipherUtil;
 import com.joe.utils.secure.KeyTools;
@@ -67,19 +68,19 @@ public class AsymmetricCipher extends AbstractCipher {
      * @return AsymmetricCipher
      */
     public static CipherUtil buildInstance(PrivateKey privateKey, PublicKey publicKey) {
-        return new AsymmetricCipher(new String(BASE_64.encrypt(privateKey.getEncoded())) + ":"
-                                    + new String(BASE_64.encrypt(publicKey.getEncoded())),
+        return new AsymmetricCipher(new String(IBase64.encrypt(privateKey.getEncoded())) + ":"
+                                    + new String(IBase64.encrypt(publicKey.getEncoded())),
             Algorithms.RSA, privateKey, publicKey);
     }
 
     @Override
     protected byte[] encrypt(CipherHolder holder, byte[] data) {
-        return BASE_64.encrypt(doCipher(holder.getEncrypt(), holder.getPublicKey(), data));
+        return IBase64.encrypt(doCipher(holder.getEncrypt(), holder.getPublicKey(), data));
     }
 
     @Override
     protected byte[] decrypt(CipherHolder holder, byte[] data) {
-        return doCipher(holder.getDecrypt(), holder.getPrivateKey(), BASE_64.decrypt(data));
+        return doCipher(holder.getDecrypt(), holder.getPrivateKey(), IBase64.decrypt(data));
     }
 
     /**

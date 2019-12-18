@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class KeyTools {
-    private static final IBase64 BASE_64 = new IBase64();
 
     /**
      * 构建RSA密钥对
@@ -64,7 +63,7 @@ public class KeyTools {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
             byte[] encodedKey = IOUtils.read(ins);
-            encodedKey = BASE_64.decrypt(encodedKey);
+            encodedKey = IBase64.decrypt(encodedKey);
             return keyFactory.generatePrivate(new PKCS8EncodedKeySpec(encodedKey));
         } catch (NoSuchAlgorithmException | IOException | InvalidKeySpecException e) {
             throw new SecureException("构建[" + algorithm + "]私钥失败", e);
@@ -86,7 +85,7 @@ public class KeyTools {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
             byte[] encodedKey = IOUtils.read(ins);
-            encodedKey = BASE_64.decrypt(encodedKey);
+            encodedKey = IBase64.decrypt(encodedKey);
             return keyFactory.generatePublic(new X509EncodedKeySpec(encodedKey));
         } catch (NoSuchAlgorithmException | IOException | InvalidKeySpecException e) {
             throw new SecureException("构建[" + algorithm + "]私钥失败", e);
@@ -123,8 +122,7 @@ public class KeyTools {
      * @return 对称加密的key
      */
     public static SecretKey buildKey(AbstractCipher.Algorithms algorithm, byte[] keySpec) {
-        SecretKeySpec key = new SecretKeySpec(keySpec, algorithm.name());
-        return key;
+        return new SecretKeySpec(keySpec, algorithm.name());
     }
 
     @Data
