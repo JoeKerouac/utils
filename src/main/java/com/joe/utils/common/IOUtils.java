@@ -166,7 +166,7 @@ public class IOUtils {
     public static void saveAsFile(byte[] data, String addr) throws IOException {
         log.debug("将字节数据保存到本地文件");
         File file = new File(addr);
-        if (!file.exists()) {
+        if (!file.exists() && !file.getParentFile().exists()) {
             if (!file.getParentFile().mkdirs()) {
                 log.error("创建目录{}失败", addr);
             }
