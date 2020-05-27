@@ -1,7 +1,13 @@
 package com.joe.utils.reflect.clazz;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
+import java.util.Optional;
 
 import com.joe.utils.collection.CollectionUtil;
 import com.joe.utils.common.Assert;
@@ -19,6 +25,43 @@ public class ClassUtils {
     private static final char  PACKAGE_SEPARATOR = '.';
     /** The ".class" file suffix */
     public static final String CLASS_FILE_SUFFIX = ".class";
+
+    /**
+     * 获取指定类的路径
+     * @param cls 类
+     * @return 该类的路径，获取失败返回null
+     */
+    public static String where(final Class<?> cls) {
+        if (cls == null)
+            throw new IllegalArgumentException("null input: cls");
+        URL result = null;
+        final String clsAsResource = cls.getName().replace('.', '/').concat(".class");
+        final ProtectionDomain pd = cls.getProtectionDomain();
+        if (pd != null) {
+            final CodeSource cs = pd.getCodeSource();
+            if (cs != null)
+                result = cs.getLocation();
+            if (result != null) {
+                if ("file".equals(result.getProtocol())) {
+                    try {
+                        if (result.toExternalForm().endsWith(".jar")
+                            || result.toExternalForm().endsWith(".zip"))
+                            result = new URL("jar:".concat(result.toExternalForm()).concat("!/")
+                                .concat(clsAsResource));
+                        else if (new File(result.getFile()).isDirectory())
+                            result = new URL(result, clsAsResource);
+                    } catch (MalformedURLException ignore) {
+                    }
+                }
+            }
+        }
+        if (result == null) {
+            final ClassLoader clsLoader = cls.getClassLoader();
+            result = clsLoader != null ? clsLoader.getResource(clsAsResource)
+                : ClassLoader.getSystemResource(clsAsResource);
+        }
+        return Optional.ofNullable(result).map(URL::getPath).orElse(null);
+    }
 
     /**
      * 获取指定class的class文件的输入流
