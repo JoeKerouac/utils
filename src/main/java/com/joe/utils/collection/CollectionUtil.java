@@ -339,6 +339,19 @@ public final class CollectionUtil {
     }
 
     /**
+     * 将a、b两个数组合并
+     * @param a a数据
+     * @param b b数组
+     * @return 合并后的数组
+     */
+    public static byte[] merge(byte[] a, byte[] b) {
+        byte[] c = new byte[a.length + b.length];
+        System.arraycopy(a, 0, c, 0, a.length);
+        System.arraycopy(b, 0, c, a.length, b.length);
+        return c;
+    }
+
+    /**
      * 将两个数组内连接，原数组为[[1,2],[3,4]]，内连接后为[[13, 14], [23, 24]]
      *
      * @param l1       第一个数组
