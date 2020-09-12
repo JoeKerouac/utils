@@ -1,5 +1,6 @@
 package com.joe.utils.common;
 
+import java.util.Collection;
 import java.util.Objects;
 
 import com.joe.utils.common.string.StringUtils;
@@ -141,6 +142,25 @@ public class Assert {
      */
     public static void notBlank(String data, String msg) {
         if (StringUtils.isEmpty(data)) {
+            throw new IllegalArgumentException(msg);
+        }
+    }
+
+    /**
+     * 断言集合不能为空
+     * @param collection 集合
+     */
+    public static void notEmpty(Collection<?> collection) {
+        notEmpty(collection, "collection must not empty");
+    }
+
+    /**
+     * 断言集合不能为空
+     * @param collection 集合
+     * @param msg 异常消息
+     */
+    public static void notEmpty(Collection<?> collection, String msg) {
+        if (collection == null || collection.isEmpty()) {
             throw new IllegalArgumentException(msg);
         }
     }
