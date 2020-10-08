@@ -64,7 +64,7 @@ public class DateUtil {
     public static int getYearDay(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        return calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        return calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
     }
 
     /**
