@@ -11,8 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 日期工具类
@@ -20,9 +19,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author joe
  */
+@Slf4j
 public class DateUtil {
-    private final static Logger                         logger          = LoggerFactory
-        .getLogger(DateUtil.class);
+
     /**
      * formatter缓存
      */
@@ -56,7 +55,7 @@ public class DateUtil {
     }
 
     /**
-     * 获取指定年份的天数
+     * 获取指定年份的天数（润年跟平年不一样）
      *
      * @param date 指定年份
      * @return 指定年份对应的天数
@@ -68,7 +67,7 @@ public class DateUtil {
     }
 
     /**
-     * 获取指定月份的天数
+     * 获取指定月份的天数（有的月份31天，有的30天....）
      *
      * @param date 指定月份
      * @return 该月份的天数
@@ -94,11 +93,11 @@ public class DateUtil {
     }
 
     /**
-     * 计算arg0-arg1的时间差
+     * 计算arg0-arg1的时间差，如果精度是天，则不足24小时不算，每满24小时则+1，例如两个日期差25小时，则差返回1天（精度为日），其他精度等同
      *
      * @param arg0     arg0
      * @param arg1     arg1
-     * @param dateUnit 返回结果的单位
+     * @param dateUnit 返回结果的单位，只能是日以及日以下的精度，年月不行
      * @return arg0-arg1的时间差，精确到指定的单位（field）
      */
     public static long calc(Date arg0, Date arg1, DateUnit dateUnit) {
@@ -106,19 +105,19 @@ public class DateUtil {
     }
 
     /**
-     * 计算arg0-arg1的时间差
+     * 计算arg0-arg1的时间差，如果精度是天，则不足24小时不算，每满24小时则+1，例如两个日期差25小时，则差返回1天（精度为日），其他精度等同
      *
      * @param arg0     日期字符串
      * @param arg1     日期字符串
      * @param format   日期字符串的格式
-     * @param dateUnit 返回结果的单位
+     * @param dateUnit 返回结果的单位，只能是日以及日以下的精度，年月不行
      * @return arg0-arg1的时间差，精确到指定的单位（field），出错时返回-1
      */
     public static long calc(String arg0, String arg1, String format, DateUnit dateUnit) {
         try {
             return calc(getTime(format, arg0), getTime(format, arg1), dateUnit);
         } catch (Exception e) {
-            logger.error("日期计算出错", e);
+            log.error("日期计算出错", e);
             return -1;
         }
     }
@@ -148,38 +147,6 @@ public class DateUtil {
      */
     public static Date add(DateUnit dateUnit, int amount, Date date) {
         return Date.from(date.toInstant().plus(amount, create(dateUnit)));
-    }
-
-    /**
-     * 将当前日期加上指定的时长
-     *
-     * @param dateUnit 单位
-     * @param amount   时长
-     * @return 增加过指定时长的时间
-     */
-    public static Date add(DateUnit dateUnit, int amount) {
-        return add(dateUnit, amount, new Date());
-    }
-
-    /**
-     * 获取指定格式的当前日期的字符串
-     *
-     * @param format 日期格式
-     * @return 指定格式的当前日期的字符串
-     */
-    public static String getFormatDate(String format) {
-        return getFormatDate(format, new Date());
-    }
-
-    /**
-     * 获取指定格式的当前日期的字符串，指定时区
-     *
-     * @param format 日期格式
-     * @param zoneId 时区ID，例如GMT
-     * @return 指定格式的当前日期的字符串
-     */
-    public static String getFormatDate(String format, String zoneId) {
-        return getFormatDate(format, new Date(), zoneId);
     }
 
     /**
@@ -216,7 +183,7 @@ public class DateUtil {
      * @return 如果指定日期在当前时间之前返回<code>true</code>
      */
     public static boolean beforeNow(String date, String format, DateUnit dateUnit) {
-        logger.debug("指定日期为：{}", date);
+        log.debug("指定日期为：{}", date);
         return calc(new Date(), parse(date, format), dateUnit) > 0;
     }
 
@@ -238,9 +205,7 @@ public class DateUtil {
      * @return 如果指定日期对象在今天则返回<code>true</code>
      */
     public static boolean isToday(String date, String format) {
-        String now = getFormatDate(SHORT);
-        String target = getFormatDate(SHORT, parse(date, format));
-        return now.equals(target);
+        return isToday(parse(date, format));
     }
 
     /**
@@ -250,7 +215,7 @@ public class DateUtil {
      * @return 如果指定日期对象在今天则返回<code>true</code>
      */
     public static boolean isToday(Date time) {
-        String now = getFormatDate(SHORT);
+        String now = getFormatDate(SHORT, new Date());
         String target = getFormatDate(SHORT, time);
         return now.equals(target);
     }
@@ -301,11 +266,11 @@ public class DateUtil {
     }
 
     /**
-     * 计算arg0-arg1的时间差
+     * 计算arg0-arg1的时间差，如果精度是天，则不足24小时不算，每满24小时则+1，例如两个日期差25小时，则差返回1天（精度为日），其他精度等同
      *
      * @param arg0     arg0
      * @param arg1     arg1
-     * @param dateUnit 返回结果的单位
+     * @param dateUnit 返回结果的单位，只能是日以及日以下的精度，年月不行
      * @return arg0-arg1的时间差，精确到指定的单位（field），出错时返回-1
      */
     private static long calc(Temporal arg0, Temporal arg1, DateUnit dateUnit) {
@@ -333,7 +298,7 @@ public class DateUtil {
             case SECOND:
                 return ChronoUnit.SECONDS;
             default:
-                throw new DateUtilException("没有单位：" + dateUnit);
+                throw new DateUtilException("不支持单位：" + dateUnit);
         }
     }
 }
