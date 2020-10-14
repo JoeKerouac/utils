@@ -89,14 +89,17 @@ public class XmlParser implements Serializer {
     public void enableDTD(boolean enable) {
         //允许DTD会有XXE漏洞，关于XXE漏洞：https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
         if (enable) {
-            //不允许DTD
-            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-            setFeature("http://xml.org/sax/features/external-general-entities", false);
-            setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        } else {
+            // 打开DTD支持，高危操作，除非你清楚你在做什么，否则不要打开
             setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
+            setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
             setFeature("http://xml.org/sax/features/external-general-entities", true);
             setFeature("http://xml.org/sax/features/external-parameter-entities", true);
+        } else {
+            //不允许DTD
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            setFeature("http://xml.org/sax/features/external-general-entities", false);
+            setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         }
     }
 
