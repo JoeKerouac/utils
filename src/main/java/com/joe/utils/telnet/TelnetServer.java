@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,17 +28,18 @@ public class TelnetServer {
 
     private AtomicBoolean        shutdown        = new AtomicBoolean(true);
 
-    private int                  port            = 1234;
+    private int                  port;
+
+    private String               host;
 
     private Selector             selector        = null;
 
     private ServerSocketChannel  acceptorSvr     = null;
 
-    private String               host            = null;
     /**
      * kill命令hook
      */
-    private Thread               shutdownHook;
+    private final Thread         shutdownHook;
 
     /**
      * 命令处理器
@@ -82,8 +80,7 @@ public class TelnetServer {
                 }
                 acceptorSvr.configureBlocking(false);
                 acceptorSvr.register(selector, SelectionKey.OP_ACCEPT);
-                log.info(
-                    "Listening on port: " + Integer.toString(acceptorSvr.socket().getLocalPort()));
+                log.info("Listening on port: " + acceptorSvr.socket().getLocalPort());
 
                 Runnable action = () -> {
                     while (!shutdown.get()) {
@@ -106,6 +103,8 @@ public class TelnetServer {
                                     log.error("An error occurs in telnet session.", t);
                                 }
                             }
+                        } catch (ClosedSelectorException e) {
+                            // 忽略，此时应该是telnet服务端关闭了
                         } catch (Throwable t) {
                             log.error("An error occurs in telnet server.", t);
                             if (shutdown.get()) {
@@ -128,7 +127,6 @@ public class TelnetServer {
      */
     public void shutdown() {
         if (shutdown.compareAndSet(false, true)) {
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
             try {
                 acceptorSvr.close();
                 selector.close();
