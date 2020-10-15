@@ -117,7 +117,7 @@ public final class CollectionUtil {
             }
             int repeat = helper = intersection(input, 0, index, output, 0, i).size();
             int temp = index - repeat + 1;
-            max = temp > max ? temp : max;
+            max = Math.max(temp, max);
         }
         return max;
     }

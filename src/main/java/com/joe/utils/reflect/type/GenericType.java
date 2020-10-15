@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
- * 泛型
  * 表示一个泛型，例如List&lt;T&gt;的T
  *
  * @author joe
