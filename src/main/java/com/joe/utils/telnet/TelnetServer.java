@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.joe.utils.common.Assert;
-import com.joe.utils.concurrent.ThreadUtil;
 import com.joe.utils.exception.IOExceptionWrapper;
 import com.joe.utils.exception.TelnetException;
 
@@ -26,20 +25,15 @@ import lombok.extern.slf4j.Slf4j;
 public class TelnetServer {
     private static final int     SELECT_TIME_GAP = 1000;
 
-    private AtomicBoolean        shutdown        = new AtomicBoolean(true);
+    private final AtomicBoolean  shutdown        = new AtomicBoolean(true);
 
-    private int                  port;
+    private final int            port;
 
-    private String               host;
+    private final String         host;
 
     private Selector             selector        = null;
 
     private ServerSocketChannel  acceptorSvr     = null;
-
-    /**
-     * kill命令hook
-     */
-    private final Thread         shutdownHook;
 
     /**
      * 命令处理器
@@ -60,7 +54,6 @@ public class TelnetServer {
         this.host = host;
         this.port = port;
         this.handler = handler;
-        this.shutdownHook = new Thread(this::shutdown);
     }
 
     /**
@@ -68,7 +61,6 @@ public class TelnetServer {
      */
     public void start() {
         if (shutdown.compareAndSet(true, false)) {
-            Runtime.getRuntime().addShutdownHook(shutdownHook);
             try {
                 selector = Selector.open();
                 acceptorSvr = ServerSocketChannel.open();
@@ -114,7 +106,9 @@ public class TelnetServer {
                     }
                 };
 
-                ThreadUtil.createPool(ThreadUtil.PoolType.Singleton, "telnet线程-%d").execute(action);
+                Thread thread = new Thread(action, "telnet线程");
+                thread.setDaemon(true);
+                thread.start();
             } catch (IOException e) {
                 log.error("Unable to open telnet.", e);
                 throw new IOExceptionWrapper(e);
