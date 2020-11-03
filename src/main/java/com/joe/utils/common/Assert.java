@@ -12,6 +12,18 @@ import com.joe.utils.common.string.StringUtils;
 public class Assert {
 
     /**
+     * 校验相同
+     * @param actual 实际值
+     * @param expected 期望值
+     */
+    public static void assertEquals(byte actual, byte expected) {
+        if (actual != expected) {
+            throw new IllegalArgumentException(
+                String.format("expected %d, actual %d", expected, actual));
+        }
+    }
+
+    /**
      * 验证参数是否大于0，参数小于等于0时抛出异常
      * @param number 参数
      */
