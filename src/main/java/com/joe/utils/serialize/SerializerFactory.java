@@ -11,15 +11,16 @@ import com.joe.utils.serialize.xml.XmlParser;
  * @version $Id: joe, v 0.1 2019年04月08日 20:28 JoeKerouac Exp $
  */
 public class SerializerFactory {
+
     public static Serializer getInstance(SerializerEnum serializerType) {
         switch (serializerType) {
             case XML:
-                XmlParser.getInstance();
-            case FORM:
+                return XmlParser.getInstance();
+            case JSON:
                 return JsonParser.getInstance();
-            case JSON:;
+            case FORM:;
             default:
-                throw new NoSupportException("不支持的SerializerEnum类型：" + serializerType);
+                throw new NoSupportException("不支持的Serializer类型：" + serializerType);
         }
     }
 }

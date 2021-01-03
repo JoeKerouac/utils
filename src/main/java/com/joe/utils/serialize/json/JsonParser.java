@@ -119,7 +119,7 @@ public class JsonParser implements Serializer {
         Assert.notNull(type);
         try {
             if (StringUtils.isEmpty(content)) {
-                log.debug("content为空，返回null", content, type);
+                log.debug("content为空，返回null");
                 return null;
             } else if (type.equals(String.class)) {
                 return (T)content;
