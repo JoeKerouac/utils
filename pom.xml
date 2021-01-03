@@ -147,7 +147,7 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <encoding>${build.encode}</encoding>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
 
@@ -157,7 +157,7 @@
                 <artifactId>formatter-maven-plugin</artifactId>
                 <version>2.13.0</version>
                 <configuration>
-                    <encoding>${build.encode}</encoding>
+                    <encoding>${project.build.sourceEncoding}</encoding>
                     <configFile>Formatter.xml</configFile>
                 </configuration>
                 <executions>
