@@ -21,44 +21,59 @@ public class StringUtils {
 
     /**
      * 正则提取，从字符串中正则提取出指定表达式，默认提取第一个括号中的内容，没有则报错，并且将结果使用指定分隔符拼接
-     * @param source 数据源
-     * @param pattern 正则表达式，不能为空
-     * @param separator 分隔符
+     * 
+     * @param source
+     *            数据源
+     * @param pattern
+     *            正则表达式，不能为空
+     * @param separator
+     *            分隔符
      * @return 提取到的数组
      */
     public static String patternCollectAndReduce(String source, String pattern, String separator) {
-        List<String> result = patternCollect(source, pattern, new int[] { 1 }, DEFAULT_FUNCTION);
+        List<String> result = patternCollect(source, pattern, new int[] {1}, DEFAULT_FUNCTION);
         return result.stream().reduce((arg0, arg1) -> arg0 + separator + arg1).get();
     }
 
     /**
      * 正则提取，从字符串中正则提取出指定表达式，默认提取第一个括号中的内容，没有则报错
-     * @param source 数据源
-     * @param pattern 正则表达式，不能为空
+     * 
+     * @param source
+     *            数据源
+     * @param pattern
+     *            正则表达式，不能为空
      * @return 提取到的数组
      */
     public static List<String> patternCollect(String source, String pattern) {
-        return patternCollect(source, pattern, new int[] { 1 }, DEFAULT_FUNCTION);
+        return patternCollect(source, pattern, new int[] {1}, DEFAULT_FUNCTION);
     }
 
     /**
      * 正则提取，从字符串中正则提取出指定表达式，默认提取第一个括号中的内容，没有则报错
-     * @param source 数据源
-     * @param pattern 正则表达式，不能为空
-     * @param function 转换函数，不能为空，将提取到的数据转换为指定数据
-     * @param <T> 转换后的数据类型
+     * 
+     * @param source
+     *            数据源
+     * @param pattern
+     *            正则表达式，不能为空
+     * @param function
+     *            转换函数，不能为空，将提取到的数据转换为指定数据
+     * @param <T>
+     *            转换后的数据类型
      * @return 提取到的数组
      */
-    public static <T> List<T> patternCollect(String source, String pattern,
-                                             StringGroupFunction<T> function) {
-        return patternCollect(source, pattern, new int[] { 1 }, function);
+    public static <T> List<T> patternCollect(String source, String pattern, StringGroupFunction<T> function) {
+        return patternCollect(source, pattern, new int[] {1}, function);
     }
 
     /**
      * 正则提取，从字符串中正则提取出指定表达式
-     * @param source 数据源
-     * @param pattern 正则表达式，不能为空
-     * @param groups 要提取的匹配到的group列表，不能为空
+     * 
+     * @param source
+     *            数据源
+     * @param pattern
+     *            正则表达式，不能为空
+     * @param groups
+     *            要提取的匹配到的group列表，不能为空
      * @return 提取到的数组
      */
     public static List<String> patternCollect(String source, String pattern, int[] groups) {
@@ -70,23 +85,26 @@ public class StringUtils {
      * 
      * <li>source:"#123,12#,#456,45#,#789,78#"</li>
      * <li>pattern:".*?#([0-9]*),([0-9]*)#.*?"</li>
-     * <li>groups:[1,2]</li>
-     * 对于以上入参，提供给function的入参分别是：
+     * <li>groups:[1,2]</li> 对于以上入参，提供给function的入参分别是：
      * <li>[123,12]</li>
      * <li>[456,45]</li>
-     * <li>[789,78]</li>
-     * 会循环调用function三次，每次入参数组长度为2
+     * <li>[789,78]</li> 会循环调用function三次，每次入参数组长度为2
      * 
      * 
-     * @param source 数据源
-     * @param pattern 正则表达式，不能为空
-     * @param groups 要提取的匹配到的group，不能为空。注意：groups必须不能超过正则表达式所能提取的最大值，例如正则中一个括号是一个group，正则本身也是一个group，详情参照测试用例
-     * @param function 转换函数，不能为空，将提取到的数据转换为指定数据
-     * @param <T> 转换后的数据类型
+     * @param source
+     *            数据源
+     * @param pattern
+     *            正则表达式，不能为空
+     * @param groups
+     *            要提取的匹配到的group，不能为空。注意：groups必须不能超过正则表达式所能提取的最大值，例如正则中一个括号是一个group，正则本身也是一个group，详情参照测试用例
+     * @param function
+     *            转换函数，不能为空，将提取到的数据转换为指定数据
+     * @param <T>
+     *            转换后的数据类型
      * @return 提取到的数组
      */
     public static <T> List<T> patternCollect(String source, String pattern, int[] groups,
-                                             StringGroupFunction<T> function) {
+        StringGroupFunction<T> function) {
         Assert.notBlank(pattern, "pattern must not be blank");
         Assert.notNull(function, "function must not be null");
         Assert.isTrue(groups != null && groups.length > 0, "groups must not empty");
@@ -112,8 +130,11 @@ public class StringUtils {
 
     /**
      * 比较两个字符串是否相等（调用equals方法）
-     * @param arg0 第一个字符串
-     * @param arg1 第二个字符串
+     * 
+     * @param arg0
+     *            第一个字符串
+     * @param arg1
+     *            第二个字符串
      * @return
      */
     public static boolean equals(String arg0, String arg1) {
@@ -122,8 +143,11 @@ public class StringUtils {
 
     /**
      * 将目标字符串重复count次返回
-     * @param str 目标字符串
-     * @param count 次数
+     * 
+     * @param str
+     *            目标字符串
+     * @param count
+     *            次数
      * @return 目标字符串重复count次结果，例如目标字符串是test，count是2，则返回testtest，如果count是3则返回testtesttest
      */
     public static String copy(String str, int count) {
@@ -153,9 +177,12 @@ public class StringUtils {
     /**
      * 替换指定结束位置之前的所有字符
      *
-     * @param str 字符串
-     * @param end 要替换的结束位置（包含该位置）
-     * @param rp  替换字符串
+     * @param str
+     *            字符串
+     * @param end
+     *            要替换的结束位置（包含该位置）
+     * @param rp
+     *            替换字符串
      * @return 替换后的字符串，例如对123456替换3,*，结果为*56
      */
     public static String replaceBefor(String str, int end, String rp) {
@@ -165,9 +192,12 @@ public class StringUtils {
     /**
      * 替换指定起始位置之后的所有字符
      *
-     * @param str   字符串
-     * @param start 要替换的起始位置（包含该位置）
-     * @param rp    替换字符串
+     * @param str
+     *            字符串
+     * @param start
+     *            要替换的起始位置（包含该位置）
+     * @param rp
+     *            替换字符串
      * @return 替换后的字符串，例如对123456替换3,*，结果为123*
      */
     public static String replaceAfter(String str, int start, String rp) {
@@ -177,10 +207,14 @@ public class StringUtils {
     /**
      * 替换指定区间位置的所有字符
      *
-     * @param str   字符串
-     * @param start 要替换的起始位置（包含该位置）
-     * @param end   要替换的结束位置（包含该位置）
-     * @param rp    替换字符串
+     * @param str
+     *            字符串
+     * @param start
+     *            要替换的起始位置（包含该位置）
+     * @param end
+     *            要替换的结束位置（包含该位置）
+     * @param rp
+     *            替换字符串
      * @return 替换后的字符串，例如对123456替换1,3,*，结果为1*56
      */
     public static String replace(String str, int start, int end, String rp) {
@@ -194,7 +228,8 @@ public class StringUtils {
     /**
      * 判断字符串长度是否大于0
      *
-     * @param str 字符串
+     * @param str
+     *            字符串
      * @return 长度大于0时返回true，字符串为null或者字符串长度等于0时返回false
      */
     public static boolean hasLength(String str) {
@@ -204,8 +239,10 @@ public class StringUtils {
     /**
      * 删除字符串的前/后缀
      *
-     * @param str 字符串
-     * @param arg 要删除的前/后缀
+     * @param str
+     *            字符串
+     * @param arg
+     *            要删除的前/后缀
      * @return 删除后的结果，例如当str是001234000、arg是0时，结果为1234
      */
     public static String trim(String str, String arg) {
@@ -226,7 +263,8 @@ public class StringUtils {
     /**
      * 解析form格式的参数，例如abc=123&amp;sdjk=234n这种格式的数据
      *
-     * @param data 要解析的数据
+     * @param data
+     *            要解析的数据
      * @return 解析出来的数据
      */
     public static Map<String, String> parseForm(String data) {
@@ -252,7 +290,8 @@ public class StringUtils {
     /**
      * 判断字符串是否为空（为null时也是空，字符串全是空白符时也是空）
      *
-     * @param arg 指定字符串
+     * @param arg
+     *            指定字符串
      * @return 如果为空则返回true
      */
     public static boolean isEmpty(String arg) {
@@ -262,7 +301,8 @@ public class StringUtils {
     /**
      * 判断字符串是否不为空（为null时也是空，字符串全是空白符时也是空）
      *
-     * @param arg 指定字符串
+     * @param arg
+     *            指定字符串
      * @return 如果不为空则返回true
      */
     public static boolean isNotEmpty(String arg) {
@@ -272,7 +312,8 @@ public class StringUtils {
     /**
      * 判断参数列表是否有空值
      *
-     * @param args 参数列表
+     * @param args
+     *            参数列表
      * @return 如果参数列表有任意一个值为空则返回true，否则返回false
      */
     public static boolean isEmptyAny(String... args) {
@@ -287,7 +328,8 @@ public class StringUtils {
     /**
      * 判断参数列表是否全为空
      *
-     * @param args 参数列表
+     * @param args
+     *            参数列表
      * @return 如果参数列表全为空则返回true，否则有任意一个值不为空就返回false
      */
     public static boolean isEmptyAll(String... args) {
@@ -302,7 +344,8 @@ public class StringUtils {
     /**
      * 判断字符串参数是否是数字（除了0.xx形式的数字，其他数字开头不能是0，例如00.1、01.1、03，上述这些都会返回false）
      *
-     * @param arg 数字参数
+     * @param arg
+     *            数字参数
      * @return 如果参数是数字则返回<code>true</code>
      */
     public static boolean isNumber(String arg) {
@@ -312,7 +355,8 @@ public class StringUtils {
     /**
      * 将首字母大写
      *
-     * @param arg 指定字符串
+     * @param arg
+     *            指定字符串
      * @return 首字母大写后的字符串
      */
     public static String toFirstUpperCase(String arg) {
@@ -322,14 +366,16 @@ public class StringUtils {
     /**
      * 求两个字符串的最大公共子序列的长度
      *
-     * @param arg0 字符串1
-     * @param arg1 字符串2
+     * @param arg0
+     *            字符串1
+     * @param arg1
+     *            字符串2
      * @return 两个字符串的最大公共子序列的长度，例：
-     * <ul>
-     *     <li>123456和456789的lcs为3</li>
-     *     <li>123456和256789的lcs为3</li>
-     *     <li>123456和556489的lcs为2</li>
-     * </ul>
+     *         <ul>
+     *         <li>123456和456789的lcs为3</li>
+     *         <li>123456和256789的lcs为3</li>
+     *         <li>123456和556489的lcs为2</li>
+     *         </ul>
      */
 
     public static long lcs(String arg0, String arg1) {
@@ -342,10 +388,14 @@ public class StringUtils {
     /**
      * 求两个字符串的最大公共子序列的长度
      *
-     * @param arg0 字符串1
-     * @param arg1 字符串2
-     * @param i    字符串1的当前位置指针
-     * @param j    字符串2的当前位置指针
+     * @param arg0
+     *            字符串1
+     * @param arg1
+     *            字符串2
+     * @param i
+     *            字符串1的当前位置指针
+     * @param j
+     *            字符串2的当前位置指针
      * @return 两个字符串的最大公共子序列的长度
      */
     private static long lcs(String arg0, String arg1, int i, int j) {

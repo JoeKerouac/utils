@@ -70,15 +70,15 @@ public class FormParser implements Serializer {
         if (Map.class.isAssignableFrom(clazz)) {
             Map<String, String> map = null;
             try {
-                map = (Map<String, String>) ClassUtils.getInstance(clazz);
+                map = (Map<String, String>)ClassUtils.getInstance(clazz);
             } catch (Exception e) {
 
             }
             if (map == null) {
-                return (T) params;
+                return (T)params;
             } else {
                 map.putAll(params);
-                return (T) map;
+                return (T)map;
             }
         }
 
@@ -86,7 +86,7 @@ public class FormParser implements Serializer {
             Collection<String> values = params.values();
             for (String value : values) {
                 try {
-                    return (T) readValue(value, clazz);
+                    return (T)readValue(value, clazz);
                 } catch (Exception e) {
                 }
             }
@@ -97,15 +97,17 @@ public class FormParser implements Serializer {
                 return t;
             }
 
-            Arrays.stream(ReflectUtil.getAllFields(clazz)).forEach(field -> ReflectUtil
-                .setFieldValue(t, field, readValue(params.get(field.getName()), field.getType())));
+            Arrays.stream(ReflectUtil.getAllFields(clazz)).forEach(
+                field -> ReflectUtil.setFieldValue(t, field, readValue(params.get(field.getName()), field.getType())));
             return t;
         }
     }
 
     /**
      * 将form格式数据读取为Map
-     * @param data form格式数据，不能为空，外部调用自己检查
+     * 
+     * @param data
+     *            form格式数据，不能为空，外部调用自己检查
      * @return 读取后的数据
      */
     private Map<String, String> readAsMap(String data) {
@@ -127,8 +129,11 @@ public class FormParser implements Serializer {
 
     /**
      * 读取值
-     * @param value 值
-     * @param type 值类型
+     * 
+     * @param value
+     *            值
+     * @param type
+     *            值类型
      * @return 读取到的值
      */
     private Object readValue(String value, Class<?> type) {
@@ -157,7 +162,7 @@ public class FormParser implements Serializer {
         } else if (String.class.equals(type)) {
             return value;
         } else if (Enum.class.equals(type)) {
-            return ReflectUtil.invoke(type, "valueOf", new Class[] { String.class }, value);
+            return ReflectUtil.invoke(type, "valueOf", new Class[] {String.class}, value);
         } else {
             throw new NoSupportException("FormParser不支持的数据类型：" + type);
         }

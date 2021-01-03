@@ -22,17 +22,17 @@ public class JClassLoader extends URLClassLoader {
     /**
      * 要突破双亲委托的包集合，支持正则，如果加载不到才会去父类加载
      */
-    private final String[]                           packages;
+    private final String[] packages;
 
     /**
      * 父ClassLoader
      */
-    private final ClassLoader                        parent;
+    private final ClassLoader parent;
 
     /**
      * class数据供应商，如果该class是需要本加载器自己加载的那么将会优先使用本供应商获取class数据
      */
-    private final ClassProvider                      classProvider;
+    private final ClassProvider classProvider;
 
     /**
      * resource供应商，供方法{@link #getResources(String)}使用
@@ -55,40 +55,39 @@ public class JClassLoader extends URLClassLoader {
         this(urls, packages, null, classProvider);
     }
 
-    public JClassLoader(URL[] urls, String[] packages, ClassLoader parent,
-                        ClassProvider classProvider) {
+    public JClassLoader(URL[] urls, String[] packages, ClassLoader parent, ClassProvider classProvider) {
         this(urls, packages, parent, classProvider, null);
     }
 
     public JClassLoader(URL[] urls, String[] packages, ClassProvider classProvider,
-                        Function<String, Enumeration<URL>> resourceProvider) {
+        Function<String, Enumeration<URL>> resourceProvider) {
         this(urls, packages, null, classProvider, resourceProvider);
     }
 
-    public JClassLoader(URL[] urls, String[] packages, ClassLoader parent,
-                        ClassProvider classProvider,
-                        Function<String, Enumeration<URL>> resourceProvider) {
+    public JClassLoader(URL[] urls, String[] packages, ClassLoader parent, ClassProvider classProvider,
+        Function<String, Enumeration<URL>> resourceProvider) {
         super(urls == null ? new URL[0] : urls);
         this.packages = packages == null ? new String[0] : packages;
         this.parent = parent == null ? JClassLoader.class.getClassLoader() : parent;
         this.classProvider = classProvider != null ? classProvider : name -> {
             Class<?> clazz;
             try {
-                clazz = ClassUtils.loadClass(name,
-                    parent != null ? parent : JClassLoader.class.getClassLoader());
+                clazz = ClassUtils.loadClass(name, parent != null ? parent : JClassLoader.class.getClassLoader());
             } catch (Exception e) {
                 throw new ClassNotFoundException(name);
             }
             return ClassUtils.getClassAsStream(clazz);
         };
-        this.resourceProvider = resourceProvider != null ? resourceProvider
-            : name -> new JEnumeration<>();
+        this.resourceProvider = resourceProvider != null ? resourceProvider : name -> new JEnumeration<>();
     }
 
     /**
      * 定义Class
-     * @param name class名
-     * @param data class数据
+     * 
+     * @param name
+     *            class名
+     * @param data
+     *            class数据
      * @return class
      */
     public Class<?> defineClass(String name, byte[] data) {
@@ -108,8 +107,7 @@ public class JClassLoader extends URLClassLoader {
                 } catch (ClassNotFoundException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new ClassNotFoundException(String.format("class数据读取异常，加载类[%s]失败", name),
-                        e);
+                    throw new ClassNotFoundException(String.format("class数据读取异常，加载类[%s]失败", name), e);
                 }
                 if (stream != null) {
                     byte[] classData;
@@ -117,8 +115,7 @@ public class JClassLoader extends URLClassLoader {
                         classData = read(stream);
                     } catch (IOException e) {
                         // 对于流读取失败的要抛出异常，不能再使用父类加载器加载
-                        throw new ClassNotFoundException(
-                            String.format("class数据读取异常，加载类[%s]失败", name), e);
+                        throw new ClassNotFoundException(String.format("class数据读取异常，加载类[%s]失败", name), e);
                     }
 
                     // 定义该类
@@ -168,8 +165,11 @@ public class JClassLoader extends URLClassLoader {
 
     /**
      * 读取Enumeration
-     * @param enumeration Enumeration
-     * @param <E> 数据类型
+     * 
+     * @param enumeration
+     *            Enumeration
+     * @param <E>
+     *            数据类型
      * @return 读取到的Enumeration
      */
     private <E> List<E> read(Enumeration<E> enumeration) {
@@ -182,9 +182,12 @@ public class JClassLoader extends URLClassLoader {
 
     /**
      * 从输入流中读取内容
-     * @param stream 输入流
+     * 
+     * @param stream
+     *            输入流
      * @return 读取到的内容
-     * @throws IOException 读取异常
+     * @throws IOException
+     *             读取异常
      */
     private byte[] read(InputStream stream) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -198,7 +201,9 @@ public class JClassLoader extends URLClassLoader {
 
     /**
      * 是否需要突破双亲委托自己加载，如果加载不到不会去父ClassLoader查找而是直接抛出ClassNotFoundException
-     * @param name 名字
+     * 
+     * @param name
+     *            名字
      * @return true表示需要突破双亲委托自己加载
      */
     private boolean needLoadBySelf(String name) {

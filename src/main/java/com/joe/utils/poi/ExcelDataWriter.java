@@ -12,15 +12,18 @@ public interface ExcelDataWriter<T> {
     /**
      * 将数据写入单元格
      *
-     * @param cell 单元格
-     * @param data 要写入的数据
+     * @param cell
+     *            单元格
+     * @param data
+     *            要写入的数据
      */
     void write(Cell cell, T data);
 
     /**
      * 数据是否可写
      *
-     * @param data 要写入的数据
+     * @param data
+     *            要写入的数据
      * @return 返回true表示可写
      */
     boolean writeable(Object data);
@@ -28,7 +31,8 @@ public interface ExcelDataWriter<T> {
     /**
      * 数据类型是否可写
      *
-     * @param type 数据类型
+     * @param type
+     *            数据类型
      * @return 返回true表示可写
      */
     boolean writeable(Class<?> type);

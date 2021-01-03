@@ -23,7 +23,8 @@ public class IBase64 {
     /**
      * base64编码
      *
-     * @param input 要编码的数据
+     * @param input
+     *            要编码的数据
      * @return 编码后的数据
      */
     public static byte[] encrypt(byte[] input) {
@@ -33,7 +34,8 @@ public class IBase64 {
     /**
      * base64编码
      *
-     * @param input 要编码的数据
+     * @param input
+     *            要编码的数据
      * @return 编码后的数据
      */
     public static String encrypt(String input) {
@@ -44,7 +46,8 @@ public class IBase64 {
     /**
      * base64解码
      *
-     * @param input 编码后的数据
+     * @param input
+     *            编码后的数据
      * @return 解码后（编码前）的数据
      */
     public static byte[] decrypt(byte[] input) {
@@ -54,7 +57,8 @@ public class IBase64 {
     /**
      * base64解码
      *
-     * @param input 编码后的数据
+     * @param input
+     *            编码后的数据
      * @return 解码后（编码前）的数据
      */
     public static String decrypt(String input) {

@@ -17,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public class BaseDTO<T> implements Serializable {
-    private static final long                serialVersionUID = 5075924626508128661L;
-    private static final Map<String, String> MSG              = new HashMap<>();
+    private static final long serialVersionUID = 5075924626508128661L;
+    private static final Map<String, String> MSG = new HashMap<>();
 
     static {
         // 成功
@@ -38,7 +38,7 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 数据
      */
-    private T      data;
+    private T data;
 
     /**
      * 默认成功构造器
@@ -50,8 +50,10 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 添加全局status-msg对（200、500为预设状态，200表示成功，500表示系统异常）
      *
-     * @param status 状态码
-     * @param msg    对应的消息
+     * @param status
+     *            状态码
+     * @param msg
+     *            对应的消息
      */
     public static void addStatus(String status, String msg) {
         MSG.put(status, msg);
@@ -67,8 +69,10 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 设置状态码
      *
-     * @param status  状态码
-     * @param message 错误消息
+     * @param status
+     *            状态码
+     * @param message
+     *            错误消息
      */
     private void status(String status, String message) {
         this.status = status;
@@ -90,7 +94,8 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 构建简单的成功对象
      *
-     * @param <T> 数据类型
+     * @param <T>
+     *            数据类型
      * @return 成功DTO
      */
     public static <T> BaseDTO<T> buildSuccess() {
@@ -100,8 +105,10 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 构建包含成功数据的成功对象
      *
-     * @param data 数据
-     * @param <T>  数据类型
+     * @param data
+     *            数据
+     * @param <T>
+     *            数据类型
      * @return 包含数据的成功对象
      */
     public static <T> BaseDTO<T> buildSuccess(T data) {
@@ -113,7 +120,8 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 构建系统异常对象
      *
-     * @param <T> 数据类型
+     * @param <T>
+     *            数据类型
      * @return 系统异常对象
      */
     public static <T> BaseDTO<T> buildError() {
@@ -126,8 +134,10 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 构建系统异常对象，status为500，msg为用户传入参数
      *
-     * @param msg 异常消息
-     * @param <T> 数据类型
+     * @param msg
+     *            异常消息
+     * @param <T>
+     *            数据类型
      * @return 系统异常对象
      */
     public static <T> BaseDTO<T> buildError(String msg) {
@@ -140,9 +150,12 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 构建指定的错误信息
      *
-     * @param status  错误代码
-     * @param message 错误消息
-     * @param <T>     数据类型
+     * @param status
+     *            错误代码
+     * @param message
+     *            错误消息
+     * @param <T>
+     *            数据类型
      * @return 错误消息
      */
     public static <T> BaseDTO<T> buildError(String status, String message) {
@@ -154,10 +167,14 @@ public class BaseDTO<T> implements Serializable {
     /**
      * 执行函数
      *
-     * @param callable 函数
-     * @param msg 错误消息模板
-     * @param param 错误消息模板参数
-     * @param <T>      返回数据类型
+     * @param callable
+     *            函数
+     * @param msg
+     *            错误消息模板
+     * @param param
+     *            错误消息模板参数
+     * @param <T>
+     *            返回数据类型
      * @return 执行结果
      */
     public static <T> BaseDTO<T> exec(Callable<BaseDTO<T>> callable, String msg, Object... param) {

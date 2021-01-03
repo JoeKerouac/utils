@@ -5,17 +5,16 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 定长队列（长度固定，当队列长度超过指定长度时自动删除最开始添加的）
- * 线程安全
+ * 定长队列（长度固定，当队列长度超过指定长度时自动删除最开始添加的） 线程安全
  * 
  * @author joe
  *
  */
 public class FixedQueue<E> extends ArrayBlockingQueue<E> implements Queue<E> {
     private static final long serialVersionUID = 159601021495564389L;
-    private final Object      lock             = new Object();
+    private final Object lock = new Object();
     // 队列的最大长度
-    private int               maxSize;
+    private int maxSize;
 
     /**
      * 构建默认长度为500的队列

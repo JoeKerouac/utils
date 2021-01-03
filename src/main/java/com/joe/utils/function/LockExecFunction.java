@@ -17,10 +17,14 @@ public interface LockExecFunction {
     /**
      * 加读锁执行
      *
-     * @param function 要执行的函数
-     * @param t        函数参数
-     * @param <T>      函数参数类型
-     * @param <R>      函数返回类型
+     * @param function
+     *            要执行的函数
+     * @param t
+     *            函数参数
+     * @param <T>
+     *            函数参数类型
+     * @param <R>
+     *            函数返回类型
      * @return 函数执行结果
      */
     default <T, R> R readLockExec(Function<T, R> function, T t) {
@@ -36,10 +40,14 @@ public interface LockExecFunction {
     /**
      * 加写锁执行
      *
-     * @param function 要执行的函数
-     * @param t        函数参数
-     * @param <T>      函数参数类型
-     * @param <R>      函数返回类型
+     * @param function
+     *            要执行的函数
+     * @param t
+     *            函数参数
+     * @param <T>
+     *            函数参数类型
+     * @param <R>
+     *            函数返回类型
      * @return 函数执行结果
      */
     default <T, R> R writeLockExec(Function<T, R> function, T t) {

@@ -8,5 +8,4 @@ import java.util.function.Function;
  * @author joe
  * @version 2018.07.19 18:30
  */
-public interface CommandHandler extends Function<String, String> {
-}
+public interface CommandHandler extends Function<String, String> {}

@@ -25,8 +25,7 @@ public class StringUtilsTest {
     @Test
     public void doPatternCollect1() {
         String data = "#123#,#456#,#789#";
-        List<String> result = StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?",
-            args -> args.get(0));
+        List<String> result = StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?", args -> args.get(0));
         List<String> expectResult = Arrays.asList("123", "456", "789");
 
         Assert.assertArrayEquals(expectResult.toArray(), result.toArray());
@@ -35,7 +34,7 @@ public class StringUtilsTest {
     @Test
     public void doPatternCollect2() {
         String data = "#123#,#456#,#789#";
-        List<String> result = StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?", new int[] { 1 });
+        List<String> result = StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?", new int[] {1});
         List<String> expectResult = Arrays.asList("123", "456", "789");
 
         Assert.assertArrayEquals(expectResult.toArray(), result.toArray());
@@ -44,7 +43,7 @@ public class StringUtilsTest {
     @Test
     public void doPatternCollect3() {
         String data = "#123#,#456#,#789#";
-        List<String> result = StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?", new int[] { 1 });
+        List<String> result = StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?", new int[] {1});
         List<String> expectResult = Arrays.asList("123", "456", "789");
 
         Assert.assertArrayEquals(expectResult.toArray(), result.toArray());
@@ -53,8 +52,8 @@ public class StringUtilsTest {
     @Test
     public void doPatternCollect4() {
         String data = "#123#,#456#,#789#";
-        List<Integer> result = StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?", new int[] { 1 },
-            args -> Integer.parseInt(args.get(0)));
+        List<Integer> result =
+            StringUtils.patternCollect(data, ".*?#([0-9]*)#.*?", new int[] {1}, args -> Integer.parseInt(args.get(0)));
         List<Integer> expectResult = Arrays.asList(123, 456, 789);
 
         Assert.assertArrayEquals(expectResult.toArray(), result.toArray());
@@ -63,8 +62,7 @@ public class StringUtilsTest {
     @Test
     public void doPatternCollect5() {
         String data = "#123,12#,#456,45#,#789,78#";
-        List<Integer> result = StringUtils.patternCollect(data, ".*?#([0-9]*),([0-9]*)#.*?",
-            new int[] { 1, 2 },
+        List<Integer> result = StringUtils.patternCollect(data, ".*?#([0-9]*),([0-9]*)#.*?", new int[] {1, 2},
             args -> Integer.parseInt(args.get(0)) * Integer.parseInt(args.get(1)));
         List<Integer> expectResult = Arrays.asList(123 * 12, 456 * 45, 789 * 78);
 

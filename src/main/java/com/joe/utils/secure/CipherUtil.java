@@ -9,7 +9,8 @@ public interface CipherUtil {
     /**
      * 加密
      *
-     * @param content 要加密的内容
+     * @param content
+     *            要加密的内容
      * @return 加密后的数据
      */
     String encrypt(String content);
@@ -17,7 +18,8 @@ public interface CipherUtil {
     /**
      * 加密
      *
-     * @param content 要加密的内容
+     * @param content
+     *            要加密的内容
      * @return 加密后的数据
      */
     byte[] encrypt(byte[] content);
@@ -25,7 +27,8 @@ public interface CipherUtil {
     /**
      * 解密
      *
-     * @param content 要解密的密文
+     * @param content
+     *            要解密的密文
      * @return 解密后的数据
      */
     String decrypt(String content);
@@ -33,7 +36,8 @@ public interface CipherUtil {
     /**
      * 解密
      *
-     * @param content 要解密的内容
+     * @param content
+     *            要解密的内容
      * @return 解密后的数据
      */
     byte[] decrypt(byte[] content);
@@ -70,6 +74,6 @@ public interface CipherUtil {
      * 加密算法
      */
     enum Algorithms {
-                     RSA, AES, DES
+        RSA, AES, DES
     }
 }

@@ -28,10 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractCipher implements CipherUtil {
     private static final Map<String, ObjectPoolImpl<CipherHolder>> CACHE = new ConcurrentHashMap<>();
-    private String                                                 id;
-    private Algorithms                                             algorithms;
-    private Key                                                    priKey;
-    private Key                                                    pubKey;
+    private String id;
+    private Algorithms algorithms;
+    private Key priKey;
+    private Key pubKey;
 
     AbstractCipher(String id, Algorithms algorithms, Key priKey, Key pubKey) {
         this.id = id.intern();
@@ -41,7 +41,7 @@ public abstract class AbstractCipher implements CipherUtil {
 
         CACHE.computeIfAbsent(this.id, key -> {
             ObjectPoolImpl<CipherHolder> pool = new ObjectPoolImpl<>(this::build);
-            //快速验证
+            // 快速验证
             pool.get().close();
             return pool;
         });
@@ -73,8 +73,10 @@ public abstract class AbstractCipher implements CipherUtil {
     /**
      * 加密指定数组
      *
-     * @param holder CipherHolder
-     * @param data   要加密的数据
+     * @param holder
+     *            CipherHolder
+     * @param data
+     *            要加密的数据
      * @return 加密后的数据（有可能会对结果编码）
      */
     protected abstract byte[] encrypt(CipherHolder holder, byte[] data);
@@ -82,8 +84,10 @@ public abstract class AbstractCipher implements CipherUtil {
     /**
      * 解密指定数组
      *
-     * @param holder CipherHolder
-     * @param data   要解密的数据
+     * @param holder
+     *            CipherHolder
+     * @param data
+     *            要解密的数据
      * @return 解密后的数据
      */
     protected abstract byte[] decrypt(CipherHolder holder, byte[] data);
@@ -146,18 +150,18 @@ public abstract class AbstractCipher implements CipherUtil {
         /**
          * 加密器
          */
-        private Cipher     encrypt;
+        private Cipher encrypt;
         /**
          * 解密器
          */
-        private Cipher     decrypt;
+        private Cipher decrypt;
         /**
          * 公钥（对称加密中公钥私钥相同）
          */
-        private Key        publicKey;
+        private Key publicKey;
         /**
          * 私钥（对称加密中公钥私钥相同）
          */
-        private Key        privateKey;
+        private Key privateKey;
     }
 }

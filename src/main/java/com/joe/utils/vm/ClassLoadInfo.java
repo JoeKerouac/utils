@@ -20,7 +20,7 @@ public class ClassLoadInfo {
     /**
      * 当前加载的class数量
      */
-    private final int  nowLoadedClassCount;
+    private final int nowLoadedClassCount;
 
     /**
      * 虚拟机运行以来总共加载的class数量

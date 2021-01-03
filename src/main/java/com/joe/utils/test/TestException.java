@@ -26,8 +26,7 @@ public class TestException extends UtilsException {
         super(cause);
     }
 
-    protected TestException(String message, Throwable cause, boolean enableSuppression,
-                            boolean writableStackTrace) {
+    protected TestException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(cause, enableSuppression, writableStackTrace, message);
     }
 }

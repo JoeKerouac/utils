@@ -27,11 +27,11 @@ public class MethodInterceptorAdapter implements MethodInterceptor {
     /**
      * target，可以为空，为空表示生成新代理，不为空表示对target代理
      */
-    private final Object       target;
+    private final Object target;
 
-    private final Class<?>     parent;
+    private final Class<?> parent;
 
-    private final ProxyParent  proxyParent;
+    private final ProxyParent proxyParent;
 
     public MethodInterceptorAdapter(Interception proxy, Object target, Class<?> parent) {
         Assert.notNull(proxy);
@@ -45,8 +45,7 @@ public class MethodInterceptorAdapter implements MethodInterceptor {
     }
 
     @Override
-    public Object intercept(Object obj, Method method, Object[] args,
-                            MethodProxy methodProxy) throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         Invoker supperCall = null;
         if (!parent.isInterface()) {
             supperCall = () -> methodProxy.invokeSuper(obj, args);

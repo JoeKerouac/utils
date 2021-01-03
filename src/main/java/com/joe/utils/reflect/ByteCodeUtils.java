@@ -21,9 +21,10 @@ public class ByteCodeUtils {
     public static final String INIT = "<init>";
 
     /**
-     * 获取Class类型的byte code标识，例如int对应的是I，String对应的是Ljava/lang/String，注意：只要不是原生类型肯定是以'L'开头
-     * 或者N个'['后跟一个'L'，'['标识数组
-     * @param clazz Class对象
+     * 获取Class类型的byte code标识，例如int对应的是I，String对应的是Ljava/lang/String，注意：只要不是原生类型肯定是以'L'开头 或者N个'['后跟一个'L'，'['标识数组
+     * 
+     * @param clazz
+     *            Class对象
      * @return 对应的byte code类型，结尾如果是对象会以';'结尾，如果是放在返回值时需要删除
      */
     public static String getByteCodeType(Class<?> clazz) {
@@ -60,7 +61,9 @@ public class ByteCodeUtils {
 
     /**
      * 获取指定构造器的byte code说明
-     * @param constructor 构造器
+     * 
+     * @param constructor
+     *            构造器
      * @return 指定构造器的说明
      */
     public static String getConstructorDesc(Constructor<?> constructor) {
@@ -70,7 +73,9 @@ public class ByteCodeUtils {
 
     /**
      * 获取指定方法的说明
-     * @param method 方法对象
+     * 
+     * @param method
+     *            方法对象
      * @return 方法说明
      */
     public static String getMethodDesc(Method method) {
@@ -80,7 +85,9 @@ public class ByteCodeUtils {
 
     /**
      * 将类名转换为byte code中的类名标识
-     * @param clazz Class对象
+     * 
+     * @param clazz
+     *            Class对象
      * @return byte code中的类名标识
      */
     public static String convert(Class<?> clazz) {
@@ -89,7 +96,9 @@ public class ByteCodeUtils {
 
     /**
      * 将类名转换为byte code中的类名标识
-     * @param className Class名字
+     * 
+     * @param className
+     *            Class名字
      * @return byte code中的类名标识
      */
     public static String convert(String className) {
@@ -98,8 +107,11 @@ public class ByteCodeUtils {
 
     /**
      * 获取指定参数类型、返回值的方法的byte code说明
-     * @param returnType 方法返回值
-     * @param paramTypes 方法参数
+     * 
+     * @param returnType
+     *            方法返回值
+     * @param paramTypes
+     *            方法参数
      * @return byte code方法说明
      */
     public static String getDesc(Class<?> returnType, Class<?>... paramTypes) {
@@ -109,7 +121,7 @@ public class ByteCodeUtils {
             sb.append(ByteCodeUtils.getByteCodeType(type));
         }
         sb.append(")");
-        //        sb.append(StringUtils.trim(ByteCodeUtils.getByteCodeType(returnType), ";"));
+        // sb.append(StringUtils.trim(ByteCodeUtils.getByteCodeType(returnType), ";"));
         sb.append(ByteCodeUtils.getByteCodeType(returnType));
         return sb.toString();
     }

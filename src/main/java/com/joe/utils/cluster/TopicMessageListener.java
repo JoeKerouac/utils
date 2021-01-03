@@ -10,8 +10,10 @@ public interface TopicMessageListener<M> {
     /**
      * Invokes on every message in topic
      *
-     * @param channel of topic
-     * @param msg     topic message
+     * @param channel
+     *            of topic
+     * @param msg
+     *            topic message
      */
     void onMessage(String channel, M msg);
 }

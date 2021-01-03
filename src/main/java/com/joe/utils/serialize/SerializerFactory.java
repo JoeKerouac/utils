@@ -17,8 +17,7 @@ public class SerializerFactory {
                 XmlParser.getInstance();
             case FORM:
                 return JsonParser.getInstance();
-            case JSON:
-                ;
+            case JSON:;
             default:
                 throw new NoSupportException("不支持的SerializerEnum类型：" + serializerType);
         }

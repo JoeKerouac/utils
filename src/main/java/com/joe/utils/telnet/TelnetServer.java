@@ -23,17 +23,17 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TelnetServer {
-    private static final int     SELECT_TIME_GAP = 1000;
+    private static final int SELECT_TIME_GAP = 1000;
 
-    private final AtomicBoolean  shutdown        = new AtomicBoolean(true);
+    private final AtomicBoolean shutdown = new AtomicBoolean(true);
 
-    private final int            port;
+    private final int port;
 
-    private final String         host;
+    private final String host;
 
-    private Selector             selector        = null;
+    private Selector selector = null;
 
-    private ServerSocketChannel  acceptorSvr     = null;
+    private ServerSocketChannel acceptorSvr = null;
 
     /**
      * 命令处理器
@@ -67,8 +67,7 @@ public class TelnetServer {
                 if (host == null) {
                     acceptorSvr.socket().bind(new InetSocketAddress(port));
                 } else {
-                    acceptorSvr.socket()
-                        .bind(new InetSocketAddress(InetAddress.getByName(host), port));
+                    acceptorSvr.socket().bind(new InetSocketAddress(InetAddress.getByName(host), port));
                 }
                 acceptorSvr.configureBlocking(false);
                 acceptorSvr.register(selector, SelectionKey.OP_ACCEPT);
@@ -135,13 +134,13 @@ public class TelnetServer {
         if (!key.isValid()) {
             return;
         } else if (key.isAcceptable()) {
-            ServerSocketChannel ssc = (ServerSocketChannel) key.channel();
+            ServerSocketChannel ssc = (ServerSocketChannel)key.channel();
             SocketChannel sc = ssc.accept();
             sc.configureBlocking(false);
             sc.register(selector, SelectionKey.OP_READ, new TelnetProtocolHandler(sc, handler));
             sc.write(ByteBuffer.wrap(TelnetProtocolHandler.NEGOTIATION_MESSAGE));
         } else if (key.isReadable()) {
-            TelnetProtocolHandler telnetProtocolHandler = (TelnetProtocolHandler) key.attachment();
+            TelnetProtocolHandler telnetProtocolHandler = (TelnetProtocolHandler)key.attachment();
             telnetProtocolHandler.handle();
         }
     }

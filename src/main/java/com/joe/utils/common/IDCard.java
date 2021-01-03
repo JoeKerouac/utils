@@ -21,18 +21,16 @@ import com.joe.utils.common.string.StringFormater;
  */
 public class IDCard {
 
-    private static final Logger  logger          = LoggerFactory.getLogger(IDCard.class);
+    private static final Logger logger = LoggerFactory.getLogger(IDCard.class);
 
     /**
      * 加权表
      */
-    private static int[]         POWER           = new int[] { 7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9,
-                                                               10, 5, 8, 4, 2 };
+    private static int[] POWER = new int[] {7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
     /**
      * 加权因子
      */
-    private static char[]        DIVISOR         = new char[] { '1', '0', 'X', '9', '8', '7', '6',
-                                                                '5', '4', '3', '2' };
+    private static char[] DIVISOR = new char[] {'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'};
 
     /**
      * 身份证正则
@@ -42,7 +40,8 @@ public class IDCard {
     /**
      * 根据出生日期随机生成一个身份证号
      *
-     * @param birthday 出生日期，格式为yyyyMMdd（本方法不严格验证参数准确性，只会验证长度和是否数字）
+     * @param birthday
+     *            出生日期，格式为yyyyMMdd（本方法不严格验证参数准确性，只会验证长度和是否数字）
      * @return 根据指定出生日期生成的身份证号，参数格式错误时返回null
      */
     public static String create(String birthday) {
@@ -55,7 +54,7 @@ public class IDCard {
         {
             // 随机挑出一个省市
             Map<String, Area> areaMap = getAreaMap(birthday);
-            int r1 = (int) (Math.random() * areaMap.size());
+            int r1 = (int)(Math.random() * areaMap.size());
             int i = 0;
             for (String befor : areaMap.keySet()) {
                 if (r1 == i) {
@@ -74,7 +73,7 @@ public class IDCard {
 
         {
             // 生成三位随机数
-            int r2 = (int) (Math.random() * 899 + 100);
+            int r2 = (int)(Math.random() * 899 + 100);
             card += r2;
         }
 
@@ -88,7 +87,8 @@ public class IDCard {
     /**
      * 检查身份证号是否符合格式
      *
-     * @param idCard 身份证号
+     * @param idCard
+     *            身份证号
      * @return 如果身份证号符合身份证格式则返回<code>true</code>
      */
     public static boolean check(String idCard) {
@@ -109,7 +109,7 @@ public class IDCard {
         if (idCardByte[17] == 'x' || idCardByte[17] == 'X') {
             last = 'X';
         } else {
-            last = (char) idCardByte[17];
+            last = (char)idCardByte[17];
         }
         if (last != calcLast) {
             // 格式不对
@@ -122,7 +122,8 @@ public class IDCard {
     /**
      * 获取用户所属省份，可能不准（因为有些人出生后很久才上户口，此时可能行政区划代码已经更改了）
      *
-     * @param idCard 用户身份证号
+     * @param idCard
+     *            用户身份证号
      * @return 用户所属省份
      */
     public static String getProvince(String idCard) {
@@ -142,7 +143,8 @@ public class IDCard {
     /**
      * 获取用户所属县市，可能不准（因为有些人出生后很久才上户口，此时可能行政区划代码已经更改了）
      *
-     * @param idCard 用户身份证号
+     * @param idCard
+     *            用户身份证号
      * @return 用户所属县市
      */
     public static String getArea(String idCard) {
@@ -161,7 +163,9 @@ public class IDCard {
 
     /**
      * 获取用于生日
-     * @param idCard 身份证号
+     * 
+     * @param idCard
+     *            身份证号
      * @return 生日，格式yyyyMMdd
      */
     public static String getBirthday(String idCard) {
@@ -170,7 +174,9 @@ public class IDCard {
 
     /**
      * 获取身份证的区域编码
-     * @param idCard 身份证
+     * 
+     * @param idCard
+     *            身份证
      * @return 区域编码
      */
     public static String getAreaCode(String idCard) {
@@ -180,7 +186,8 @@ public class IDCard {
     /**
      * 获取用户性别，0是女，1是男
      *
-     * @param idCard 用户身份证号
+     * @param idCard
+     *            用户身份证号
      * @return 用户性别
      */
     public static int getSex(String idCard) {
@@ -192,7 +199,8 @@ public class IDCard {
     /**
      * 获取用户年龄
      *
-     * @param idCard 用户身份证号
+     * @param idCard
+     *            用户身份证号
      * @return 用户年龄
      */
     public static int getAge(String idCard) {
@@ -217,7 +225,9 @@ public class IDCard {
 
     /**
      * 计算校验和
-     * @param card 身份证号，长度不得低于17位，使用前17位计算校验和
+     * 
+     * @param card
+     *            身份证号，长度不得低于17位，使用前17位计算校验和
      * @return 校验和
      */
     private static int calcMod(String card) {
@@ -225,7 +235,7 @@ public class IDCard {
         byte[] idCardByte = card.getBytes();
         int sum = 0;
         for (int j = 0; j < 17; j++) {
-            sum += (((int) idCardByte[j]) - 48) * POWER[j];
+            sum += (((int)idCardByte[j]) - 48) * POWER[j];
         }
         return sum % 11;
     }
@@ -233,8 +243,10 @@ public class IDCard {
     /**
      * 获取指定年份指定code对应的区域集合
      *
-     * @param birthday 年份
-     * @param code 区域编码
+     * @param birthday
+     *            年份
+     * @param code
+     *            区域编码
      * @return 指定年份指定code对应的区域集合
      */
     private static Map<String, Area> getAreaMap(String birthday, String code) {
@@ -267,11 +279,13 @@ public class IDCard {
 
     /**
      * 获取指定年份的区域集合
-     * @param birthday 生日
+     * 
+     * @param birthday
+     *            生日
      * @return 该生日对应的区域集合
      */
     private static Map<String, Area> getAreaMap(String birthday) {
-        return AreaUtil.getArea(birthday.substring(0, 4) + "." + birthday.substring(4, 6) + "."
-                                + birthday.substring(6, 8));
+        return AreaUtil
+            .getArea(birthday.substring(0, 4) + "." + birthday.substring(4, 6) + "." + birthday.substring(6, 8));
     }
 }

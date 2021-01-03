@@ -22,12 +22,11 @@ public class MethodInterceptorAdapter implements InvocationHandler {
     /**
      * 代理的方法
      */
-    private final Object       target;
+    private final Object target;
 
-    private final ProxyParent  proxyParent;
+    private final ProxyParent proxyParent;
 
-    public MethodInterceptorAdapter(Object target, Class<?> targetClass,
-                                    Interception interception) {
+    public MethodInterceptorAdapter(Object target, Class<?> targetClass, Interception interception) {
         Assert.notNull(targetClass);
         Assert.notNull(interception);
         this.target = target;

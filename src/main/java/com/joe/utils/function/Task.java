@@ -10,7 +10,9 @@ public interface Task {
 
     /**
      * 执行任务
-     * @throws Throwable 异常
+     * 
+     * @throws Throwable
+     *             异常
      */
     void run() throws Throwable;
 }

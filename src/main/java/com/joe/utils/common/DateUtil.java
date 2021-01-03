@@ -14,8 +14,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 日期工具类
- * 该版本升级使用JDK8的全新日期API，同时年的格式化必须为小写y，也就是可以是yyyy，不能为YYYY（大写Y）
+ * 日期工具类 该版本升级使用JDK8的全新日期API，同时年的格式化必须为小写y，也就是可以是yyyy，不能为YYYY（大写Y）
  *
  * @author joe
  */
@@ -29,25 +28,27 @@ public class DateUtil {
     /**
      * 常用格式化yyyy-MM-dd HH:mm:ss
      */
-    public final static String                          BASE            = "yyyy-MM-dd HH:mm:ss";
+    public final static String BASE = "yyyy-MM-dd HH:mm:ss";
     /**
      * 常用格式化yyyy-MM-dd
      */
-    public final static String                          SHORT           = "yyyy-MM-dd";
+    public final static String SHORT = "yyyy-MM-dd";
     /**
      * 常用格式化HH:mm:ss
      */
-    public final static String                          TIME            = "HH:mm:ss";
+    public final static String TIME = "HH:mm:ss";
 
-    private DateUtil() {
-    }
+    private DateUtil() {}
 
     /**
      * 将一种格式的日期转换为另一种格式
      *
-     * @param date      日期字符串
-     * @param format    日期对应的格式
-     * @param newFormat 要转换的新格式
+     * @param date
+     *            日期字符串
+     * @param format
+     *            日期对应的格式
+     * @param newFormat
+     *            要转换的新格式
      * @return 新格式的日期
      */
     public static String convert(String date, String format, String newFormat) {
@@ -57,7 +58,8 @@ public class DateUtil {
     /**
      * 获取指定年份的天数（润年跟平年不一样）
      *
-     * @param date 指定年份
+     * @param date
+     *            指定年份
      * @return 指定年份对应的天数
      */
     public static int getYearDay(Date date) {
@@ -69,7 +71,8 @@ public class DateUtil {
     /**
      * 获取指定月份的天数（有的月份31天，有的30天....）
      *
-     * @param date 指定月份
+     * @param date
+     *            指定月份
      * @return 该月份的天数
      */
     public static int getMonthDay(Date date) {
@@ -81,23 +84,29 @@ public class DateUtil {
     /**
      * 将指定日期字符串按照指定格式转换为日期对象（如果传入的时间没有当前时分秒信息或者年月日信息则默认填充当前时间）
      *
-     * @param date   格式化日期字符串
-     * @param format 日期字符串的格式
+     * @param date
+     *            格式化日期字符串
+     * @param format
+     *            日期字符串的格式
      * @return 格式化日期字符串对应的日期对象
-     * @throws DateUtilException 格式错误时返回该异常
+     * @throws DateUtilException
+     *             格式错误时返回该异常
      */
     public static Date parse(String date, String format) {
         LocalDateTime time = getTime(format, date);
-        //返回对应日期
+        // 返回对应日期
         return Date.from(time.toInstant(ZoneOffset.ofTotalSeconds(60 * 60 * 8)));
     }
 
     /**
      * 计算arg0-arg1的时间差，如果精度是天，则不足24小时不算，每满24小时则+1，例如两个日期差25小时，则差返回1天（精度为日），其他精度等同
      *
-     * @param arg0     arg0
-     * @param arg1     arg1
-     * @param dateUnit 返回结果的单位，只能是日以及日以下的精度，年月不行
+     * @param arg0
+     *            arg0
+     * @param arg1
+     *            arg1
+     * @param dateUnit
+     *            返回结果的单位，只能是日以及日以下的精度，年月不行
      * @return arg0-arg1的时间差，精确到指定的单位（field）
      */
     public static long calc(Date arg0, Date arg1, DateUnit dateUnit) {
@@ -107,10 +116,14 @@ public class DateUtil {
     /**
      * 计算arg0-arg1的时间差，如果精度是天，则不足24小时不算，每满24小时则+1，例如两个日期差25小时，则差返回1天（精度为日），其他精度等同
      *
-     * @param arg0     日期字符串
-     * @param arg1     日期字符串
-     * @param format   日期字符串的格式
-     * @param dateUnit 返回结果的单位，只能是日以及日以下的精度，年月不行
+     * @param arg0
+     *            日期字符串
+     * @param arg1
+     *            日期字符串
+     * @param format
+     *            日期字符串的格式
+     * @param dateUnit
+     *            返回结果的单位，只能是日以及日以下的精度，年月不行
      * @return arg0-arg1的时间差，精确到指定的单位（field），出错时返回-1
      */
     public static long calc(String arg0, String arg1, String format, DateUnit dateUnit) {
@@ -125,10 +138,14 @@ public class DateUtil {
     /**
      * 将指定日期增加指定时长
      *
-     * @param dateUnit 单位
-     * @param amount   时长
-     * @param date     指定日期
-     * @param format   指定日期字符串的格式
+     * @param dateUnit
+     *            单位
+     * @param amount
+     *            时长
+     * @param date
+     *            指定日期
+     * @param format
+     *            指定日期字符串的格式
      * @return 增加后的日期
      */
     public static Date add(DateUnit dateUnit, int amount, String date, String format) {
@@ -140,9 +157,12 @@ public class DateUtil {
     /**
      * 将指定日期加上指定的时长
      *
-     * @param dateUnit 单位
-     * @param amount   时长
-     * @param date     指定的日期
+     * @param dateUnit
+     *            单位
+     * @param amount
+     *            时长
+     * @param date
+     *            指定的日期
      * @return 增加指定时长后的日期
      */
     public static Date add(DateUnit dateUnit, int amount, Date date) {
@@ -152,8 +172,10 @@ public class DateUtil {
     /**
      * 获取指定日期的指定格式的字符串
      *
-     * @param format 日期格式
-     * @param date   指定日期
+     * @param format
+     *            日期格式
+     * @param date
+     *            指定日期
      * @return 指定日期的指定格式的字符串
      */
     public static String getFormatDate(String format, Date date) {
@@ -163,23 +185,28 @@ public class DateUtil {
     /**
      * 获取指定日期的指定格式的字符串，指定时区
      *
-     * @param format 日期格式
-     * @param date   指定日期
-     * @param zoneId 时区ID，例如GMT
+     * @param format
+     *            日期格式
+     * @param date
+     *            指定日期
+     * @param zoneId
+     *            时区ID，例如GMT
      * @return 指定日期的指定格式的字符串
      */
     public static String getFormatDate(String format, Date date, String zoneId) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format);
-        return dateTimeFormatter
-            .format(date.toInstant().atZone(ZoneId.of(zoneId)).toLocalDateTime());
+        return dateTimeFormatter.format(date.toInstant().atZone(ZoneId.of(zoneId)).toLocalDateTime());
     }
 
     /**
      * 判断指定日期是否在当前时间之前，精确到指定单位
      *
-     * @param date     指定日期
-     * @param format   指定日期的格式
-     * @param dateUnit 精确单位（例如传入年就是精确到年）
+     * @param date
+     *            指定日期
+     * @param format
+     *            指定日期的格式
+     * @param dateUnit
+     *            精确单位（例如传入年就是精确到年）
      * @return 如果指定日期在当前时间之前返回<code>true</code>
      */
     public static boolean beforeNow(String date, String format, DateUnit dateUnit) {
@@ -190,7 +217,8 @@ public class DateUtil {
     /**
      * 查询时间是否在今日
      *
-     * @param time 时间戳
+     * @param time
+     *            时间戳
      * @return 如果时间戳是今天的则返回<code>true</code>
      */
     public static boolean isToday(long time) {
@@ -200,8 +228,10 @@ public class DateUtil {
     /**
      * 查询时间是否在今日
      *
-     * @param date   时间字符串
-     * @param format 时间字符串的格式
+     * @param date
+     *            时间字符串
+     * @param format
+     *            时间字符串的格式
      * @return 如果指定日期对象在今天则返回<code>true</code>
      */
     public static boolean isToday(String date, String format) {
@@ -211,7 +241,8 @@ public class DateUtil {
     /**
      * 查询时间是否在今日
      *
-     * @param time 日期对象
+     * @param time
+     *            日期对象
      * @return 如果指定日期对象在今天则返回<code>true</code>
      */
     public static boolean isToday(Date time) {
@@ -222,13 +253,16 @@ public class DateUtil {
 
     /**
      * 从指定日期字符串获取LocalDateTime对象
-     * @param format 日期字符串格式
-     * @param date 日期字符串
+     * 
+     * @param format
+     *            日期字符串格式
+     * @param date
+     *            日期字符串
      * @return LocalDateTime对象
      */
     private static LocalDateTime getTime(String format, String date) {
         DateTimeFormatter formatter;
-        //优先从缓存取，取不到创建一个，不用加锁
+        // 优先从缓存取，取不到创建一个，不用加锁
         if ((formatter = FORMATTER_CACHE.get(format)) == null) {
             formatter = DateTimeFormatter.ofPattern(format);
             FORMATTER_CACHE.put(format, formatter);
@@ -237,9 +271,8 @@ public class DateUtil {
         TemporalAccessor accessor = formatter.parse(date);
         LocalDateTime time;
 
-        //判断日期类型，新版日期类将时间分为年月日（LocalDate）、时分秒（LocalTime）、年月日时分秒（LocalDateTime）三种类型
-        if (accessor.isSupported(ChronoField.DAY_OF_YEAR)
-            && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
+        // 判断日期类型，新版日期类将时间分为年月日（LocalDate）、时分秒（LocalTime）、年月日时分秒（LocalDateTime）三种类型
+        if (accessor.isSupported(ChronoField.DAY_OF_YEAR) && accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
             time = LocalDateTime.from(accessor);
         } else if (accessor.isSupported(ChronoField.SECOND_OF_DAY)) {
             LocalTime localTime = LocalTime.from(accessor);
@@ -254,7 +287,7 @@ public class DateUtil {
     }
 
     public enum DateUnit {
-                          YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
+        YEAR, MONTH, DAY, HOUR, MINUTE, SECOND
     }
 
     static class DateUtilException extends RuntimeException {
@@ -268,9 +301,12 @@ public class DateUtil {
     /**
      * 计算arg0-arg1的时间差，如果精度是天，则不足24小时不算，每满24小时则+1，例如两个日期差25小时，则差返回1天（精度为日），其他精度等同
      *
-     * @param arg0     arg0
-     * @param arg1     arg1
-     * @param dateUnit 返回结果的单位，只能是日以及日以下的精度，年月不行
+     * @param arg0
+     *            arg0
+     * @param arg1
+     *            arg1
+     * @param dateUnit
+     *            返回结果的单位，只能是日以及日以下的精度，年月不行
      * @return arg0-arg1的时间差，精确到指定的单位（field），出错时返回-1
      */
     private static long calc(Temporal arg0, Temporal arg1, DateUnit dateUnit) {
@@ -280,7 +316,8 @@ public class DateUtil {
     /**
      * 创建相应的ChronoUnit
      *
-     * @param dateUnit 单位
+     * @param dateUnit
+     *            单位
      * @return ChronoUnit
      */
     private static ChronoUnit create(DateUnit dateUnit) {

@@ -85,7 +85,7 @@ public class RedisClusterManager implements ClusterManager {
     @Override
     public boolean free(Object obj) {
         if (obj instanceof RObject) {
-            RObject rObject = (RObject) obj;
+            RObject rObject = (RObject)obj;
             return rObject.delete();
         } else {
             return false;
@@ -94,7 +94,7 @@ public class RedisClusterManager implements ClusterManager {
 
     @Override
     protected void finalize() throws Throwable {
-        //不应该依赖该方法进行shutdown！！！
+        // 不应该依赖该方法进行shutdown！！！
         super.finalize();
         redissonClient.shutdown();
     }

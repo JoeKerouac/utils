@@ -21,12 +21,12 @@ public class DocumentRootHelper {
     /**
      * classpath下的doc-root
      */
-    private static final File     DEFAULT_DOC_ROOT;
+    private static final File DEFAULT_DOC_ROOT;
     /**
      * 本地工作空间的doc-root
      */
-    private static final File     LOCAL_DOC_ROOT;
-    private static final String[] COMMON_DOC_ROOTS = { "src/main/webapp", "public", "static" };
+    private static final File LOCAL_DOC_ROOT;
+    private static final String[] COMMON_DOC_ROOTS = {"src/main/webapp", "public", "static"};
 
     static {
         URL url = Thread.currentThread().getContextClassLoader().getResource("");
@@ -54,7 +54,7 @@ public class DocumentRootHelper {
         file = file != null ? file : getExplodedWarFileDocumentRoot();
         if (file == null) {
             log.debug("None of the document roots " + Arrays.asList(COMMON_DOC_ROOTS)
-                      + " point to a directory and will be ignored.");
+                + " point to a directory and will be ignored.");
         } else {
             log.debug("Document root: " + file);
         }
@@ -100,8 +100,7 @@ public class DocumentRootHelper {
     private static File getArchiveFileDocumentRoot(String extension) {
         File file = getCodeSourceArchive();
         log.debug("Code archive: " + file);
-        if (file != null && file.exists() && !file.isDirectory()
-            && file.getName().toLowerCase().endsWith(extension)) {
+        if (file != null && file.exists() && !file.isDirectory() && file.getName().toLowerCase().endsWith(extension)) {
             return file.getAbsoluteFile();
         }
         return null;
@@ -110,7 +109,8 @@ public class DocumentRootHelper {
     /**
      * 获取解压后的代码对应的doc-root目录
      *
-     * @param codeSourceFile 当前代码所处的文件
+     * @param codeSourceFile
+     *            当前代码所处的文件
      * @return 解压后的代码对应的doc-root目录
      */
     private static File getExplodedWarFileDocumentRoot(File codeSourceFile) {
@@ -141,7 +141,7 @@ public class DocumentRootHelper {
             String path = location.getPath();
             URLConnection connection = location.openConnection();
             if (connection instanceof JarURLConnection) {
-                path = ((JarURLConnection) connection).getJarFile().getName();
+                path = ((JarURLConnection)connection).getJarFile().getName();
             }
             if (path.indexOf("!/") != -1) {
                 path = path.substring(0, path.indexOf("!/"));

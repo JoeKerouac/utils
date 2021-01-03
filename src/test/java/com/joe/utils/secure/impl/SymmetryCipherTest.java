@@ -16,10 +16,8 @@ public class SymmetryCipherTest {
 
     @Before
     public void init() {
-        desCipher = SymmetryCipher.buildInstance(AbstractCipher.Algorithms.DES,
-            "123123123123123123", 56);
-        aesCipher = SymmetryCipher.buildInstance(AbstractCipher.Algorithms.AES,
-            "123123123123123123", 128);
+        desCipher = SymmetryCipher.buildInstance(AbstractCipher.Algorithms.DES, "123123123123123123", 56);
+        aesCipher = SymmetryCipher.buildInstance(AbstractCipher.Algorithms.AES, "123123123123123123", 128);
     }
 
     @Test

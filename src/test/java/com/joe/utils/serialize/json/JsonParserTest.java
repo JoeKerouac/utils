@@ -19,13 +19,12 @@ import lombok.NoArgsConstructor;
 public class JsonParserTest {
     JsonParser parser;
     List<User> users;
-    String     usersJson;
+    String usersJson;
 
     @Test
     public void doParse() {
         Assert.assertEquals(parser.toJson(users), usersJson);
-        Arrays.deepEquals(parser.readAsCollection(usersJson, ArrayList.class, User.class).toArray(),
-            users.toArray());
+        Arrays.deepEquals(parser.readAsCollection(usersJson, ArrayList.class, User.class).toArray(), users.toArray());
     }
 
     @Data
@@ -33,7 +32,7 @@ public class JsonParserTest {
     @NoArgsConstructor
     static class User {
         private String name;
-        private int    age;
+        private int age;
         private String alias;
     }
 
@@ -47,6 +46,6 @@ public class JsonParserTest {
             users.add(user);
         }
         usersJson = "[{\"name\":\"user-0\",\"age\":0,\"alias\":\"joe-0\"},{\"name\":\"user-1\",\"age\":1,"
-                    + "\"alias\":\"joe-1\"},{\"name\":\"user-2\",\"age\":2,\"alias\":\"joe-2\"}]";
+            + "\"alias\":\"joe-1\"},{\"name\":\"user-2\",\"age\":2,\"alias\":\"joe-2\"}]";
     }
 }

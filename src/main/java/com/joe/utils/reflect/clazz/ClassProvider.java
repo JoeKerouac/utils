@@ -12,9 +12,12 @@ public interface ClassProvider {
 
     /**
      * 根据className查找class的输入流
-     * @param className className
+     * 
+     * @param className
+     *            className
      * @return class的输入流
-     * @throws ClassNotFoundException 找不到时应该抛出该异常
+     * @throws ClassNotFoundException
+     *             找不到时应该抛出该异常
      */
     InputStream findClassStream(String className) throws ClassNotFoundException;
 }

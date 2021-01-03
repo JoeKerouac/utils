@@ -16,21 +16,20 @@ import com.joe.utils.serialize.xml.XmlTypeConvert;
  * @version 2018.02.01 10:12
  */
 public interface XmlConverter<T> extends XmlTypeConvert<T> {
-    Logger    logger = LoggerFactory.getLogger(XmlConverter.class);
+    Logger logger = LoggerFactory.getLogger(XmlConverter.class);
     XmlParser PARSER = XmlParser.buildInstance();
 
     @SuppressWarnings("unchecked")
     @Override
     default T read(Element element, String attrName) {
-        String data = StringUtils.isEmpty(attrName) ? element.asXML()
-            : element.attributeValue(attrName);
+        String data = StringUtils.isEmpty(attrName) ? element.asXML() : element.attributeValue(attrName);
         Class<T> clazz = resolve();
         if (String.class.equals(clazz)) {
             logger.info("xml转换器确定的字段类型为String，转到String转换器");
-            return (T) data;
+            return (T)data;
         } else if (JavaTypeUtil.isBasic(clazz) || JavaTypeUtil.isGeneralType(clazz)) {
             logger.info("xml转换器确定的字段类型为" + clazz.getName() + "，转到基本类型转换器");
-            return (T) XmlTypeConverterUtil.converters.get(clazz.getName()).read(element, attrName);
+            return (T)XmlTypeConverterUtil.converters.get(clazz.getName()).read(element, attrName);
         }
         return PARSER.parse(data, clazz);
     }

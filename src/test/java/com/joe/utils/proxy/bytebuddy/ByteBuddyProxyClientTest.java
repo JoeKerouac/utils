@@ -13,7 +13,6 @@ public class ByteBuddyProxyClientTest {
 
     @Test
     public void doTest() {
-        new ProxyClientTestHelper(ProxyClient.getInstance(ProxyClient.ClientType.BYTE_BUDDY))
-            .doTest();
+        new ProxyClientTestHelper(ProxyClient.getInstance(ProxyClient.ClientType.BYTE_BUDDY)).doTest();
     }
 }

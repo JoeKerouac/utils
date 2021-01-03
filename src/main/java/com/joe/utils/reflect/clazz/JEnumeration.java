@@ -21,7 +21,7 @@ public class JEnumeration<E> implements Enumeration<E> {
     /**
      * 指针
      */
-    private int     point = 0;
+    private int point = 0;
 
     public JEnumeration() {
         this(Collections.emptyList());

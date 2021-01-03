@@ -30,12 +30,12 @@ public abstract class WebBaseTest extends BaseTest {
     /**
      * 当前运行的web程序的端口号
      */
-    private static ThreadLocal<Integer>                        PORT_THREAD_LOCAL    = new ThreadLocal<>();
+    private static ThreadLocal<Integer> PORT_THREAD_LOCAL = new ThreadLocal<>();
 
     /**
      * 当前运行的web程序的url
      */
-    private static ThreadLocal<String>                         URL_THREAD_LOCAL     = new ThreadLocal<>();
+    private static ThreadLocal<String> URL_THREAD_LOCAL = new ThreadLocal<>();
 
     /**
      * 当前运行的web程序的spring上下文
@@ -45,12 +45,13 @@ public abstract class WebBaseTest extends BaseTest {
     /**
      * 是否初始化，true表示已经初始化
      */
-    private volatile boolean                                   init;
+    private volatile boolean init;
 
-    private final Object                                       lock                 = new Object();
+    private final Object lock = new Object();
 
     /**
      * 获取端口
+     * 
      * @return 端口号，需要在(0, 60000)的范围
      */
     protected int getPort() {
@@ -59,6 +60,7 @@ public abstract class WebBaseTest extends BaseTest {
 
     /**
      * 获取基础URL
+     * 
      * @return 基础URL，示例：http://127.0.0.1:10/
      */
     protected String getBaseUrl() {
@@ -67,18 +69,20 @@ public abstract class WebBaseTest extends BaseTest {
 
     /**
      * 获取Source
+     * 
      * @return 默认为当前class
      */
     protected Class<?>[] getSource() {
-        return new Class[] { this.getClass() };
+        return new Class[] {this.getClass()};
     }
 
     /**
      * 随机生成一个取值范围为[30000, 60000)的端口号码
+     * 
      * @return 随机端口号
      */
     protected int randomPort() {
-        return (int) (Math.random() * 30000) + 30000;
+        return (int)(Math.random() * 30000) + 30000;
     }
 
     @Bean
@@ -106,11 +110,11 @@ public abstract class WebBaseTest extends BaseTest {
             }
             try {
                 Class<?>[] source = getSource();
-                //初始化端口号和url
+                // 初始化端口号和url
                 PORT_THREAD_LOCAL.set(randomPort());
                 URL_THREAD_LOCAL.set("http://127.0.0.1:" + PORT_THREAD_LOCAL.get() + "/");
-                CONTEXT_THREAD_LOCAL.set(SpringApplication
-                    .run(CollectionUtil.addTo(WebBaseTest.class, source), new String[0]));
+                CONTEXT_THREAD_LOCAL
+                    .set(SpringApplication.run(CollectionUtil.addTo(WebBaseTest.class, source), new String[0]));
             } catch (Throwable e) {
                 throw new UtilsException(e, "初始化异常");
             }

@@ -22,12 +22,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class JsonParser implements Serializer {
-    private static final JsonParser   JSON_PARSER;
+    private static final JsonParser JSON_PARSER;
     private static final ObjectMapper MAPPER_IGNORE_NULL;
     private static final ObjectMapper MAPPER;
 
-    private JsonParser() {
-    }
+    private JsonParser() {}
 
     static {
         MAPPER = new ObjectMapper();
@@ -55,21 +54,19 @@ public class JsonParser implements Serializer {
 
     @Override
     public <T> T read(byte[] data, Class<T> clazz) throws SerializeException {
-        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz),
-            SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz), SerializeException::new);
     }
 
     @Override
     public <T> T read(String data, Class<T> clazz) throws SerializeException {
-        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz),
-            SerializeException::new);
+        return ExceptionWraper.runWithResult(() -> readAsObject(data, clazz), SerializeException::new);
     }
 
     /**
-     * 将Object序列化（对于byte[]，会将byte[]用Base64编码一下，然后返回，相当于对该byte调用Base64的encode方法然后将结果返回，对于String
-     * 会直接将String返回）
+     * 将Object序列化（对于byte[]，会将byte[]用Base64编码一下，然后返回，相当于对该byte调用Base64的encode方法然后将结果返回，对于String 会直接将String返回）
      *
-     * @param obj 要序列化的数据
+     * @param obj
+     *            要序列化的数据
      * @return 序列化失败将返回空字符串
      */
     public String toJson(Object obj) {
@@ -77,11 +74,12 @@ public class JsonParser implements Serializer {
     }
 
     /**
-     * 将Object序列化（对于byte[]，会将byte[]用Base64编码一下，然后返回，相当于对该byte调用Base64的encode方法然后将结果返回，对于String
-     * 会直接将String返回）
+     * 将Object序列化（对于byte[]，会将byte[]用Base64编码一下，然后返回，相当于对该byte调用Base64的encode方法然后将结果返回，对于String 会直接将String返回）
      *
-     * @param obj        要序列化的对象
-     * @param ignoreNull 是否忽略空元素 ，如果为true为忽略
+     * @param obj
+     *            要序列化的对象
+     * @param ignoreNull
+     *            是否忽略空元素 ，如果为true为忽略
      * @return 序列化失败将返回空字符串
      */
     public String toJson(Object obj, boolean ignoreNull) {
@@ -89,7 +87,7 @@ public class JsonParser implements Serializer {
             return null;
         }
         if (obj instanceof String) {
-            return (String) obj;
+            return (String)obj;
         }
         try {
             ObjectMapper mapper;
@@ -108,9 +106,12 @@ public class JsonParser implements Serializer {
     /**
      * 解析json
      *
-     * @param content json字符串
-     * @param type    json解析后对应的实体类型
-     * @param <T>     实体类型的实际类型
+     * @param content
+     *            json字符串
+     * @param type
+     *            json解析后对应的实体类型
+     * @param <T>
+     *            实体类型的实际类型
      * @return 解析失败将返回null
      */
     @SuppressWarnings("unchecked")
@@ -121,7 +122,7 @@ public class JsonParser implements Serializer {
                 log.debug("content为空，返回null", content, type);
                 return null;
             } else if (type.equals(String.class)) {
-                return (T) content;
+                return (T)content;
             }
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
@@ -133,9 +134,12 @@ public class JsonParser implements Serializer {
     /**
      * 解析json
      *
-     * @param content json字符串
-     * @param type    json解析后对应的实体类型
-     * @param <T>     实体类型的实际类型
+     * @param content
+     *            json字符串
+     * @param type
+     *            json解析后对应的实体类型
+     * @param <T>
+     *            实体类型的实际类型
      * @return 解析失败将返回null
      */
     @SuppressWarnings("unchecked")
@@ -145,7 +149,7 @@ public class JsonParser implements Serializer {
                 log.debug("content为{}，type为：{}", content, type);
                 return null;
             } else if (type.equals(String.class)) {
-                return (T) new String(content);
+                return (T)new String(content);
             }
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
@@ -157,17 +161,24 @@ public class JsonParser implements Serializer {
     /**
      * 将json数据读取为带泛型的map类型的数据
      *
-     * @param content   json数据
-     * @param mapType   要返回的map类型
-     * @param keyType   map的key的泛型
-     * @param valueType map的value的泛型
-     * @param <T>       Map的实际类型
-     * @param <K>       map中key的实际类型
-     * @param <V>       map中value的实际类型
+     * @param content
+     *            json数据
+     * @param mapType
+     *            要返回的map类型
+     * @param keyType
+     *            map的key的泛型
+     * @param valueType
+     *            map的value的泛型
+     * @param <T>
+     *            Map的实际类型
+     * @param <K>
+     *            map中key的实际类型
+     * @param <V>
+     *            map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(String content, Class<? extends Map> mapType,
-                                                   Class<K> keyType, Class<V> valueType) {
+    public <T extends Map<K, V>, K, V> T readAsMap(String content, Class<? extends Map> mapType, Class<K> keyType,
+        Class<V> valueType) {
         try {
             MapType type = MAPPER.getTypeFactory().constructMapType(mapType, keyType, valueType);
             return MAPPER.readValue(content, type);
@@ -180,36 +191,46 @@ public class JsonParser implements Serializer {
     /**
      * 将json数据读取为带泛型的map类型的数据
      *
-     * @param content   json数据
-     * @param mapType   要返回的map类型
-     * @param keyType   map的key的泛型
-     * @param valueType map的value的泛型
-     * @param <T>       Map的实际类型
-     * @param <K>       map中key的实际类型
-     * @param <V>       map中value的实际类型
+     * @param content
+     *            json数据
+     * @param mapType
+     *            要返回的map类型
+     * @param keyType
+     *            map的key的泛型
+     * @param valueType
+     *            map的value的泛型
+     * @param <T>
+     *            Map的实际类型
+     * @param <K>
+     *            map中key的实际类型
+     * @param <V>
+     *            map中value的实际类型
      * @return map 解析结果
      */
-    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content, Class<? extends Map> mapType,
-                                                   Class<K> keyType, Class<V> valueType) {
+    public <T extends Map<K, V>, K, V> T readAsMap(byte[] content, Class<? extends Map> mapType, Class<K> keyType,
+        Class<V> valueType) {
         return readAsMap(new String(content), mapType, keyType, valueType);
     }
 
     /**
      * 将json读取为collection类型的数据
      *
-     * @param content        json数据
-     * @param collectionType collection类型
-     * @param elementsType   collection泛型
-     * @param <T>            list的实际类型
-     * @param <V>            list的泛型
+     * @param content
+     *            json数据
+     * @param collectionType
+     *            collection类型
+     * @param elementsType
+     *            collection泛型
+     * @param <T>
+     *            list的实际类型
+     * @param <V>
+     *            list的泛型
      * @return 解析结果
      */
-    public <T extends Collection<V>, V> T readAsCollection(String content,
-                                                           Class<? extends Collection> collectionType,
-                                                           Class<V> elementsType) {
+    public <T extends Collection<V>, V> T readAsCollection(String content, Class<? extends Collection> collectionType,
+        Class<V> elementsType) {
         try {
-            CollectionLikeType type = MAPPER.getTypeFactory()
-                .constructCollectionLikeType(collectionType, elementsType);
+            CollectionLikeType type = MAPPER.getTypeFactory().constructCollectionLikeType(collectionType, elementsType);
             return MAPPER.readValue(content, type);
         } catch (Exception e) {
             log.error("json解析失败，失败原因：", e);
@@ -220,16 +241,20 @@ public class JsonParser implements Serializer {
     /**
      * 将json读取为collection类型的数据
      *
-     * @param content        json数据
-     * @param collectionType collection类型
-     * @param elementsType   collection泛型
-     * @param <T>            list的实际类型
-     * @param <V>            list的泛型
+     * @param content
+     *            json数据
+     * @param collectionType
+     *            collection类型
+     * @param elementsType
+     *            collection泛型
+     * @param <T>
+     *            list的实际类型
+     * @param <V>
+     *            list的泛型
      * @return 解析结果
      */
-    public <T extends Collection<V>, V> T readAsCollection(byte[] content,
-                                                           Class<? extends Collection> collectionType,
-                                                           Class<V> elementsType) {
+    public <T extends Collection<V>, V> T readAsCollection(byte[] content, Class<? extends Collection> collectionType,
+        Class<V> elementsType) {
         return readAsCollection(new String(content), collectionType, elementsType);
     }
 }

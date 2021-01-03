@@ -10,12 +10,11 @@ public final class MethodConst {
     /**
      * String的equals方法
      */
-    public static final Method EQUALAS_METHOD = ReflectUtil.getMethod(String.class, "equals",
-        Object.class);
+    public static final Method EQUALAS_METHOD = ReflectUtil.getMethod(String.class, "equals", Object.class);
 
     /**
      * String的format方法
      */
-    public static final Method FORMAT_METHOD  = ReflectUtil.getMethod(String.class, "format",
-        String.class, Object[].class);
+    public static final Method FORMAT_METHOD =
+        ReflectUtil.getMethod(String.class, "format", String.class, Object[].class);
 }

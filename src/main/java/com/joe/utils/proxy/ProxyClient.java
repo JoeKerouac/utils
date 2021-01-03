@@ -21,9 +21,13 @@ public interface ProxyClient {
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
-     * @param parent 指定接口
-     * @param proxy 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param proxy
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
     default <T> T create(Class<T> parent, Interception proxy) {
@@ -32,10 +36,15 @@ public interface ProxyClient {
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的，支持多重代理
-     * @param parent 指定接口
-     * @param proxy 被代理的对象
-     * @param interception 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param proxy
+     *            被代理的对象
+     * @param interception
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
     default <T> T create(Class<T> parent, T proxy, Interception interception) {
@@ -44,10 +53,15 @@ public interface ProxyClient {
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
-     * @param parent 指定接口
-     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
-     * @param proxy 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param name
+     *            生成的对象的class名字，不一定支持（java代理不支持）
+     * @param proxy
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
     default <T> T create(Class<T> parent, String name, Interception proxy) {
@@ -56,11 +70,17 @@ public interface ProxyClient {
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的，支持多重代理
-     * @param parent 指定接口
-     * @param proxy 被代理的对象
-     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
-     * @param interception 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param proxy
+     *            被代理的对象
+     * @param name
+     *            生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
     default <T> T create(Class<T> parent, T proxy, String name, Interception interception) {
@@ -69,10 +89,15 @@ public interface ProxyClient {
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
-     * @param parent 指定接口
-     * @param loader 加载生成的对象的class的classloader
-     * @param proxy 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param loader
+     *            加载生成的对象的class的classloader
+     * @param proxy
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
     default <T> T create(Class<T> parent, ClassLoader loader, Interception proxy) {
@@ -81,11 +106,17 @@ public interface ProxyClient {
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的，支持多重代理
-     * @param parent 指定接口
-     * @param proxy 被代理的对象
-     * @param loader 加载生成的对象的class的classloader
-     * @param interception 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param proxy
+     *            被代理的对象
+     * @param loader
+     *            加载生成的对象的class的classloader
+     * @param interception
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
     default <T> T create(Class<T> parent, T proxy, ClassLoader loader, Interception interception) {
@@ -94,11 +125,17 @@ public interface ProxyClient {
 
     /**
      * 构建指定接口的代理Class，接口必须是公共的，同时代理方法也必须是公共的
-     * @param parent 指定接口
-     * @param loader 加载生成的对象的class的classloader
-     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
-     * @param proxy 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param loader
+     *            加载生成的对象的class的classloader
+     * @param name
+     *            生成的对象的class名字，不一定支持（java代理不支持）
+     * @param proxy
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
     default <T> T create(Class<T> parent, ClassLoader loader, String name, Interception proxy) {
@@ -107,56 +144,81 @@ public interface ProxyClient {
 
     /**
      * 构建指定对象的代理，对象的类必须是公共的，同时代理方法也必须是公共的，支持多重代理
-     * @param parent 指定接口
-     * @param proxy 被代理的对象
-     * @param loader 加载生成的对象的class的classloader
-     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
-     * @param interception 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param proxy
+     *            被代理的对象
+     * @param loader
+     *            加载生成的对象的class的classloader
+     * @param name
+     *            生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
-    default <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
-                         Interception interception) {
+    default <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name, Interception interception) {
         return create(parent, proxy, loader, name, interception, null, null);
     }
 
     /**
      * 构建指定对象的代理Class，稍后可以通过反射构建该class的实例，对象的类必须是公共的，同时代理方法也必须是公共的
-     * @param parent 指定接口
-     * @param proxy 被代理的对象
-     * @param loader 加载生成的对象的class的classloader
-     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
-     * @param interception 方法代理
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param proxy
+     *            被代理的对象
+     * @param loader
+     *            加载生成的对象的class的classloader
+     * @param name
+     *            生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception
+     *            方法代理
+     * @param <T>
+     *            代理真实类型
      * @return 代理class
      */
     <T> Class<? extends T> createClass(Class<T> parent, T proxy, ClassLoader loader, String name,
-                                       Interception interception);
+        Interception interception);
 
     /**
      * 构建指定对象的代理，对象的类必须是公共的，同时代理方法也必须是公共的
-     * @param parent 指定接口
-     * @param proxy 被代理的对象
-     * @param loader 加载生成的对象的class的classloader
-     * @param name 生成的对象的class名字，不一定支持（java代理不支持）
-     * @param interception 方法代理
-     * @param paramTypes 构造器参数类型，如果构造器是无参构造器那么传null
-     * @param params 构造器参数，如果是无参构造器那么传null
-     * @param <T> 代理真实类型
+     * 
+     * @param parent
+     *            指定接口
+     * @param proxy
+     *            被代理的对象
+     * @param loader
+     *            加载生成的对象的class的classloader
+     * @param name
+     *            生成的对象的class名字，不一定支持（java代理不支持）
+     * @param interception
+     *            方法代理
+     * @param paramTypes
+     *            构造器参数类型，如果构造器是无参构造器那么传null
+     * @param params
+     *            构造器参数，如果是无参构造器那么传null
+     * @param <T>
+     *            代理真实类型
      * @return 代理
      */
-    <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
-                 Interception interception, Class<?>[] paramTypes, Object[] params);
+    <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name, Interception interception,
+        Class<?>[] paramTypes, Object[] params);
 
     /**
      * 获取代理客户端的类型
+     * 
      * @return 代理客户端类型
      */
     ClientType getClientType();
 
     /**
      * 获取指定类型的代理客户端
-     * @param type 代理客户端类型
+     * 
+     * @param type
+     *            代理客户端类型
      * @return 客户端
      */
     static ProxyClient getInstance(ClientType type) {
@@ -167,20 +229,20 @@ public interface ProxyClient {
      * 
      */
     enum ClientType {
-                     /**
-                      * CGLIB代理客户端
-                      */
-                     CGLIB("com.joe.utils.proxy.cglib.CglibProxyClient"),
+        /**
+         * CGLIB代理客户端
+         */
+        CGLIB("com.joe.utils.proxy.cglib.CglibProxyClient"),
 
-                     /**
-                      * ByteBuddy客户端
-                      */
-                     BYTE_BUDDY("com.joe.utils.proxy.bytebuddy.ByteBuddyProxyClient"),
+        /**
+         * ByteBuddy客户端
+         */
+        BYTE_BUDDY("com.joe.utils.proxy.bytebuddy.ByteBuddyProxyClient"),
 
-                     /**
-                      * JAVA代理客户端
-                      */
-                     JAVA("com.joe.utils.proxy.java.JavaProxyClient");
+        /**
+         * JAVA代理客户端
+         */
+        JAVA("com.joe.utils.proxy.java.JavaProxyClient");
 
         private String clientClass;
 

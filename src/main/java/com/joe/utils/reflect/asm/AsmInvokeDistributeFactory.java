@@ -40,15 +40,14 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
     /**
      * 被代理对象在代理对象中的字段名
      */
-    private static final String             TARGET_FIELD_NAME   = "target";
+    private static final String TARGET_FIELD_NAME = "target";
 
     /**
      * Error方法的带String的构造器
      */
-    private static final Constructor<Error> ERROR_CONSTRUCTOR   = ReflectUtil
-        .getConstructor(Error.class, String.class);
+    private static final Constructor<Error> ERROR_CONSTRUCTOR = ReflectUtil.getConstructor(Error.class, String.class);
 
-    private final int                       version;
+    private final int version;
 
     public AsmInvokeDistributeFactory() {
         String nowVersion = System.getProperty("java.version");
@@ -62,20 +61,18 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Class<InvokeDistribute> build(Class<?> clazz, String className,
-                                         DynamicClassLoader classLoader) {
+    public Class<InvokeDistribute> build(Class<?> clazz, String className, DynamicClassLoader classLoader) {
         Assert.notNull(clazz);
 
         // 校验给定的class
         {
             if (InvokeDistribute.class.isAssignableFrom(clazz)) {
-                return (Class<InvokeDistribute>) clazz;
+                return (Class<InvokeDistribute>)clazz;
             }
 
             int modifier = clazz.getModifiers();
             if (!Modifier.isPublic(modifier)) {
-                throw new InvokeException(
-                    StringFormater.simpleFormat("给定class[{0}]不是public的", clazz.getName()));
+                throw new InvokeException(StringFormater.simpleFormat("给定class[{0}]不是public的", clazz.getName()));
             }
         }
 
@@ -84,18 +81,16 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
             try {
                 Constructor<?> constructor = clazz.getDeclaredConstructor();
                 if (!AccessorUtil.isPublic(constructor)) {
-                    throw new InvokeException(
-                        StringFormater.simpleFormat("给定class[{}]无参构造器不是public", clazz.getName()));
+                    throw new InvokeException(StringFormater.simpleFormat("给定class[{}]无参构造器不是public", clazz.getName()));
                 }
             } catch (NoSuchMethodException e) {
-                throw new InvokeException(
-                    StringFormater.simpleFormat("给定class[{}]没有无参构造器", clazz.getName()), e);
+                throw new InvokeException(StringFormater.simpleFormat("给定class[{}]没有无参构造器", clazz.getName()), e);
             }
 
             try {
                 clazz.getDeclaredConstructor(clazz);
-                throw new InvokeException(StringFormater.simpleFormat(
-                    "给定class[{}]不能包含只有一个[{}]类型参数的构造器", clazz.getName(), clazz.getName()));
+                throw new InvokeException(
+                    StringFormater.simpleFormat("给定class[{}]不能包含只有一个[{}]类型参数的构造器", clazz.getName(), clazz.getName()));
             } catch (NoSuchMethodException e) {
                 // 没有该构造器是正常的
             }
@@ -121,8 +116,11 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
 
     /**
      * 构建byte code
-     * @param parentClass 父类
-     * @param className 生成的class名
+     * 
+     * @param parentClass
+     *            父类
+     * @param className
+     *            生成的class名
      * @return 生成的class的byte code数据
      */
     public byte[] buildByteCode(Class<?> parentClass, String className) {
@@ -134,18 +132,17 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
             convert(className), // package and name
             null, // signature (null means not generic)
             convert(parentClass), // superclass
-            new String[] { convert(InvokeDistribute.class) });
+            new String[] {convert(InvokeDistribute.class)});
 
         // 声明保存实际Target的字段
-        cw.visitField(ACC_PRIVATE + ACC_FINAL, TARGET_FIELD_NAME, getByteCodeType(parentClass),
-            null, null).visitEnd();
+        cw.visitField(ACC_PRIVATE + ACC_FINAL, TARGET_FIELD_NAME, getByteCodeType(parentClass), null, null).visitEnd();
 
         /* 为类构建默认构造器（编译器会自动生成，但是此处要手动生成bytecode就只能手动生成无参构造器了） */
         generateDefaultConstructor(cw, parentClass, className);
 
         // 构建分发方法
         buildMethod(cw, className, parentClass);
-        //        buildMethod(cw);
+        // buildMethod(cw);
 
         // finish the class definition
         cw.visitEnd();
@@ -154,9 +151,13 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
 
     /**
      * 构建{@link InvokeDistribute#invoke(String, String, String, Object[]) invoke}方法
-     * @param cw ClassWriter
-     * @param className 生成的类名
-     * @param parentClass 父类
+     * 
+     * @param cw
+     *            ClassWriter
+     * @param className
+     *            生成的类名
+     * @param parentClass
+     *            父类
      */
     private static void buildMethod(ClassWriter cw, String className, Class<?> parentClass) {
         /* Build method */
@@ -214,9 +215,8 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
             mv.visitVarInsn(ALOAD, 3);
             mv.visitInsn(AASTORE);
 
-            mv.visitMethodInsn(INVOKESTATIC, convert(String.class),
-                MethodConst.FORMAT_METHOD.getName(), getMethodDesc(MethodConst.FORMAT_METHOD),
-                false);
+            mv.visitMethodInsn(INVOKESTATIC, convert(String.class), MethodConst.FORMAT_METHOD.getName(),
+                getMethodDesc(MethodConst.FORMAT_METHOD), false);
 
             mv.visitMethodInsn(INVOKESPECIAL, convert(NoSuchMethodException.class), INIT,
                 getConstructorDesc(ERROR_CONSTRUCTOR), false);
@@ -229,62 +229,68 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
 
     /**
      * 创建if分支的byte code
-     * @param mv MethodVisitor
-     * @param method Method
-     * @param next 下一个分支的起始位置
-     * @param start 该分支的结束位置
+     * 
+     * @param mv
+     *            MethodVisitor
+     * @param method
+     *            Method
+     * @param next
+     *            下一个分支的起始位置
+     * @param start
+     *            该分支的结束位置
      */
-    private static void createIf(MethodVisitor mv, Method method, Label next, Label start,
-                                 String className, Class<?> parentClass) {
+    private static void createIf(MethodVisitor mv, Method method, Label next, Label start, String className,
+        Class<?> parentClass) {
         // 标记分支开始位置
         mv.visitLabel(start);
         mv.visitFrame(F_SAME, 0, null, 0, null);
         // 比较方法声明类
-        stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 1), convert(method.getDeclaringClass()), next,
-            () -> {
-                // 比较方法名
-                stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 2), method.getName(), next, () -> {
-                    // 方法名一致再比较方法说明
-                    stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 3),
-                        ByteCodeUtils.getMethodDesc(method), next, () -> {
-                            // 方法说明也一致后执行方法
-                            invokeMethod(mv, method, () -> {
-                                // 调用代理对象对应的方法而不是本代理的方法
-                                mv.visitVarInsn(ALOAD, 0);
-                                mv.visitFieldInsn(GETFIELD, convert(className), TARGET_FIELD_NAME,
-                                    getByteCodeType(parentClass));
-                                // 获取参数数量，用于载入参数
-                                int count = method.getParameterCount();
-                                Class<?>[] types = method.getParameterTypes();
+        stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 1), convert(method.getDeclaringClass()), next, () -> {
+            // 比较方法名
+            stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 2), method.getName(), next, () -> {
+                // 方法名一致再比较方法说明
+                stringEquals(mv, () -> mv.visitVarInsn(ALOAD, 3), ByteCodeUtils.getMethodDesc(method), next, () -> {
+                    // 方法说明也一致后执行方法
+                    invokeMethod(mv, method, () -> {
+                        // 调用代理对象对应的方法而不是本代理的方法
+                        mv.visitVarInsn(ALOAD, 0);
+                        mv.visitFieldInsn(GETFIELD, convert(className), TARGET_FIELD_NAME,
+                            getByteCodeType(parentClass));
+                        // 获取参数数量，用于载入参数
+                        int count = method.getParameterCount();
+                        Class<?>[] types = method.getParameterTypes();
 
-                                // 循环载入参数
-                                for (int i = 0; i < count; i++) {
-                                    mv.visitVarInsn(Opcodes.ALOAD, 4);
-                                    // 这里注意，访问数组下标0-5和6-无穷是不一样的
-                                    // 访问0-5对应的byte code：  aload | iconst_[0-5] | aaload
-                                    // 访问下标大于5的byte code: aload | bipush [6-无穷] aaload
-                                    if (i <= 5) {
-                                        mv.visitInsn(ICONST_0 + i);
-                                    } else {
-                                        mv.visitIntInsn(BIPUSH, i);
-                                    }
-                                    mv.visitInsn(Opcodes.AALOAD);
-                                    mv.visitTypeInsn(CHECKCAST, convert(types[i]));
-                                }
-                            });
-                        });
+                        // 循环载入参数
+                        for (int i = 0; i < count; i++) {
+                            mv.visitVarInsn(Opcodes.ALOAD, 4);
+                            // 这里注意，访问数组下标0-5和6-无穷是不一样的
+                            // 访问0-5对应的byte code： aload | iconst_[0-5] | aaload
+                            // 访问下标大于5的byte code: aload | bipush [6-无穷] aaload
+                            if (i <= 5) {
+                                mv.visitInsn(ICONST_0 + i);
+                            } else {
+                                mv.visitIntInsn(BIPUSH, i);
+                            }
+                            mv.visitInsn(Opcodes.AALOAD);
+                            mv.visitTypeInsn(CHECKCAST, convert(types[i]));
+                        }
+                    });
                 });
             });
+        });
     }
 
     /**
      * 为类构建默认构造器（正常编译器会自动生成，但是此处要手动生成bytecode就只能手动生成无参构造器了
-     * @param cw ClassWriter
-     * @param parentClass 构建类的父类，会自动调用父类的构造器
-     * @param className 生成的新类名
+     * 
+     * @param cw
+     *            ClassWriter
+     * @param parentClass
+     *            构建类的父类，会自动调用父类的构造器
+     * @param className
+     *            生成的新类名
      */
-    private static void generateDefaultConstructor(ClassWriter cw, Class<?> parentClass,
-                                                   String className) {
+    private static void generateDefaultConstructor(ClassWriter cw, Class<?> parentClass, String className) {
         MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, // public method
             INIT, // method name
             getDesc(void.class, parentClass), // descriptor
@@ -304,8 +310,7 @@ public class AsmInvokeDistributeFactory implements InvokeDistributeFactory {
         // 设置字段值，相当于this.target = target;
         mv.visitVarInsn(ALOAD, 0); // 加载this
         mv.visitVarInsn(ALOAD, 1); // 加载参数
-        mv.visitFieldInsn(PUTFIELD, convert(className), TARGET_FIELD_NAME,
-            getByteCodeType(parentClass));
+        mv.visitFieldInsn(PUTFIELD, convert(className), TARGET_FIELD_NAME, getByteCodeType(parentClass));
 
         mv.visitMaxs(2, 1);
         mv.visitInsn(RETURN); // End the constructor method

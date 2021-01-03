@@ -36,12 +36,12 @@ public class HostInfo {
     /**
      * hostName
      */
-    private final String             hostName;
+    private final String hostName;
 
     /**
      * hostAddress
      */
-    private final String             hostAddress;
+    private final String hostAddress;
 
     static {
         // 初始化
@@ -59,13 +59,13 @@ public class HostInfo {
 
     /**
      * 获取默认网卡，有限获取
+     * 
      * @return 默认网卡
      */
     private static HostInfo obtain() {
         try {
             // 获取所有网卡接口
-            Enumeration<NetworkInterface> networkInterfaceEnumeration = NetworkInterface
-                .getNetworkInterfaces();
+            Enumeration<NetworkInterface> networkInterfaceEnumeration = NetworkInterface.getNetworkInterfaces();
             List<InetGroup> list = new ArrayList<>();
             while (networkInterfaceEnumeration.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaceEnumeration.nextElement();
@@ -74,8 +74,7 @@ public class HostInfo {
                     continue;
                 }
                 // 获取该网卡的所有ip地址（同一个网卡允许有多个IP）
-                Enumeration<InetAddress> inetAddressEnumeration = networkInterface
-                    .getInetAddresses();
+                Enumeration<InetAddress> inetAddressEnumeration = networkInterface.getInetAddresses();
                 List<InetAddress> inetAddresses = new ArrayList<>();
                 while (inetAddressEnumeration.hasMoreElements()) {
                     InetAddress inetAddress = inetAddressEnumeration.nextElement();
@@ -95,8 +94,7 @@ public class HostInfo {
                             inetAddresses.add(inetAddress);
                         }
                     } catch (IOException e) {
-                        log.debug("ip地址[{}:{}]不可达", inetAddress.getHostName(),
-                            inetAddress.getHostAddress());
+                        log.debug("ip地址[{}:{}]不可达", inetAddress.getHostName(), inetAddress.getHostAddress());
                     }
                 }
                 if (inetAddresses.size() > 0) {
@@ -134,12 +132,13 @@ public class HostInfo {
         /**
          * 网卡index
          */
-        private int               index;
+        private int index;
 
     }
 
     /**
      * 获取机器信息
+     * 
      * @return 机器信息
      */
     public static HostInfo getInstance() {
@@ -148,6 +147,7 @@ public class HostInfo {
 
     /**
      * 获取本地网络信息
+     * 
      * @return 本地网络信息
      */
     private static HostInfo getLocal() {

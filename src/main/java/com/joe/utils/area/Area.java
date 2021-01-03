@@ -21,17 +21,17 @@ public class Area {
     /**
      * 当前地区代码
      */
-    private String     code;
+    private String code;
 
     /**
      * 父地区代码
      */
-    private String     parent;
+    private String parent;
 
     /**
      * 地区名
      */
-    private String     name;
+    private String name;
 
     /**
      * 子地区

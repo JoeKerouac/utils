@@ -31,7 +31,8 @@ public class SymmetryCipher extends AbstractCipher {
     /**
      * 生成AES加密器
      *
-     * @param seed 随机数种子
+     * @param seed
+     *            随机数种子
      * @return SymmetryCipher
      */
     public static CipherUtil buildInstance(String seed) {
@@ -41,8 +42,10 @@ public class SymmetryCipher extends AbstractCipher {
     /**
      * SymmetryCipher构造器，采用默认keySize
      *
-     * @param algorithms 算法，当前仅支持AES和DES
-     * @param seed       随机数种子
+     * @param algorithms
+     *            算法，当前仅支持AES和DES
+     * @param seed
+     *            随机数种子
      * @return SymmetryCipher
      */
     public static CipherUtil buildInstance(Algorithms algorithms, String seed) {
@@ -58,9 +61,12 @@ public class SymmetryCipher extends AbstractCipher {
     /**
      * SymmetryCipher构造器
      *
-     * @param algorithms 算法，当前仅支持AES和DES
-     * @param seed       随机数种子
-     * @param keySize    keySize
+     * @param algorithms
+     *            算法，当前仅支持AES和DES
+     * @param seed
+     *            随机数种子
+     * @param keySize
+     *            keySize
      * @return SymmetryCipher
      */
     public static CipherUtil buildInstance(Algorithms algorithms, String seed, int keySize) {
@@ -78,8 +84,10 @@ public class SymmetryCipher extends AbstractCipher {
     /**
      * SymmetryCipher构造器
      *
-     * @param algorithms 算法
-     * @param keySpec    keySpec
+     * @param algorithms
+     *            算法
+     * @param keySpec
+     *            keySpec
      * @return CipherUtil
      */
     public static CipherUtil buildInstance(Algorithms algorithms, byte[] keySpec) {

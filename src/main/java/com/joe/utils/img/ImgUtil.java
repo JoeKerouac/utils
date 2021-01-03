@@ -15,16 +15,19 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ImgUtil {
-    private ImgUtil() {
-    }
+    private ImgUtil() {}
 
     /**
      * 更改图片alpha值
      *
-     * @param oldPath 图片本地路径
-     * @param newPath 更改alpha值后的图片保存路径
-     * @param alpha   要设置的alpha值
-     * @throws IOException IOException
+     * @param oldPath
+     *            图片本地路径
+     * @param newPath
+     *            更改alpha值后的图片保存路径
+     * @param alpha
+     *            要设置的alpha值
+     * @throws IOException
+     *             IOException
      */
     public static void changeAlpha(String oldPath, String newPath, byte alpha) throws IOException {
         changeAlpha(new FileInputStream(oldPath), new FileOutputStream(newPath), alpha);
@@ -33,49 +36,60 @@ public class ImgUtil {
     /**
      * 更改图片alpha值
      *
-     * @param oldPath 图片本地路径
-     * @param newPath 更改alpha值后的图片保存路径
-     * @param alpha   要设置的alpha值
-     * @param filter  alpha filter
-     * @throws IOException IOException
+     * @param oldPath
+     *            图片本地路径
+     * @param newPath
+     *            更改alpha值后的图片保存路径
+     * @param alpha
+     *            要设置的alpha值
+     * @param filter
+     *            alpha filter
+     * @throws IOException
+     *             IOException
      */
-    public static void changeAlpha(String oldPath, String newPath, byte alpha,
-                                   AlphaFilter filter) throws IOException {
+    public static void changeAlpha(String oldPath, String newPath, byte alpha, AlphaFilter filter) throws IOException {
         changeAlpha(new FileInputStream(oldPath), new FileOutputStream(newPath), alpha, filter);
     }
 
     /**
      * 更改图片的alpha值
      *
-     * @param srcInput   图像输入
-     * @param destOutput 图像输出
-     * @param alpha      要设置的alpha值
-     * @throws IOException IOException
+     * @param srcInput
+     *            图像输入
+     * @param destOutput
+     *            图像输出
+     * @param alpha
+     *            要设置的alpha值
+     * @throws IOException
+     *             IOException
      */
-    public static void changeAlpha(InputStream srcInput, OutputStream destOutput,
-                                   byte alpha) throws IOException {
+    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha) throws IOException {
         changeAlpha(srcInput, destOutput, alpha, null);
     }
 
     /**
      * 更改alpha值
      *
-     * @param srcInput   图像输入
-     * @param destOutput 图像输出
-     * @param alpha      要设置的alpha值
-     * @param filter     alpha filter
-     * @throws IOException IOException
+     * @param srcInput
+     *            图像输入
+     * @param destOutput
+     *            图像输出
+     * @param alpha
+     *            要设置的alpha值
+     * @param filter
+     *            alpha filter
+     * @throws IOException
+     *             IOException
      */
-    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha,
-                                   AlphaFilter filter) throws IOException {
-        //加载图片
+    public static void changeAlpha(InputStream srcInput, OutputStream destOutput, byte alpha, AlphaFilter filter)
+        throws IOException {
+        // 加载图片
         log.debug("开始加载图片");
         BufferedImage old = ImageIO.read(srcInput);
         log.debug("图片加载完毕，开始改变图片的alpha值");
 
-        //使用32位深带alpha通道模式
-        BufferedImage bufferedImage = new BufferedImage(old.getWidth(), old.getHeight(),
-            BufferedImage.TYPE_4BYTE_ABGR);
+        // 使用32位深带alpha通道模式
+        BufferedImage bufferedImage = new BufferedImage(old.getWidth(), old.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 
         if (filter == null) {
             filter = (x, y, rgb) -> true;
@@ -86,7 +100,7 @@ public class ImgUtil {
             for (int y = 0; y < bufferedImage.getHeight(); y++) {
                 int rgb = old.getRGB(x, y);
                 if (filter.filter(x, y, rgb)) {
-                    //设置alpha值
+                    // 设置alpha值
                     rgb = (alpha << 24) | (rgb & 0x00ffffff);
                 }
                 bufferedImage.setRGB(x, y, rgb);
@@ -97,44 +111,46 @@ public class ImgUtil {
         ImageIO.write(bufferedImage, "png", destOutput);
     }
 
-    //    public static BufferedImage spin(BufferedImage image, double angle) {
-    //        int width = image.getWidth();
-    //        int height = image.getHeight();
-    //        BufferedImage bufferedImage = new BufferedImage(height, width, image.getType());
+    // public static BufferedImage spin(BufferedImage image, double angle) {
+    // int width = image.getWidth();
+    // int height = image.getHeight();
+    // BufferedImage bufferedImage = new BufferedImage(height, width, image.getType());
     //
-    //        int x = width >> 1;
-    //        int y = height >> 1;
+    // int x = width >> 1;
+    // int y = height >> 1;
     //
-    //        for (int i = 0; i < width; i++) {
-    //            for (int j = 0; j < height; j++) {
-    //                int rgb = image.getRGB(i, j);
-    //                Point point = MathUtil.spin(new Point(i - x, j - y), angle);
-    //                int newX = (int)Math.round(point.getX()) + x;
-    //                int newY = (int) Math.round(point.getY()) + y;
-    //                try {
+    // for (int i = 0; i < width; i++) {
+    // for (int j = 0; j < height; j++) {
+    // int rgb = image.getRGB(i, j);
+    // Point point = MathUtil.spin(new Point(i - x, j - y), angle);
+    // int newX = (int)Math.round(point.getX()) + x;
+    // int newY = (int) Math.round(point.getY()) + y;
+    // try {
     //
-    //                    bufferedImage.setRGB(newX, newY, rgb);
-    //                } catch (Exception e) {
+    // bufferedImage.setRGB(newX, newY, rgb);
+    // } catch (Exception e) {
     //
-    //                }
-    //            }
-    //        }
+    // }
+    // }
+    // }
     //
-    //        return bufferedImage;
-    //    }
+    // return bufferedImage;
+    // }
 
-    //    public static void main(String[] args) throws IOException{
-    //        BufferedImage old = ImageIO.read(new FileInputStream("D:\\2.jpg"));
-    //        BufferedImage image = spin(old, MathUtil.ANGLE_90);
-    //        ImageIO.write(image, "jpg", new FileOutputStream("D:\\3.jpg"));
-    //    }
+    // public static void main(String[] args) throws IOException{
+    // BufferedImage old = ImageIO.read(new FileInputStream("D:\\2.jpg"));
+    // BufferedImage image = spin(old, MathUtil.ANGLE_90);
+    // ImageIO.write(image, "jpg", new FileOutputStream("D:\\3.jpg"));
+    // }
 
     /**
      * 获取图片的说明
      *
-     * @param path 图片的路径
+     * @param path
+     *            图片的路径
      * @return 图片说明
-     * @throws IOException IOException
+     * @throws IOException
+     *             IOException
      */
     public static ImgMetadata getImgInfo(final String path) throws IOException {
         return getImgInfo(ImageIO.read(new File(path)));
@@ -143,7 +159,8 @@ public class ImgUtil {
     /**
      * 获取图片的说明
      *
-     * @param image 图片的数据
+     * @param image
+     *            图片的数据
      * @return 图片说明（不包含文件名，获取不到文件名）
      */
     public static ImgMetadata getImgInfo(BufferedImage image) {
@@ -158,8 +175,10 @@ public class ImgUtil {
     /**
      * 缩放图片（将图片宽高同时变小，图片将会变模糊同时变小）
      *
-     * @param src   原图片数据
-     * @param scale 缩放比列，宽高同时缩放
+     * @param src
+     *            原图片数据
+     * @param scale
+     *            缩放比列，宽高同时缩放
      * @return 缩放后的图片（会变模糊）
      */
     public static BufferedImage compression(BufferedImage src, int scale) {
@@ -169,9 +188,12 @@ public class ImgUtil {
     /**
      * 缩放图片
      *
-     * @param src         图片源
-     * @param widthScale  宽度缩放比例
-     * @param heightScale 高度缩放比列
+     * @param src
+     *            图片源
+     * @param widthScale
+     *            宽度缩放比例
+     * @param heightScale
+     *            高度缩放比列
      * @return 缩放后的图片（会变模糊）
      */
     public static BufferedImage compression(BufferedImage src, int widthScale, int heightScale) {
@@ -195,20 +217,22 @@ public class ImgUtil {
     /**
      * 复制image
      *
-     * @param image image源
+     * @param image
+     *            image源
      * @return 复制后的image，与原图一模一样
      */
     public static BufferedImage copy(BufferedImage image) {
-        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(),
-            image.getType());
+        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
         return copy(image, newImage);
     }
 
     /**
      * 将一个image信息复制到另一个image中
      *
-     * @param src  源
-     * @param dest 目标
+     * @param src
+     *            源
+     * @param dest
+     *            目标
      * @return dest
      */
     public static BufferedImage copy(BufferedImage src, BufferedImage dest) {
@@ -223,9 +247,12 @@ public class ImgUtil {
         /**
          * 根据结果判断更改alpha值
          *
-         * @param x   像素x坐标
-         * @param y   像素y坐标
-         * @param rgb x、y坐标对应的rgb值
+         * @param x
+         *            像素x坐标
+         * @param y
+         *            像素y坐标
+         * @param rgb
+         *            x、y坐标对应的rgb值
          * @return 返回true表示需要更改，返回false表示不需要更改
          */
         boolean filter(int x, int y, int rgb);
@@ -233,25 +260,24 @@ public class ImgUtil {
 
     @Data
     public static final class ImgMetadata {
-        ImgMetadata() {
-        }
+        ImgMetadata() {}
 
         /**
          * 图片宽
          */
-        private int     width;
+        private int width;
         /**
          * 图片高
          */
-        private int     height;
+        private int height;
         /**
          * 图片文件名
          */
-        private String  name;
+        private String name;
         /**
          * 图片位深
          */
-        private int     pixelSize;
+        private int pixelSize;
         /**
          * 是否有alpha通道
          */

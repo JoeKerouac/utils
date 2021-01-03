@@ -45,7 +45,7 @@ public class MemoryInfo {
     /**
      * 内存区名字
      */
-    private final String       name;
+    private final String name;
 
     /**
      * 内存区初始化大小
@@ -70,7 +70,8 @@ public class MemoryInfo {
     /**
      * 获取各个内存区的使用情况
      *
-     * @param unit 结果单位
+     * @param unit
+     *            结果单位
      * @return 各个内存区的使用情况
      */
     public static List<MemoryInfo> getMemoryInfos(MemoryUnitDefinition unit) {
@@ -108,7 +109,7 @@ public class MemoryInfo {
 
     @Override
     public String toString() {
-        return "MemoryInfo{" + "name='" + name + '\'' + ", init=" + init + ", used=" + used
-               + ", committed=" + committed + ", max=" + max + '}';
+        return "MemoryInfo{" + "name='" + name + '\'' + ", init=" + init + ", used=" + used + ", committed=" + committed
+            + ", max=" + max + '}';
     }
 }

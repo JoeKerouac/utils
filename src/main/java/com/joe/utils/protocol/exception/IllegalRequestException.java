@@ -11,7 +11,8 @@ public class IllegalRequestException extends ProtocolException {
     /**
      * 非法请求
      *
-     * @param cause 非法请求来源
+     * @param cause
+     *            非法请求来源
      */
     public IllegalRequestException(String cause) {
         super("非法请求：" + cause);
@@ -20,7 +21,8 @@ public class IllegalRequestException extends ProtocolException {
     /**
      * 非法请求
      *
-     * @param cause 非法请求导致的异常
+     * @param cause
+     *            非法请求导致的异常
      */
     public IllegalRequestException(Throwable cause) {
         super("非法请求：", cause);

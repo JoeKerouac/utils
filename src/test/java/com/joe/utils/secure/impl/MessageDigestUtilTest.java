@@ -13,14 +13,12 @@ import com.joe.utils.secure.MessageDigestUtil;
  */
 public class MessageDigestUtilTest {
     private MessageDigestUtil util;
-    private String[]          algorithmsList = { "MD2", "MD5", "SHA1", "SHA224", "SHA256", "SHA384",
-                                                 "SHA512" };
+    private String[] algorithmsList = {"MD2", "MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512"};
 
     @Test
     public void doDigest() {
         for (String algorithms : algorithmsList) {
-            util = MessageDigestUtilImpl
-                .buildInstance(MessageDigestUtilImpl.Algorithms.valueOf(algorithms));
+            util = MessageDigestUtilImpl.buildInstance(MessageDigestUtilImpl.Algorithms.valueOf(algorithms));
             Assert.notNull(util.digest("你好啊"));
         }
     }

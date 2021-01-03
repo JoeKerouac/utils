@@ -15,7 +15,8 @@ public class ConsoleUtil {
     /**
      * 从控制台获取命令并且处理
      *
-     * @param consumer 处理控制台获取的命令，当输入的是exit时系统退出
+     * @param consumer
+     *            处理控制台获取的命令，当输入的是exit时系统退出
      */
     public static void start(Consumer<String> consumer) {
         try {
@@ -27,8 +28,7 @@ public class ConsoleUtil {
                 reader = console::readLine;
             } else {
                 System.out.println("Console对象不存在，使用Reader");
-                BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(System.in));
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
                 reader = bufferedReader::readLine;
             }
             work(reader, consumer);

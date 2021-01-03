@@ -24,10 +24,15 @@ public class RedPacketUtilsTest {
 
     /**
      * 测试红包程序是否正确
-     * @param amount 总金额
-     * @param count 总数量
-     * @param min 最小值
-     * @param max 最大值
+     * 
+     * @param amount
+     *            总金额
+     * @param count
+     *            总数量
+     * @param min
+     *            最小值
+     * @param max
+     *            最大值
      */
     private void check(int amount, int count, int min, int max) {
         int[] packets = RedPacketUtils.split(amount, count, min, max);

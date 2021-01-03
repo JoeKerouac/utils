@@ -13,19 +13,23 @@ public class Assert {
 
     /**
      * 校验相同
-     * @param actual 实际值
-     * @param expected 期望值
+     * 
+     * @param actual
+     *            实际值
+     * @param expected
+     *            期望值
      */
     public static void assertEquals(byte actual, byte expected) {
         if (actual != expected) {
-            throw new IllegalArgumentException(
-                String.format("expected %d, actual %d", expected, actual));
+            throw new IllegalArgumentException(String.format("expected %d, actual %d", expected, actual));
         }
     }
 
     /**
      * 验证参数是否大于0，参数小于等于0时抛出异常
-     * @param number 参数
+     * 
+     * @param number
+     *            参数
      */
     public static void isPositive(int number) {
         isPositive(number, "number must is prositive number");
@@ -33,8 +37,11 @@ public class Assert {
 
     /**
      * 验证参数大于0，参数小于等于0时抛出异常
-     * @param number 参数
-     * @param msg 异常消息
+     * 
+     * @param number
+     *            参数
+     * @param msg
+     *            异常消息
      */
     public static void isPositive(int number, String msg) {
         if (number <= 0) {
@@ -44,9 +51,13 @@ public class Assert {
 
     /**
      * 断言给定时间是一个正确的时间段（即开始时间小于结束时间）
-     * @param beginTime 开始时间
-     * @param endTime 结束时间
-     * @param format 时间格式
+     * 
+     * @param beginTime
+     *            开始时间
+     * @param endTime
+     *            结束时间
+     * @param format
+     *            时间格式
      */
     public static void isTimeZone(String beginTime, String endTime, String format) {
         DateUtil.parse(beginTime, format);
@@ -59,7 +70,8 @@ public class Assert {
     /**
      * 断言参数true
      *
-     * @param flag 参数
+     * @param flag
+     *            参数
      */
     public static void isTrue(boolean flag) {
         isTrue(flag, null);
@@ -68,8 +80,10 @@ public class Assert {
     /**
      * 断言参数true
      *
-     * @param flag 参数
-     * @param msg 为false时的异常提示
+     * @param flag
+     *            参数
+     * @param msg
+     *            为false时的异常提示
      */
     public static void isTrue(boolean flag, String msg) {
         if (!flag) {
@@ -80,7 +94,8 @@ public class Assert {
     /**
      * 断言参数为false
      *
-     * @param flag 参数
+     * @param flag
+     *            参数
      */
     public static void isFalse(boolean flag) {
         isFalse(flag, null);
@@ -89,8 +104,10 @@ public class Assert {
     /**
      * 断言参数为false
      *
-     * @param flag 参数
-     * @param msg 为true时的异常提示
+     * @param flag
+     *            参数
+     * @param msg
+     *            为true时的异常提示
      */
     public static void isFalse(boolean flag, String msg) {
         if (flag) {
@@ -101,7 +118,8 @@ public class Assert {
     /**
      * 断言参数不为null
      *
-     * @param obj 参数
+     * @param obj
+     *            参数
      */
     public static void notNull(Object obj) {
         notNull(obj, null);
@@ -110,8 +128,10 @@ public class Assert {
     /**
      * 断言参数不为null
      *
-     * @param obj 参数
-     * @param msg 为null时的异常提示
+     * @param obj
+     *            参数
+     * @param msg
+     *            为null时的异常提示
      */
     public static void notNull(Object obj, String msg) {
         Objects.requireNonNull(obj, msg);
@@ -120,7 +140,8 @@ public class Assert {
     /**
      * 断言参数全不为null
      *
-     * @param objs 参数列表
+     * @param objs
+     *            参数列表
      */
     public static void notNull(Object[] objs) {
         notNull(objs, "param must not be null");
@@ -129,8 +150,10 @@ public class Assert {
     /**
      * 断言参数全不为null
      *
-     * @param objs 参数列表
-     * @param msg  为null时的异常提示
+     * @param objs
+     *            参数列表
+     * @param msg
+     *            为null时的异常提示
      */
     public static void notNull(Object[] objs, String msg) {
         notNull(objs, msg);
@@ -140,17 +163,22 @@ public class Assert {
     }
 
     /**
-     * 断言字符串肯定不是空，""和"  "都认为是空
-     * @param data data
+     * 断言字符串肯定不是空，""和" "都认为是空
+     * 
+     * @param data
+     *            data
      */
     public static void notBlank(String data) {
         notBlank(data, "data must not be blank");
     }
 
     /**
-     * 断言字符串肯定不是空，""和"  "都认为是空
-     * @param data data
-     * @param msg msg
+     * 断言字符串肯定不是空，""和" "都认为是空
+     * 
+     * @param data
+     *            data
+     * @param msg
+     *            msg
      */
     public static void notBlank(String data, String msg) {
         if (StringUtils.isEmpty(data)) {
@@ -160,7 +188,9 @@ public class Assert {
 
     /**
      * 断言集合不能为空
-     * @param collection 集合
+     * 
+     * @param collection
+     *            集合
      */
     public static void notEmpty(Collection<?> collection) {
         notEmpty(collection, "collection must not empty");
@@ -168,8 +198,11 @@ public class Assert {
 
     /**
      * 断言集合不能为空
-     * @param collection 集合
-     * @param msg 异常消息
+     * 
+     * @param collection
+     *            集合
+     * @param msg
+     *            异常消息
      */
     public static void notEmpty(Collection<?> collection, String msg) {
         if (collection == null || collection.isEmpty()) {

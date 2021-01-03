@@ -33,8 +33,10 @@ public class FormDataBuilder {
     /**
      * 添加form数据（key不能重复）
      *
-     * @param key   key
-     * @param value value
+     * @param key
+     *            key
+     * @param value
+     *            value
      * @return FormDataBuilder
      */
     public FormDataBuilder form(String key, Object value) {
@@ -45,7 +47,8 @@ public class FormDataBuilder {
     /**
      * 删除一个form数据
      *
-     * @param key 要删除的key
+     * @param key
+     *            要删除的key
      * @return FormDataBuilder
      */
     public FormDataBuilder del(String key) {
@@ -67,15 +70,16 @@ public class FormDataBuilder {
     /**
      * 获取form数据
      *
-     * @param useUrlencode 是否使用URLEncode对value进行编码，true表示使用URLEncode进行编码
-     * @param charset      编码字符集
+     * @param useUrlencode
+     *            是否使用URLEncode对value进行编码，true表示使用URLEncode进行编码
+     * @param charset
+     *            编码字符集
      * @return form数据
      */
     public String data(boolean useUrlencode, String charset) {
         StringBuilder sb = new StringBuilder();
         if (useUrlencode) {
-            datas.forEach((k, v) -> sb.append("&").append(k).append("=")
-                .append(urlencode(String.valueOf(v), charset)));
+            datas.forEach((k, v) -> sb.append("&").append(k).append("=").append(urlencode(String.valueOf(v), charset)));
         } else {
             datas.forEach((k, v) -> sb.append("&").append(k).append("=").append(String.valueOf(v)));
         }
@@ -85,8 +89,10 @@ public class FormDataBuilder {
     /**
      * 对数据进行URLEncode编码
      *
-     * @param data    数据
-     * @param charset 字符集
+     * @param data
+     *            数据
+     * @param charset
+     *            字符集
      * @return 编码后的数据
      */
     private String urlencode(String data, String charset) {
@@ -109,7 +115,8 @@ public class FormDataBuilder {
     /**
      * 构建一个FormDataBuilder（不排序）
      *
-     * @param data 预设data
+     * @param data
+     *            预设data
      * @return FormDataBuilder
      */
     public static FormDataBuilder builder(Map<String, ?> data) {
@@ -119,7 +126,8 @@ public class FormDataBuilder {
     /**
      * 构建一个FormDataBuilder
      *
-     * @param sort 是否排序（默认按照字典序排）
+     * @param sort
+     *            是否排序（默认按照字典序排）
      * @return FormDataBuilder
      */
     public static FormDataBuilder builder(boolean sort) {
@@ -129,8 +137,10 @@ public class FormDataBuilder {
     /**
      * 构建一个FormDataBuilder
      *
-     * @param sort 是否排序（默认按照字典序排）
-     * @param data 预设data
+     * @param sort
+     *            是否排序（默认按照字典序排）
+     * @param data
+     *            预设data
      * @return FormDataBuilder
      */
     public static FormDataBuilder builder(boolean sort, Map<String, ?> data) {

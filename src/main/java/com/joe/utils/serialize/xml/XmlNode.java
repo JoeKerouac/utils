@@ -18,7 +18,7 @@ import java.util.List;
  * @author joe
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE})
 @Documented
 public @interface XmlNode {
     /**
@@ -29,8 +29,7 @@ public @interface XmlNode {
     boolean isCDATA() default false;
 
     /**
-     * 该节点的名称，默认为字段的名称（如果{@link #isAttribute}为true那么该名称为xml属性值对应
-     * 的节点名称，如果不指定该值或者为空时表示该属性是当前节点父节点的属性，如果指定的话表示就是当前同级节点
+     * 该节点的名称，默认为字段的名称（如果{@link #isAttribute}为true那么该名称为xml属性值对应 的节点名称，如果不指定该值或者为空时表示该属性是当前节点父节点的属性，如果指定的话表示就是当前同级节点
      * 的属性）
      *
      * @return 节点的名称
@@ -61,8 +60,7 @@ public @interface XmlNode {
     /**
      * 类型转换器，默认都是String类型的，如果字段不是String类型那么请使用类型转换器
      * <p>
-     * 如果字段是集合类型，而集合类型的泛型不是String，那么必须要有该转换器，否则最后注入的集合将是一个
-     * 泛型为String的集合
+     * 如果字段是集合类型，而集合类型的泛型不是String，那么必须要有该转换器，否则最后注入的集合将是一个 泛型为String的集合
      *
      * @return 类型转换器
      */
@@ -71,8 +69,7 @@ public @interface XmlNode {
     /**
      * 当字段为带泛型的集合时，如果不指定converter，那么需要指定该字段，表示集合中的泛型类型
      * <p>
-     * 当字段为不带泛型的类时该方法应该返回字段的真实类型而不是接口或抽象类（当字段声明是一个接口或者抽象类
-     * 时必须有该字段）
+     * 当字段为不带泛型的类时该方法应该返回字段的真实类型而不是接口或抽象类（当字段声明是一个接口或者抽象类 时必须有该字段）
      *
      * @return 集合中的泛型类型
      */

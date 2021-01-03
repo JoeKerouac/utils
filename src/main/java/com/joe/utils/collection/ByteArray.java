@@ -13,8 +13,8 @@ import java.util.NoSuchElementException;
  */
 public class ByteArray implements Iterable<Byte> {
     private volatile int modCount = 0;
-    private byte[]       datas    = null;
-    private int          size     = 0;
+    private byte[] datas = null;
+    private int size = 0;
 
     public ByteArray() {
         this(256);
@@ -112,6 +112,7 @@ public class ByteArray implements Iterable<Byte> {
 
     /**
      * 获取原始数据（请谨慎操作，对该数组进行的任何操作都有可能会带来未知的错误）
+     * 
      * @return 原始数据
      */
     public byte[] getOriginalData() {
@@ -166,9 +167,9 @@ public class ByteArray implements Iterable<Byte> {
     }
 
     private class ByteArrayIterator implements Iterator<Byte> {
-        int                     expectedModCount = modCount;
+        int expectedModCount = modCount;
         private final ByteArray byteArray;
-        private int             point            = 0;
+        private int point = 0;
 
         ByteArrayIterator(final ByteArray byteArray) {
             this.byteArray = byteArray;

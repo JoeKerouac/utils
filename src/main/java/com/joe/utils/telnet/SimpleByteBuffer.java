@@ -8,11 +8,11 @@ public class SimpleByteBuffer {
 
     private final static int BUFFER_CHUNK = 20;
 
-    private byte[]           buffer;
+    private byte[] buffer;
 
-    private int              pos          = 0;
+    private int pos = 0;
 
-    private int              size         = 0;
+    private int size = 0;
 
     public SimpleByteBuffer() {
         buffer = new byte[BUFFER_CHUNK];

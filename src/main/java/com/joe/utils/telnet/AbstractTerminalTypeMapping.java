@@ -16,9 +16,9 @@ public abstract class AbstractTerminalTypeMapping {
 
     protected Map<String, KEYS> escKeys;
 
-    protected byte              backSpace;
+    protected byte backSpace;
 
-    protected byte              del;
+    protected byte del;
 
     public AbstractTerminalTypeMapping(byte backSpace, byte del) {
         this.backSpace = backSpace;
@@ -57,6 +57,6 @@ public abstract class AbstractTerminalTypeMapping {
     }
 
     public enum KEYS {
-                      RIGHT, LEFT, DEL, UNFINISHED, UNKNOWN
+        RIGHT, LEFT, DEL, UNFINISHED, UNKNOWN
     }
 }

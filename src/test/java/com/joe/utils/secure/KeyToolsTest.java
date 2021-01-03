@@ -12,8 +12,7 @@ public class KeyToolsTest {
     @Test
     public void doBuildKey() {
         KeyTools.KeyHolder holder = KeyTools.buildRSAKey(2048);
-        CipherUtil cipher = AsymmetricCipher.buildInstance(holder.getPrivateKey(),
-            holder.getPublicKey());
+        CipherUtil cipher = AsymmetricCipher.buildInstance(holder.getPrivateKey(), holder.getPublicKey());
         CipherUtilTest.checkCipher(cipher);
     }
 }

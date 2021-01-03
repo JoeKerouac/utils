@@ -2,6 +2,7 @@ package com.joe.utils.scan;
 
 /**
  * ClassFilter
+ * 
  * @author joe
  *
  */

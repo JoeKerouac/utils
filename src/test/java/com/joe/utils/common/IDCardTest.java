@@ -14,7 +14,7 @@ public class IDCardTest {
     /**
      * 预设身份证
      */
-    private static final String ID_CARD  = "362528199002168308";
+    private static final String ID_CARD = "362528199002168308";
 
     /**
      * 预设身份证的省份
@@ -24,7 +24,7 @@ public class IDCardTest {
     /**
      * 预设身份证的地区
      */
-    private static final String AREA     = "江西省抚州地区金溪县";
+    private static final String AREA = "江西省抚州地区金溪县";
 
     @Test
     public void doTest() {

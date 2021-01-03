@@ -13,7 +13,7 @@ import com.joe.utils.serialize.xml.XmlTypeConvert;
  * @version 2018.02.01 10:02
  */
 public abstract class AbstractXmlTypeConvert<T> implements XmlTypeConvert<T> {
-    private Class<T>              type;
+    private Class<T> type;
     protected static final Logger logger = LoggerFactory.getLogger(AbstractXmlTypeConvert.class);
 
     @SuppressWarnings("unchecked")
@@ -21,9 +21,9 @@ public abstract class AbstractXmlTypeConvert<T> implements XmlTypeConvert<T> {
         Type genericSuperclass = getClass().getGenericSuperclass();
         // 只检查一层Repository泛型参数，不检查父类
         if (genericSuperclass instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
+            ParameterizedType parameterizedType = (ParameterizedType)genericSuperclass;
             Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-            type = (Class<T>) actualTypeArguments[0];
+            type = (Class<T>)actualTypeArguments[0];
         } else {
             logger.warn("请检查[{}]类的泛型", this.getClass());
         }

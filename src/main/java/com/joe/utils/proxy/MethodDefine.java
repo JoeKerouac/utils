@@ -21,7 +21,7 @@ public class MethodDefine {
     /**
      * 方法访权限，例如{@link java.lang.reflect.Modifier#PUBLIC public}
      */
-    private final int    modifiers;
+    private final int modifiers;
 
     /**
      * 方法实现

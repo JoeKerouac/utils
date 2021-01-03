@@ -147,8 +147,33 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <encoding>${encode}</encoding>
+                    <encoding>${build.encode}</encoding>
                 </configuration>
+            </plugin>
+
+            <!-- 代码格式化插件，自动格式化代码使之格式统一 -->
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>2.13.0</version>
+                <configuration>
+                    <encoding>${build.encode}</encoding>
+                    <configFile>Formatter.xml</configFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.JoeKerouac</groupId>
+                        <artifactId>java-parent</artifactId>
+                        <version>1.1.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

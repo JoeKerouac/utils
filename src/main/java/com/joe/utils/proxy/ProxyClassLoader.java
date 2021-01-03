@@ -14,7 +14,9 @@ public class ProxyClassLoader extends ClassLoader {
 
     /**
      * 构建class
-     * @param data class数据
+     * 
+     * @param data
+     *            class数据
      * @return 构建的Class
      */
     public Class<?> buildClass(byte[] data) {

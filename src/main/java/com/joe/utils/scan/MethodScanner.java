@@ -14,11 +14,10 @@ import java.util.List;
  * @author joe
  */
 public class MethodScanner implements Scanner<Method, MethodFilter> {
-    private static final Object           lock = new Object();
+    private static final Object lock = new Object();
     private static volatile MethodScanner methodScanner;
 
-    private MethodScanner() {
-    }
+    private MethodScanner() {}
 
     public static MethodScanner getInstance() {
         if (methodScanner == null) {
@@ -48,7 +47,7 @@ public class MethodScanner implements Scanner<Method, MethodFilter> {
             } else if (!(obj instanceof Class)) {
                 obj = obj.getClass();
             }
-            Class<?> clazz = (Class<?>) obj;
+            Class<?> clazz = (Class<?>)obj;
             Method[] methods = clazz.getMethods();
             if (excludeFilters == null || excludeFilters.isEmpty()) {
                 result.addAll(Arrays.asList(methods));

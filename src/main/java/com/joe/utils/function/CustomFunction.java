@@ -9,7 +9,9 @@ package com.joe.utils.function;
 public interface CustomFunction {
     /**
      * 执行函数
-     * @throws Throwable 异常
+     * 
+     * @throws Throwable
+     *             异常
      */
     void run() throws Throwable;
 }

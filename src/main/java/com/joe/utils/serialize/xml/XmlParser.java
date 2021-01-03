@@ -28,8 +28,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * XML解析（反向解析为java对象时不区分大小写），该解析器由于大量使用反射，所以在第一次解析
- * 某个类型的对象时效率较低，解析过一次系统会自动添加缓存，速度将会大幅提升（测试中提升了25倍）
+ * XML解析（反向解析为java对象时不区分大小写），该解析器由于大量使用反射，所以在第一次解析 某个类型的对象时效率较低，解析过一次系统会自动添加缓存，速度将会大幅提升（测试中提升了25倍）
  * <p>
  * XXE漏洞：https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
  *
@@ -37,9 +36,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class XmlParser implements Serializer {
-    private static final XmlParser DEFAULT      = new XmlParser();
-    private static final String    DEFAULT_ROOT = "root";
-    private SAXReader              reader;
+    private static final XmlParser DEFAULT = new XmlParser();
+    private static final String DEFAULT_ROOT = "root";
+    private SAXReader reader;
 
     private XmlParser() {
         this.reader = new SAXReader();
@@ -70,7 +69,8 @@ public class XmlParser implements Serializer {
     /**
      * 使用指定配置构建一个新的XmlParser实例（如果不做设置则默认禁用了外部DTD）
      *
-     * @param prop 功能配置
+     * @param prop
+     *            功能配置
      * @return 新的XmlParser实例
      */
     public static XmlParser buildInstance(Map<String, Boolean> prop) {
@@ -84,10 +84,11 @@ public class XmlParser implements Serializer {
     /**
      * 设置DTD支持
      *
-     * @param enable true表示支持DTD，false表示不支持
+     * @param enable
+     *            true表示支持DTD，false表示不支持
      */
     public void enableDTD(boolean enable) {
-        //允许DTD会有XXE漏洞，关于XXE漏洞：https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
+        // 允许DTD会有XXE漏洞，关于XXE漏洞：https://www.owasp.org/index.php/XML_External_Entity_(XXE)_Prevention_Cheat_Sheet
         if (enable) {
             // 打开DTD支持，高危操作，除非你清楚你在做什么，否则不要打开
             setFeature("http://apache.org/xml/features/disallow-doctype-decl", false);
@@ -95,7 +96,7 @@ public class XmlParser implements Serializer {
             setFeature("http://xml.org/sax/features/external-general-entities", true);
             setFeature("http://xml.org/sax/features/external-parameter-entities", true);
         } else {
-            //不允许DTD
+            // 不允许DTD
             setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -106,8 +107,10 @@ public class XmlParser implements Serializer {
     /**
      * 配置SAXReader
      *
-     * @param k      name
-     * @param enable 是否允许，true表示允许
+     * @param k
+     *            name
+     * @param enable
+     *            是否允许，true表示允许
      */
     public void setFeature(String k, boolean enable) {
         try {
@@ -120,9 +123,11 @@ public class XmlParser implements Serializer {
     /**
      * 将xml解析为Document
      *
-     * @param text xml文本
+     * @param text
+     *            xml文本
      * @return Document
-     * @throws DocumentException DocumentException
+     * @throws DocumentException
+     *             DocumentException
      */
     private Document parseText(String text) throws DocumentException {
         Document result;
@@ -146,7 +151,8 @@ public class XmlParser implements Serializer {
     /**
      * 获取xml的编码方式
      *
-     * @param text xml文件
+     * @param text
+     *            xml文件
      * @return xml的编码
      */
     private String getEncoding(String text) {
@@ -176,12 +182,11 @@ public class XmlParser implements Serializer {
     }
 
     /**
-     * 解析XML，将xml解析为map（注意：如果XML是&lt;a&gt;data&lt;b&gt;bbb&lt;/b&gt;&lt;/a&gt;
-     * 这种格式那么data将不被解析，对于list可以正确解析）
+     * 解析XML，将xml解析为map（注意：如果XML是&lt;a&gt;data&lt;b&gt;bbb&lt;/b&gt;&lt;/a&gt; 这种格式那么data将不被解析，对于list可以正确解析）
      *
-     * @param xml xml字符串
-     * @return 由xml解析的Map，可能是String类型或者Map&lt;String, Object&gt;类型，其中Map的value有可能
-     * 是Stirng类型，也有可能是List&lt;String&gt;类型
+     * @param xml
+     *            xml字符串
+     * @return 由xml解析的Map，可能是String类型或者Map&lt;String, Object&gt;类型，其中Map的value有可能 是Stirng类型，也有可能是List&lt;String&gt;类型
      */
     @SuppressWarnings("unchecked")
     public Map<String, Object> parse(String xml) {
@@ -193,7 +198,7 @@ public class XmlParser implements Serializer {
                 map.put(root.getName(), root.getText());
                 return map;
             } else {
-                return (HashMap<String, Object>) parse(root);
+                return (HashMap<String, Object>)parse(root);
             }
         } catch (Exception e) {
             log.error("xml格式不正确", e);
@@ -202,15 +207,16 @@ public class XmlParser implements Serializer {
     }
 
     /**
-     * 将XML解析为POJO对象，暂时无法解析map，当需要解析的字段是{@link java.util.Collection}的子类时必须带有注
-     * 解{@link XmlNode}，否则将解析失败。
+     * 将XML解析为POJO对象，暂时无法解析map，当需要解析的字段是{@link java.util.Collection}的子类时必须带有注 解{@link XmlNode}，否则将解析失败。
      * <p>
-     * PS：对象中的集合字段必须添加注解，必须是简单集合，即集合中只有一种数据类型，并且当类型不是String时需要指定
-     * converter，否则将会解析失败。
+     * PS：对象中的集合字段必须添加注解，必须是简单集合，即集合中只有一种数据类型，并且当类型不是String时需要指定 converter，否则将会解析失败。
      *
-     * @param xml   XML源
-     * @param clazz POJO对象的class
-     * @param <T>   POJO的实际类型
+     * @param xml
+     *            XML源
+     * @param clazz
+     *            POJO对象的class
+     * @param <T>
+     *            POJO的实际类型
      * @return 解析结果
      */
     @SuppressWarnings("unchecked")
@@ -246,27 +252,26 @@ public class XmlParser implements Serializer {
         for (CustomPropertyDescriptor descript : propertyDescriptor) {
             XmlNode xmlNode = descript.getAnnotation(XmlNode.class);
             final String fieldName = descript.getName();
-            //节点名
+            // 节点名
             String nodeName = null;
-            //属性名
+            // 属性名
             String attributeName = null;
             boolean isParent = false;
             boolean ignore = false;
             if (xmlNode == null) {
                 nodeName = fieldName;
             } else if (!xmlNode.ignore()) {
-                //如果节点不是被忽略的节点那么继续
-                //获取节点名称，优先使用注解，如果注解没有设置名称那么使用字段名
+                // 如果节点不是被忽略的节点那么继续
+                // 获取节点名称，优先使用注解，如果注解没有设置名称那么使用字段名
                 nodeName = StringUtils.isEmpty(xmlNode.name()) ? fieldName : xmlNode.name();
                 log.debug("字段[{}]对应的节点名为：{}", fieldName, nodeName);
 
-                //判断节点是否是属性值
+                // 判断节点是否是属性值
                 if (xmlNode.isAttribute()) {
-                    //如果节点是属性值，那么需要同时设置节点名和属性名，原则上如果是属性的话必须设置节点名，但是为了防止
-                    //用户忘记设置，在用户没有设置的时候使用字段名
+                    // 如果节点是属性值，那么需要同时设置节点名和属性名，原则上如果是属性的话必须设置节点名，但是为了防止
+                    // 用户忘记设置，在用户没有设置的时候使用字段名
                     if (StringUtils.isEmpty(xmlNode.attributeName())) {
-                        log.warn("字段[{}]是属性值，但是未设置属性名（attributeName字段），将采用字段名作为属性名",
-                            descript.getName());
+                        log.warn("字段[{}]是属性值，但是未设置属性名（attributeName字段），将采用字段名作为属性名", descript.getName());
                         attributeName = fieldName;
                     } else {
                         attributeName = xmlNode.attributeName();
@@ -283,29 +288,28 @@ public class XmlParser implements Serializer {
             }
 
             if (!ignore) {
-                //获取指定节点名的element
+                // 获取指定节点名的element
                 List<Element> nodes = (!StringUtils.isEmpty(attributeName) && isParent)
-                    ? Collections.singletonList(root)
-                    : root.elements(nodeName);
-                //判断是否为空
+                    ? Collections.singletonList(root) : root.elements(nodeName);
+                // 判断是否为空
                 if (nodes.isEmpty()) {
-                    //如果为空那么将首字母大写后重新获取
+                    // 如果为空那么将首字母大写后重新获取
                     nodes = root.elements(StringUtils.toFirstUpperCase(nodeName));
                 }
                 if (!nodes.isEmpty()) {
-                    //如果还不为空，那么为pojo赋值
+                    // 如果还不为空，那么为pojo赋值
                     Class<?> type = descript.getRealType();
 
-                    //开始赋值
-                    //判断字段是否是集合
+                    // 开始赋值
+                    // 判断字段是否是集合
                     if (Collection.class.isAssignableFrom(type)) {
-                        //是集合
+                        // 是集合
                         setValue(nodes, attributeName, pojo, descript);
                     } else if (Map.class.isAssignableFrom(type)) {
-                        //是Map
+                        // 是Map
                         log.warn("当前暂时不支持解析map");
                     } else {
-                        //不是集合，直接赋值
+                        // 不是集合，直接赋值
                         setValue(nodes.get(0), attributeName, pojo, descript);
                     }
                 }
@@ -317,7 +321,8 @@ public class XmlParser implements Serializer {
     /**
      * 将Object解析为xml，根节点为root，字段值为null的将不包含在xml中，暂时只能解析基本类型（可以正确解析list、map）
      *
-     * @param source bean
+     * @param source
+     *            bean
      * @return 解析结果
      */
     public String toXml(Object source) {
@@ -327,9 +332,12 @@ public class XmlParser implements Serializer {
     /**
      * 将Object解析为xml，暂时只能解析基本类型（可以正确解析list、map）
      *
-     * @param source   bean
-     * @param rootName 根节点名称，如果为null则会尝试使用默认值
-     * @param hasNull  是否包含null元素（true：包含）
+     * @param source
+     *            bean
+     * @param rootName
+     *            根节点名称，如果为null则会尝试使用默认值
+     * @param hasNull
+     *            是否包含null元素（true：包含）
      * @return 解析结果
      */
     public String toXml(Object source, String rootName, boolean hasNull) {
@@ -358,18 +366,22 @@ public class XmlParser implements Serializer {
     /**
      * 根据pojo构建xml的document（方法附件参考附件xml解析器思路）
      *
-     * @param parent     父节点
-     * @param pojo       pojo，不能为空
-     * @param clazz      pojo的Class
-     * @param ignoreNull 是否忽略空元素
+     * @param parent
+     *            父节点
+     * @param pojo
+     *            pojo，不能为空
+     * @param clazz
+     *            pojo的Class
+     * @param ignoreNull
+     *            是否忽略空元素
      */
     @SuppressWarnings("unchecked")
     private void buildDocument(Element parent, Object pojo, Class<?> clazz, boolean ignoreNull) {
-        //字段描述，key是节点名，value是XmlData
+        // 字段描述，key是节点名，value是XmlData
         Map<String, XmlData> map = new HashMap<>();
-        //构建字段描述
+        // 构建字段描述
         if (pojo instanceof Map) {
-            Map<?, ?> pojoMap = (Map<?, ?>) pojo;
+            Map<?, ?> pojoMap = (Map<?, ?>)pojo;
             pojoMap.forEach((k, v) -> {
                 if (k == null) {
                     log.debug("忽略map中key为null的值");
@@ -377,29 +389,26 @@ public class XmlParser implements Serializer {
                     if (ignoreNull && v == null) {
                         log.debug("当前配置为忽略空值，[{}]的值为空，忽略", k);
                     } else {
-                        map.put(String.valueOf(k),
-                            new XmlData(null, v, v == null ? null : v.getClass()));
+                        map.put(String.valueOf(k), new XmlData(null, v, v == null ? null : v.getClass()));
                     }
                 }
             });
         } else {
-            CustomPropertyDescriptor[] propertyDescriptors = BeanUtils
-                .getPropertyDescriptors(clazz == null ? pojo.getClass() : clazz);
+            CustomPropertyDescriptor[] propertyDescriptors =
+                BeanUtils.getPropertyDescriptors(clazz == null ? pojo.getClass() : clazz);
             for (CustomPropertyDescriptor descriptor : propertyDescriptors) {
                 XmlNode xmlNode = descriptor.getAnnotation(XmlNode.class);
-                //字段值
+                // 字段值
                 try {
-                    Object valueObj = pojo == null ? null
-                        : BeanUtils.getProperty(pojo, descriptor.getName());
-                    //判断是否忽略
+                    Object valueObj = pojo == null ? null : BeanUtils.getProperty(pojo, descriptor.getName());
+                    // 判断是否忽略
                     if ((ignoreNull && valueObj == null) || (xmlNode != null && xmlNode.ignore())) {
                         log.debug("忽略空节点或者节点被注解忽略");
                         continue;
                     }
 
-                    //节点名
-                    String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name()))
-                        ? descriptor.getName()
+                    // 节点名
+                    String nodeName = (xmlNode == null || StringUtils.isEmpty(xmlNode.name())) ? descriptor.getName()
                         : xmlNode.name();
                     map.put(nodeName, new XmlData(xmlNode, valueObj, descriptor.getRealType()));
                 } catch (Exception e) {
@@ -412,47 +421,46 @@ public class XmlParser implements Serializer {
             XmlNode xmlNode = v.getXmlNode();
             Object valueObj = v.getData();
 
-            //节点名
+            // 节点名
             String nodeName = k;
-            //属性名
-            String attrName = (xmlNode == null || StringUtils.isEmpty(xmlNode.attributeName()))
-                ? nodeName
-                : xmlNode.attributeName();
-            //是否是cdata
+            // 属性名
+            String attrName =
+                (xmlNode == null || StringUtils.isEmpty(xmlNode.attributeName())) ? nodeName : xmlNode.attributeName();
+            // 是否是cdata
             boolean isCDATA = xmlNode != null && xmlNode.isCDATA();
-            //数据类型
+            // 数据类型
             Class<?> type = v.getType();
-            //构建一个对应的节点
+            // 构建一个对应的节点
             Element node = parent.element(nodeName);
             if (node == null) {
-                //搜索不到，创建一个（在属性是父节点属性的情况和节点是list的情况需要将该节点删除）
+                // 搜索不到，创建一个（在属性是父节点属性的情况和节点是list的情况需要将该节点删除）
                 node = DocumentHelper.createElement(nodeName);
                 parent.add(node);
             }
 
-            //判断字段对应的是否是属性
+            // 判断字段对应的是否是属性
             if (xmlNode != null && xmlNode.isAttribute()) {
-                //属性值，属性值只能是简单值
+                // 属性值，属性值只能是简单值
                 String attrValue = valueObj == null ? "" : String.valueOf(valueObj);
-                //判断是否是父节点的属性
+                // 判断是否是父节点的属性
                 if (StringUtils.isEmpty(xmlNode.name())) {
-                    //如果是父节点那么删除之前添加的
+                    // 如果是父节点那么删除之前添加的
                     parent.remove(node);
                     node = parent;
                 }
-                //为属性对应的节点添加属性
+                // 为属性对应的节点添加属性
                 node.addAttribute(attrName, attrValue);
             } else if (type == null) {
                 log.debug("当前不知道节点[{}]的类型，忽略该节点", k);
             } else if (JavaTypeUtil.isNotPojo(type)) {
-                //是简单类型或者集合类型
+                // 是简单类型或者集合类型
                 if (Map.class.isAssignableFrom(type)) {
                     log.warn("当前字段[{}]是map类型", k);
                     buildDocument(node, v.getData(), type, ignoreNull);
                 } else if (Collection.class.isAssignableFrom(type)) {
                     parent.remove(node);
-                    //集合类型
-                    //判断字段值是否为null
+                    // 集合类型
+                    // 判断字段值是否为null
                     if (valueObj != null) {
                         String arrayNodeName;
                         Element root;
@@ -464,7 +472,7 @@ public class XmlParser implements Serializer {
                             root = DocumentHelper.createElement(nodeName);
                             parent.add(root);
                         }
-                        Collection collection = (Collection) valueObj;
+                        Collection collection = (Collection)valueObj;
                         collection.stream().forEach(obj -> {
                             Element n = DocumentHelper.createElement(arrayNodeName);
                             root.add(n);
@@ -481,9 +489,9 @@ public class XmlParser implements Serializer {
                     }
                 }
             } else {
-                //猜测字段类型（防止字段的声明是一个接口，优先采用xmlnode中申明的类型）
+                // 猜测字段类型（防止字段的声明是一个接口，优先采用xmlnode中申明的类型）
                 Class<?> realType = resolveRealType(type, xmlNode);
-                //pojo类型
+                // pojo类型
                 buildDocument(node, valueObj, realType, ignoreNull);
             }
         });
@@ -492,14 +500,15 @@ public class XmlParser implements Serializer {
     /**
      * 确定字段的真实类型
      *
-     * @param fieldType 字段类型
-     * @param xmlNode   字段XmlNode注解
+     * @param fieldType
+     *            字段类型
+     * @param xmlNode
+     *            字段XmlNode注解
      * @return 字段实际类型而不是接口或者抽象类
      */
     private Class<?> resolveRealType(Class<?> fieldType, XmlNode xmlNode) {
-        //猜测字段类型（防止字段的声明是一个接口，优先采用xmlnode中申明的类型）
-        Class<?> type = (xmlNode == null || xmlNode.general() == null) ? fieldType
-            : xmlNode.general();
+        // 猜测字段类型（防止字段的声明是一个接口，优先采用xmlnode中申明的类型）
+        Class<?> type = (xmlNode == null || xmlNode.general() == null) ? fieldType : xmlNode.general();
 
         if (!fieldType.isAssignableFrom(type)) {
             type = fieldType;
@@ -510,9 +519,9 @@ public class XmlParser implements Serializer {
     /**
      * 解析element
      *
-     * @param element element
-     * @return 解析结果，可能是String类型或者Map&lt;String, Object&gt;类型，其中Map的value有可能是Stirng类型，也有可能
-     * 是List&lt;String&gt;类型
+     * @param element
+     *            element
+     * @return 解析结果，可能是String类型或者Map&lt;String, Object&gt;类型，其中Map的value有可能是Stirng类型，也有可能 是List&lt;String&gt;类型
      */
     @SuppressWarnings("unchecked")
     private Object parse(Element element) {
@@ -529,7 +538,7 @@ public class XmlParser implements Serializer {
                     List<String> list;
                     if (obj instanceof List) {
                         // 如果obj不等于null并且是list对象，说明map中存的已经是一个list
-                        list = (List<String>) obj;
+                        list = (List<String>)obj;
                     } else {
                         // 如果obj等于null或者不是list对象，那么新建一个list对象
                         list = new ArrayList<>();
@@ -548,13 +557,16 @@ public class XmlParser implements Serializer {
     /**
      * 往pojo中指定字段设置值
      *
-     * @param element  要设置的数据节点
-     * @param attrName 要获取的属性名，如果该值不为空则认为数据需要从属性中取而不是从节点数据中取
-     * @param pojo     pojo
-     * @param field    字段说明
+     * @param element
+     *            要设置的数据节点
+     * @param attrName
+     *            要获取的属性名，如果该值不为空则认为数据需要从属性中取而不是从节点数据中取
+     * @param pojo
+     *            pojo
+     * @param field
+     *            字段说明
      */
-    private void setValue(Element element, String attrName, Object pojo,
-                          CustomPropertyDescriptor field) {
+    private void setValue(Element element, String attrName, Object pojo, CustomPropertyDescriptor field) {
         XmlNode attrXmlNode = field.getAnnotation(XmlNode.class);
         log.debug("要赋值的fieldName为{}", field.getName());
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
@@ -566,20 +578,23 @@ public class XmlParser implements Serializer {
     /**
      * 往pojo中指定字段设置值（字段为Collection类型）
      *
-     * @param elements 要设置的数据节点
-     * @param attrName 要获取的属性名，如果该值不为空则认为数据需要从属性中取而不是从节点数据中取
-     * @param pojo     pojo
-     * @param field    字段说明
+     * @param elements
+     *            要设置的数据节点
+     * @param attrName
+     *            要获取的属性名，如果该值不为空则认为数据需要从属性中取而不是从节点数据中取
+     * @param pojo
+     *            pojo
+     * @param field
+     *            字段说明
      */
     @SuppressWarnings("unchecked")
-    private void setValue(List<Element> elements, String attrName, Object pojo,
-                          CustomPropertyDescriptor field) {
+    private void setValue(List<Element> elements, String attrName, Object pojo, CustomPropertyDescriptor field) {
         XmlNode attrXmlNode = field.getAnnotation(XmlNode.class);
         log.debug("要赋值的fieldName为{}", field.getName());
         final XmlTypeConvert convert = XmlTypeConverterUtil.resolve(attrXmlNode, field);
 
         Class<? extends Collection> collectionClass;
-        Class<? extends Collection> real = (Class<? extends Collection>) field.getRealType();
+        Class<? extends Collection> real = (Class<? extends Collection>)field.getRealType();
 
         if (attrXmlNode != null) {
             collectionClass = attrXmlNode.arrayType();
@@ -595,12 +610,11 @@ public class XmlParser implements Serializer {
             elements = elements.get(0).elements(attrXmlNode.arrayRoot());
         }
 
-        //将数据转换为用户指定数据
-        List<?> list = elements.stream().map(d -> convert.read(d, attrName))
-            .collect(Collectors.toList());
+        // 将数据转换为用户指定数据
+        List<?> list = elements.stream().map(d -> convert.read(d, attrName)).collect(Collectors.toList());
 
         if (!trySetValue(list, pojo, field, collectionClass)) {
-            //使用注解标记的类型赋值失败并且注解的集合类型与实际字段类型不符时尝试使用字段实际类型赋值
+            // 使用注解标记的类型赋值失败并且注解的集合类型与实际字段类型不符时尝试使用字段实际类型赋值
             if (!trySetValue(list, pojo, field, real)) {
                 log.warn("无法为字段[{}]赋值", field.getName());
             }
@@ -610,15 +624,19 @@ public class XmlParser implements Serializer {
     /**
      * 尝试为list类型的字段赋值
      *
-     * @param datas 转换后的数据
-     * @param pojo  要赋值的pojo
-     * @param field 要赋值的字段说明
-     * @param clazz 集合的Class对象
+     * @param datas
+     *            转换后的数据
+     * @param pojo
+     *            要赋值的pojo
+     * @param field
+     *            要赋值的字段说明
+     * @param clazz
+     *            集合的Class对象
      * @return 返回true表示赋值成功，返回false表示赋值失败
      */
     @SuppressWarnings("unchecked")
     private boolean trySetValue(List<?> datas, Object pojo, CustomPropertyDescriptor field,
-                                Class<? extends Collection> clazz) {
+        Class<? extends Collection> clazz) {
         log.debug("要赋值的fieldName为{}", field.getName());
 
         Collection collection = tryBuildCollection(clazz);
@@ -638,7 +656,8 @@ public class XmlParser implements Serializer {
     /**
      * 根据class尝试构建出集合实例，有可能返回null
      *
-     * @param clazz 集合的Class对象
+     * @param clazz
+     *            集合的Class对象
      * @return 集合实例
      */
     private Collection tryBuildCollection(Class<? extends Collection> clazz) {
@@ -695,11 +714,11 @@ public class XmlParser implements Serializer {
         /**
          * 节点注解，可以为空
          */
-        private XmlNode  xmlNode;
+        private XmlNode xmlNode;
         /**
          * 节点数据
          */
-        private Object   data;
+        private Object data;
         /**
          * 节点数据的实际类型，可以为空
          */

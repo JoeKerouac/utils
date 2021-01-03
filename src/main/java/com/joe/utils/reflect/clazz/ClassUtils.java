@@ -22,13 +22,15 @@ import com.joe.utils.reflect.ReflectUtil;
  */
 public class ClassUtils {
     /** The package separator character: '.' */
-    private static final char  PACKAGE_SEPARATOR = '.';
+    private static final char PACKAGE_SEPARATOR = '.';
     /** The ".class" file suffix */
     public static final String CLASS_FILE_SUFFIX = ".class";
 
     /**
      * 获取指定类的路径
-     * @param cls 类
+     * 
+     * @param cls
+     *            类
      * @return 该类的路径，获取失败返回null
      */
     public static String where(final Class<?> cls) {
@@ -44,10 +46,8 @@ public class ClassUtils {
             if (result != null) {
                 if ("file".equals(result.getProtocol())) {
                     try {
-                        if (result.toExternalForm().endsWith(".jar")
-                            || result.toExternalForm().endsWith(".zip"))
-                            result = new URL("jar:".concat(result.toExternalForm()).concat("!/")
-                                .concat(clsAsResource));
+                        if (result.toExternalForm().endsWith(".jar") || result.toExternalForm().endsWith(".zip"))
+                            result = new URL("jar:".concat(result.toExternalForm()).concat("!/").concat(clsAsResource));
                         else if (new File(result.getFile()).isDirectory())
                             result = new URL(result, clsAsResource);
                     } catch (MalformedURLException ignore) {
@@ -57,15 +57,17 @@ public class ClassUtils {
         }
         if (result == null) {
             final ClassLoader clsLoader = cls.getClassLoader();
-            result = clsLoader != null ? clsLoader.getResource(clsAsResource)
-                : ClassLoader.getSystemResource(clsAsResource);
+            result =
+                clsLoader != null ? clsLoader.getResource(clsAsResource) : ClassLoader.getSystemResource(clsAsResource);
         }
         return Optional.ofNullable(result).map(URL::getPath).orElse(null);
     }
 
     /**
      * 获取指定class的class文件的输入流
-     * @param clazz class
+     * 
+     * @param clazz
+     *            class
      * @return 对应的输入流
      */
     public static InputStream getClassAsStream(Class<?> clazz) {
@@ -75,7 +77,9 @@ public class ClassUtils {
 
     /**
      * 获取class的class文件名（不包含包名，例如：String.class）
-     * @param clazz the class
+     * 
+     * @param clazz
+     *            the class
      * @return .class文件名
      */
     public static String getClassFileName(Class<?> clazz) {
@@ -104,35 +108,43 @@ public class ClassUtils {
     /**
      * 使用给定的ClassLoader重新加载class
      *
-     * @param clazz class
-     * @param loader 重加加载class的ClassLoader
-     * @param <T>       class实际类型
+     * @param clazz
+     *            class
+     * @param loader
+     *            重加加载class的ClassLoader
+     * @param <T>
+     *            class实际类型
      * @return class
      */
     @SuppressWarnings("unchecked")
     public static <T> Class<T> reloadClass(Class<T> clazz, ClassLoader loader) {
         Assert.notNull(clazz, "class不能为空");
-        return (Class<T>) loadClass(clazz.getName(), loader);
+        return (Class<T>)loadClass(clazz.getName(), loader);
     }
 
     /**
      * 使用默认ClassLoader加载class
      *
-     * @param className class名字
-     * @param <T>       class实际类型
+     * @param className
+     *            class名字
+     * @param <T>
+     *            class实际类型
      * @return class
      */
     @SuppressWarnings("unchecked")
     public static <T> Class<T> loadClass(String className) {
-        return (Class<T>) loadClass(className, getDefaultClassLoader());
+        return (Class<T>)loadClass(className, getDefaultClassLoader());
     }
 
     /**
      * 使用指定ClassLoader加载class
      *
-     * @param className class名字
-     * @param loader    加载class的ClassLoader
-     * @param <T>       class实际类型
+     * @param className
+     *            class名字
+     * @param loader
+     *            加载class的ClassLoader
+     * @param <T>
+     *            class实际类型
      * @return class
      */
     @SuppressWarnings("unchecked")
@@ -141,24 +153,24 @@ public class ClassUtils {
         Assert.notNull(loader, "loader不能为null");
         switch (className) {
             case "boolean":
-                return (Class<T>) boolean.class;
+                return (Class<T>)boolean.class;
             case "byte":
-                return (Class<T>) byte.class;
+                return (Class<T>)byte.class;
             case "char":
-                return (Class<T>) char.class;
+                return (Class<T>)char.class;
             case "short":
-                return (Class<T>) short.class;
+                return (Class<T>)short.class;
             case "int":
-                return (Class<T>) int.class;
+                return (Class<T>)int.class;
             case "long":
-                return (Class<T>) long.class;
+                return (Class<T>)long.class;
             case "double":
-                return (Class<T>) double.class;
+                return (Class<T>)double.class;
             case "float":
-                return (Class<T>) float.class;
+                return (Class<T>)float.class;
             default:
                 try {
-                    return (Class<T>) loader.loadClass(className);
+                    return (Class<T>)loader.loadClass(className);
                 } catch (ClassNotFoundException e) {
                     throw new ReflectException("找不到指定class：" + className, e);
                 }
@@ -167,8 +179,11 @@ public class ClassUtils {
 
     /**
      * 获取class实例
-     * @param className class名字
-     * @param <T> class类型
+     * 
+     * @param className
+     *            class名字
+     * @param <T>
+     *            class类型
      * @return class的实例
      */
     public static <T> T getInstance(String className) {
@@ -177,9 +192,13 @@ public class ClassUtils {
 
     /**
      * 获取class实例
-     * @param className class名字
-     * @param loader 加载class的classloader
-     * @param <T> class类型
+     * 
+     * @param className
+     *            class名字
+     * @param loader
+     *            加载class的classloader
+     * @param <T>
+     *            class类型
      * @return class的实例
      */
     public static <T> T getInstance(String className, ClassLoader loader) {
@@ -188,8 +207,11 @@ public class ClassUtils {
 
     /**
      * 获取class的实例
-     * @param clazz class
-     * @param <T> class类型
+     * 
+     * @param clazz
+     *            class
+     * @param <T>
+     *            class类型
      * @return Class实例
      */
     public static <T> T getInstance(Class<T> clazz) {
@@ -204,10 +226,15 @@ public class ClassUtils {
 
     /**
      * 获取class的实例
-     * @param clazz class
-     * @param paramTypes 构造器参数类型
-     * @param params 参数
-     * @param <T> class类型
+     * 
+     * @param clazz
+     *            class
+     * @param paramTypes
+     *            构造器参数类型
+     * @param params
+     *            参数
+     * @param <T>
+     *            class类型
      * @return Class实例
      */
     public static <T> T getInstance(Class<T> clazz, Class<?>[] paramTypes, Object[] params) {

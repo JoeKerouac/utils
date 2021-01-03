@@ -35,7 +35,8 @@ public class JVMMemoryInfo {
     /**
      * 获取JVM虚拟机内存信息
      *
-     * @param unit 结果单位
+     * @param unit
+     *            结果单位
      * @return JVM虚拟机内存信息
      */
     public static JVMMemoryInfo getInstance(MemoryUnitDefinition unit) {
@@ -50,7 +51,7 @@ public class JVMMemoryInfo {
 
     @Override
     public String toString() {
-        return "JVMMemoryInfo{" + "freeMemory=" + freeMemory + ", maxMemory=" + maxMemory
-               + ", totalMemory=" + totalMemory + '}';
+        return "JVMMemoryInfo{" + "freeMemory=" + freeMemory + ", maxMemory=" + maxMemory + ", totalMemory="
+            + totalMemory + '}';
     }
 }

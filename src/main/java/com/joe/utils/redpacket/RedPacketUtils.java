@@ -14,10 +14,15 @@ public class RedPacketUtils {
 
     /**
      * 分红包
-     * @param amount 红包总额
-     * @param count 红包个数
-     * @param min 红包最小值
-     * @param max 红包最大值
+     * 
+     * @param amount
+     *            红包总额
+     * @param count
+     *            红包个数
+     * @param min
+     *            红包最小值
+     * @param max
+     *            红包最大值
      * @return 红包数组
      */
     public static int[] split(int amount, int count, int min, int max) {
@@ -50,13 +55,13 @@ public class RedPacketUtils {
                 int random = Math.abs(secureRandom.nextInt());
                 int nowMax = nowAmount - ((count - i - 1) * min);
                 int nowMin = nowAmount - ((count - i - 1) * max);
-                //当前允许最小值
+                // 当前允许最小值
                 nowMax = Math.min(nowMax, max);
-                //当前允许最大值
+                // 当前允许最大值
                 nowMin = Math.max(nowMin, min);
-                //区间
+                // 区间
                 int mod = nowMax - nowMin;
-                //当前值
+                // 当前值
                 int packet;
                 if (mod == 0) {
                     // 此时说明后续的红包都是最小的了

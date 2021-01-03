@@ -18,16 +18,16 @@ import com.joe.utils.test.TestException;
  * @version 2018.08.09 09:51
  */
 public class ClusterManagerTest extends BaseTest {
-    String         pre  = ClusterManagerTest.class.getName() + "-%s";
+    String pre = ClusterManagerTest.class.getName() + "-%s";
     /**
      * redis host
      */
-    String         host = "192.168.2.222";
+    String host = "192.168.2.222";
     /**
      * redis port
      */
-    int            port = 7001;
-    String         text = "text";
+    int port = 7001;
+    String text = "text";
     ClusterManager manager;
     ClusterManager check;
 
@@ -66,10 +66,8 @@ public class ClusterManagerTest extends BaseTest {
     @Test
     public void doBlockingDeque() {
         runCase(() -> {
-            BlockingDeque<String> deque = manager
-                .getBlockingDeque(String.format(pre, "BlockingDeque"));
-            BlockingDeque<String> checkDeque = manager
-                .getBlockingDeque(String.format(pre, "BlockingDeque"));
+            BlockingDeque<String> deque = manager.getBlockingDeque(String.format(pre, "BlockingDeque"));
+            BlockingDeque<String> checkDeque = manager.getBlockingDeque(String.format(pre, "BlockingDeque"));
             deque.put(text);
 
             CountDownLatch latch = new CountDownLatch(1);

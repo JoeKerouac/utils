@@ -18,10 +18,15 @@ public abstract class DynamicClassLoader extends ClassLoader {
 
     /**
      * 根据bytecode生成class对象
-     * @param name class对象名
-     * @param b bytecode
-     * @param begin byte code数组起始位置
-     * @param len byte code数据长度
+     * 
+     * @param name
+     *            class对象名
+     * @param b
+     *            bytecode
+     * @param begin
+     *            byte code数组起始位置
+     * @param len
+     *            byte code数据长度
      * @return class对象
      */
     public abstract <T> Class<T> buildClass(String name, byte[] b, int begin, int len);

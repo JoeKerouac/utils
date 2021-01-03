@@ -11,8 +11,7 @@ public class StringFormaterTest {
 
     @Test
     public void doSimpleFormat() {
-        Assert.assertEquals("你好啊:-JoeKerouac-",
-            StringFormater.simpleFormat("你好啊:{1}{0}{1}", "JoeKerouac", "-"));
+        Assert.assertEquals("你好啊:-JoeKerouac-", StringFormater.simpleFormat("你好啊:{1}{0}{1}", "JoeKerouac", "-"));
     }
 
     @Test

@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class JsonObject {
     private static final JsonParser parser = JsonParser.getInstance();
-    private Map<Object, Object>     data;
+    private Map<Object, Object> data;
 
     public JsonObject() {
         this.data = new HashMap<>();

@@ -29,9 +29,9 @@ public class GeneralInterceptor {
     /**
      * target，可以为空，为空表示生成新代理，不为空表示对target代理
      */
-    private final Object       target;
+    private final Object target;
 
-    private final ProxyParent  proxyParent;
+    private final ProxyParent proxyParent;
 
     public GeneralInterceptor(Interception interception, Class<?> parent) {
         this(interception, parent, null);
@@ -48,27 +48,32 @@ public class GeneralInterceptor {
 
     /**
      * 拦截有实现的方法
-     * @param params 调用方法的参数
-     * @param method 被拦截的方法
-     * @param callable 父类调用
+     * 
+     * @param params
+     *            调用方法的参数
+     * @param method
+     *            被拦截的方法
+     * @param callable
+     *            父类调用
      * @return 执行结果
      */
     @RuntimeType
     public Object interceptClass(@AllArguments Object[] params, @Origin Method method,
-                                 @SuperCall Callable<Object> callable) throws Throwable {
-        return Interception.invokeWrap(interception, target, method, null, params,
-            callable::call);
+        @SuperCall Callable<Object> callable) throws Throwable {
+        return Interception.invokeWrap(interception, target, method, null, params, callable::call);
     }
 
     /**
      * 拦截抽象方法
-     * @param params 调用方法的参数
-     * @param method 被拦截的方法
+     * 
+     * @param params
+     *            调用方法的参数
+     * @param method
+     *            被拦截的方法
      * @return 执行结果
      */
     @RuntimeType
-    public Object interceptInterface(@AllArguments Object[] params,
-                                     @Origin Method method) throws Throwable {
+    public Object interceptInterface(@AllArguments Object[] params, @Origin Method method) throws Throwable {
         if (ProxyParent.canInvoke(method)) {
             return Interception.invokeWrap(interception, null, method, null, params,
                 () -> ProxyParent.invoke(method, proxyParent));

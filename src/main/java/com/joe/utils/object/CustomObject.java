@@ -10,7 +10,9 @@ public interface CustomObject<T> {
 
     /**
      * 判断给定参数列表是否包含本对象包含的实际对象
-     * @param args 参数列表
+     * 
+     * @param args
+     *            参数列表
      * @return 返回true表示本对象包含的实际对象包含在参数列表中
      */
     boolean in(T... args);

@@ -37,7 +37,7 @@ public class ExcelExecutorTest {
 
     @Test
     public void doWriteStream() {
-        //测试写入流
+        // 测试写入流
         fileTest(file -> {
             try {
                 FileOutputStream outputStream = new FileOutputStream(file);
@@ -51,7 +51,7 @@ public class ExcelExecutorTest {
 
     @Test
     public void doWriteFile() {
-        //测试写入文件
+        // 测试写入文件
         fileTest(file -> {
             try {
                 ExcelExecutor.getInstance().writeToExcel(list, true, file.getAbsolutePath());
@@ -63,17 +63,17 @@ public class ExcelExecutorTest {
 
     @Test
     public void doStyle() {
-        //测试样式
+        // 测试样式
         fileTest(file -> {
             try {
                 SXSSFWorkbook wb = new SXSSFWorkbook(100);
                 ExcelExecutor.getInstance().writeToExcel(list, true, wb);
                 WorkBookAccesser workBookAccesser = new WorkBookAccesser(wb);
-                //合并单元格
+                // 合并单元格
                 workBookAccesser.mergedRowRegion(4, 0, 3);
                 CellStyleAccesser accesser = workBookAccesser.getCellStyleAccesser(0, 0);
                 accesser.bold(true);
-                accesser.setFontSize((short) 100);
+                accesser.setFontSize((short)100);
                 accesser.color(HSSFColor.HSSFColorPredefined.BLUE);
                 OutputStream stream = new FileOutputStream(file);
                 wb.write(stream);
@@ -92,15 +92,14 @@ public class ExcelExecutorTest {
             try {
                 ExcelExecutor executor = ExcelExecutor.getInstance();
 
-                //使用自定义的StringDataWriter替换系统默认的StringDataWriter
+                // 使用自定义的StringDataWriter替换系统默认的StringDataWriter
                 executor.registerDataWriter(String.class, new StringDataWriter() {
                     @Override
                     public void write(Cell cell, String data) {
-                        //将第一行加粗设置字号为20并且颜色设置为红色
+                        // 将第一行加粗设置字号为20并且颜色设置为红色
                         if (cell.getRowIndex() == 0) {
                             CellStyleAccesser accesser = CellStyleAccesser.build(cell);
-                            accesser.bold(true).setFontSize((short) 20)
-                                .color(HSSFColor.HSSFColorPredefined.RED);
+                            accesser.bold(true).setFontSize((short)20).color(HSSFColor.HSSFColorPredefined.RED);
                         }
                         cell.setCellValue(data);
                     }
@@ -130,7 +129,7 @@ public class ExcelExecutorTest {
         @ExcelColumn("姓名")
         private String name;
         @ExcelColumn("年龄")
-        private int    age;
+        private int age;
     }
 
     @Data

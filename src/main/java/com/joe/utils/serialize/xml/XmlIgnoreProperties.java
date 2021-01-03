@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * @author joe
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Documented
 public @interface XmlIgnoreProperties {
     /**

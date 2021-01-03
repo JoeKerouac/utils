@@ -8,14 +8,16 @@ class ProxyUtil {
 
     /**
      * 转换classloader
-     * @param loader 原classloader
+     * 
+     * @param loader
+     *            原classloader
      * @return 转换后的classloader
      */
     public static ProxyClassLoader convertClassloader(ClassLoader loader) {
         if (loader == null) {
             return ProxyClient.DEFAULT_LOADER;
         } else if (loader instanceof ProxyClassLoader) {
-            return (ProxyClassLoader) loader;
+            return (ProxyClassLoader)loader;
         } else {
             return new ProxyClassLoader(loader);
         }

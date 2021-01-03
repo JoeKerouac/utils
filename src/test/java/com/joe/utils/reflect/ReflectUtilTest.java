@@ -40,7 +40,7 @@ public class ReflectUtilTest {
         User user = new User();
         user.setName(name);
         Assert.assertEquals(ReflectUtil.invoke(user, "getName", null), name);
-        ReflectUtil.invoke(user, "setName", new Class[] { String.class }, "234");
+        ReflectUtil.invoke(user, "setName", new Class[] {String.class}, "234");
         Assert.assertEquals(user.getName(), "234");
 
         Method method = User.class.getDeclaredMethod("getName");
@@ -57,17 +57,14 @@ public class ReflectUtilTest {
         List<Method> list = new ArrayList<>(2);
         list.add(User.class.getDeclaredMethod("say"));
         list.add(Say.class.getDeclaredMethod("say"));
-        Assert.assertEquals(User.class.getDeclaredMethod("say"),
-            ReflectUtil.filter(list, User.class));
+        Assert.assertEquals(User.class.getDeclaredMethod("say"), ReflectUtil.filter(list, User.class));
     }
 
     @Test
     public void getMethodTest() throws NoSuchMethodException {
         // 正常获取方法
-        Assert.assertEquals(User.class.getDeclaredMethod("say"),
-            ReflectUtil.getMethod(User.class, "say"));
-        Assert.assertEquals(User.class.getDeclaredMethod("getName"),
-            ReflectUtil.getMethod(User.class, "getName"));
+        Assert.assertEquals(User.class.getDeclaredMethod("say"), ReflectUtil.getMethod(User.class, "say"));
+        Assert.assertEquals(User.class.getDeclaredMethod("getName"), ReflectUtil.getMethod(User.class, "getName"));
         Assert.assertEquals(User.class.getDeclaredMethod("setName", String.class),
             ReflectUtil.getMethod(User.class, "setName", String.class));
 
@@ -96,16 +93,14 @@ public class ReflectUtilTest {
 
     @Test
     public void getAllAnnotationPresentClassTest() {
-        List<Class<?>> list = ReflectUtil.getAllAnnotationPresentClass(CustomAnnotation.class,
-            "com.joe.utils.reflect");
+        List<Class<?>> list = ReflectUtil.getAllAnnotationPresentClass(CustomAnnotation.class, "com.joe.utils.reflect");
         Assert.assertEquals(1, list.size());
         Assert.assertEquals(Say.class, list.get(0));
     }
 
     @Test
     public void getAllAnnotationPresentMethodTest() {
-        List<Method> list = ReflectUtil.getAllAnnotationPresentMethod(User.class,
-            CustomAnnotation.class);
+        List<Method> list = ReflectUtil.getAllAnnotationPresentMethod(User.class, CustomAnnotation.class);
         Assert.assertEquals(2, list.size());
         Assert.assertFalse(list.contains(ReflectUtil.getMethod(User.class, "say")));
     }
@@ -128,7 +123,7 @@ public class ReflectUtilTest {
     public static class User extends AbstractUser implements Say {
         private static final String ID = "user";
 
-        private String              name;
+        private String name;
 
         @Override
         public final String say() {
@@ -150,7 +145,7 @@ public class ReflectUtilTest {
     }
 
     public static abstract class AbstractUser {
-        private String    name;
+        private String name;
         private final int age = 123;
     }
 
@@ -161,8 +156,7 @@ public class ReflectUtilTest {
         String say();
 
         @CustomAnnotation
-        default void hello() {
-        }
+        default void hello() {}
     }
 
     @Documented

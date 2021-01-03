@@ -2,6 +2,7 @@ package com.joe.utils.collection;
 
 /**
  * 集合操作异常
+ * 
  * @author joe
  *
  */
@@ -25,7 +26,7 @@ public class CollectionException extends RuntimeException {
     }
 
     protected CollectionException(String message, Throwable cause, boolean enableSuppression,
-                                  boolean writableStackTrace) {
+        boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

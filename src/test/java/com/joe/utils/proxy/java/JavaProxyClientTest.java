@@ -18,7 +18,7 @@ public class JavaProxyClientTest {
 
         Interception interception = (target, params, method, invoker) -> {
             if (method.getName().equals("say")) {
-                return new Hello().hi((String) params[0]);
+                return new Hello().hi((String)params[0]);
             } else {
                 return invoker.call();
             }

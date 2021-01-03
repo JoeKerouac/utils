@@ -10,8 +10,11 @@ public class StringFormater {
 
     /**
      * 将字符串中的{}依次替换为指定数据，例如"ab{0}{1}{0}"
-     * @param templet 字符串模板
-     * @param args 变量
+     * 
+     * @param templet
+     *            字符串模板
+     * @param args
+     *            变量
      * @return 字符串
      */
     public static String simpleFormat(String templet, Object... args) {
@@ -20,7 +23,9 @@ public class StringFormater {
 
     /**
      * json格式化，注意：会遍历字符串，性能不会太好
-     * @param jsonStr 要格式化的json串（不会校验json格式）
+     * 
+     * @param jsonStr
+     *            要格式化的json串（不会校验json格式）
      * @return 格式化后的字符串
      */
     public static String jsonFormat(String jsonStr) {

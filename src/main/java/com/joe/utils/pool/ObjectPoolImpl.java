@@ -20,7 +20,7 @@ public class ObjectPoolImpl<T> {
     /**
      * 池的最大大小
      */
-    private final int     MAX_CAPACITY = Integer.MAX_VALUE;
+    private final int MAX_CAPACITY = Integer.MAX_VALUE;
 
     /**
      * 当前池的大小，包含未使用和已使用的总共大小
@@ -30,13 +30,14 @@ public class ObjectPoolImpl<T> {
     /**
      *
      */
-    private Deque<T>      pool;
-    private Supplier<T>   function;
+    private Deque<T> pool;
+    private Supplier<T> function;
 
     /**
      * Object池
      *
-     * @param function 创建新Object元素的函数，池中的元素将使用该函数创建
+     * @param function
+     *            创建新Object元素的函数，池中的元素将使用该函数创建
      */
     public ObjectPoolImpl(Supplier<T> function) {
         this.pool = new LinkedBlockingDeque<>();
@@ -69,7 +70,8 @@ public class ObjectPoolImpl<T> {
     /**
      * 清理当前池中的指定个数元素
      *
-     * @param size 大小
+     * @param size
+     *            大小
      */
     public void clear(int size) {
         if (size <= 0) {
@@ -90,13 +92,14 @@ public class ObjectPoolImpl<T> {
     /**
      * 池元素持有者，用户使用完后应该调用close方法归还
      *
-     * @param <T> 池元素持有的实际数据类型
+     * @param <T>
+     *            池元素持有的实际数据类型
      */
     public static class PooledObjectImpl<T> implements PooledObject<T> {
         private final Object lock = new Object();
-        private T            data;
-        private Deque<T>     pool;
-        private boolean      closed;
+        private T data;
+        private Deque<T> pool;
+        private boolean closed;
 
         private PooledObjectImpl(T data, Deque<T> pool) {
             this.closed = false;

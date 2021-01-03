@@ -37,7 +37,8 @@ public class JvmInfo {
     /**
      * 获取系统配置
      *
-     * @param name 配置名
+     * @param name
+     *            配置名
      * @return 配置value
      */
     private static String getSystemProperty(String name) {
@@ -45,7 +46,7 @@ public class JvmInfo {
             return System.getProperty(name);
         } catch (SecurityException e) {
             System.err.println("Caught a SecurityException reading the system property '" + name
-                               + "'; the SystemUtil property value will default to null.");
+                + "'; the SystemUtil property value will default to null.");
 
             return null;
         }
@@ -53,6 +54,7 @@ public class JvmInfo {
 
     /**
      * 获取JVM信息实例
+     * 
      * @return JVM信息实例
      */
     public static JvmInfo getInstance() {

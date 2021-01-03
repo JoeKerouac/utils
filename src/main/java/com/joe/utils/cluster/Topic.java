@@ -17,17 +17,18 @@ public interface Topic<M> {
     /**
      * Publish the message to all subscribers of this topic
      *
-     * @param message to send
+     * @param message
+     *            to send
      * @return the number of clients that received the message
      */
     long publish(M message);
 
     /**
-     * Subscribes to this topic.
-     * <code>MessageListener.onMessage</code> is called when any message
-     * is published on this topic.
+     * Subscribes to this topic. <code>MessageListener.onMessage</code> is called when any message is published on this
+     * topic.
      *
-     * @param listener for messages
+     * @param listener
+     *            for messages
      * @return locally unique listener id
      * @see TopicMessageListener
      */
@@ -36,7 +37,8 @@ public interface Topic<M> {
     /**
      * Removes the listener by <code>id</code> for listening this topic
      *
-     * @param listenerId - listener id
+     * @param listenerId
+     *            - listener id
      */
     void removeListener(int listenerId);
 }

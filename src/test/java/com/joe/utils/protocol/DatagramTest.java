@@ -14,8 +14,7 @@ public class DatagramTest {
         String str = "你好";
         byte[] data = str.getBytes();
         // 先构建为数据报
-        Datagram datagram = DatagramUtil.build(data, DatagramConst.Type.FILE,
-            DatagramConst.Version.V1);
+        Datagram datagram = DatagramUtil.build(data, DatagramConst.Type.FILE, DatagramConst.Version.V1);
         // 获取数据反解析
         datagram = DatagramUtil.decode(datagram.getData());
         // 判断数据是否一致

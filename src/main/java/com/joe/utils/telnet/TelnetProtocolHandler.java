@@ -19,97 +19,75 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TelnetProtocolHandler {
-    private static final int                         BUFFER_SIZE           = 128;
-    private static final String                      TELNET_STRING_END     = new String(
-        new byte[] { (byte) 13, (byte) 10 });
-    public final static String                       TELNET_SESSION_PROMPT = "JoeKerouac-telnet>";
+    private static final int BUFFER_SIZE = 128;
+    private static final String TELNET_STRING_END = new String(new byte[] {(byte)13, (byte)10});
+    public final static String TELNET_SESSION_PROMPT = "JoeKerouac-telnet>";
 
     /**
-     * https://www.ietf.org/rfc/rfc857.txt
-     * https://www.ietf.org/rfc/rfc858.txt
-     * https://www.ietf.org/rfc/rfc1073.txt
+     * https://www.ietf.org/rfc/rfc857.txt https://www.ietf.org/rfc/rfc858.txt https://www.ietf.org/rfc/rfc1073.txt
      * https://www.ietf.org/rfc/rfc1091.txt
      */
-    public static final byte[]                       NEGOTIATION_MESSAGE   = new byte[] { (byte) 255,
-                                                                                          (byte) 251,
-                                                                                          (byte) 1,
-                                                                                          (byte) 255,
-                                                                                          (byte) 251,
-                                                                                          (byte) 3,
-                                                                                          (byte) 255,
-                                                                                          (byte) 253,
-                                                                                          (byte) 31,
-                                                                                          (byte) 255,
-                                                                                          (byte) 253,
-                                                                                          (byte) 24 };
+    public static final byte[] NEGOTIATION_MESSAGE = new byte[] {(byte)255, (byte)251, (byte)1, (byte)255, (byte)251,
+        (byte)3, (byte)255, (byte)253, (byte)31, (byte)255, (byte)253, (byte)24};
 
-    private SocketChannel                            socketChannel;
+    private SocketChannel socketChannel;
 
-    private String                                   telnetCommand;
-    private String                                   escCommand;
-    private SimpleByteBuffer                         arkCommandBuffer      = new SimpleByteBuffer();
+    private String telnetCommand;
+    private String escCommand;
+    private SimpleByteBuffer arkCommandBuffer = new SimpleByteBuffer();
 
-    private String                                   clientTerminalType    = AbstractTerminalTypeMapping
-        .getDefaultTerminalType();
+    private String clientTerminalType = AbstractTerminalTypeMapping.getDefaultTerminalType();
     private Map<String, AbstractTerminalTypeMapping> terminalTypeMapping;
 
     /**
-     * Telnet NVT
-     * http://www.ietf.org/rfc/rfc854.txt
-     * https://www.ietf.org/rfc/rfc1091.txt
+     * Telnet NVT http://www.ietf.org/rfc/rfc854.txt https://www.ietf.org/rfc/rfc1091.txt
      */
-    private final static byte                        IAC                   = (byte) 255;
-    private final static byte                        WILL                  = (byte) 251;
-    private final static byte                        WONT                  = (byte) 252;
-    private final static byte                        DO                    = (byte) 253;
-    private final static byte                        DONT                  = (byte) 254;
-    private final static byte                        SB                    = (byte) 250;
-    private final static byte                        SE                    = (byte) 240;
-    private final static byte                        ECHO                  = 1;
-    private final static byte                        GA                    = 3;
-    private final static byte                        NAWS                  = 31;
-    private final static byte                        TERMINAL_TYPE         = 24;
+    private final static byte IAC = (byte)255;
+    private final static byte WILL = (byte)251;
+    private final static byte WONT = (byte)252;
+    private final static byte DO = (byte)253;
+    private final static byte DONT = (byte)254;
+    private final static byte SB = (byte)250;
+    private final static byte SE = (byte)240;
+    private final static byte ECHO = 1;
+    private final static byte GA = 3;
+    private final static byte NAWS = 31;
+    private final static byte TERMINAL_TYPE = 24;
 
     /**
      * Special Character Value
      */
-    private final static byte                        MIN_VISUAL_BYTE       = 32;
-    private final static byte                        MAX_VISUAL_BYTE       = 126;
-    private final static byte                        SPACE                 = 32;
-    private final static byte                        ESC                   = 27;
-    private final static byte                        BS                    = 8;
-    private final static byte                        LF                    = 10;
-    private final static byte                        CR                    = 13;
+    private final static byte MIN_VISUAL_BYTE = 32;
+    private final static byte MAX_VISUAL_BYTE = 126;
+    private final static byte SPACE = 32;
+    private final static byte ESC = 27;
+    private final static byte BS = 8;
+    private final static byte LF = 10;
+    private final static byte CR = 13;
 
-    private boolean                                  isHandlingCommand;
-    private boolean                                  isWill;
-    private boolean                                  isWont;
-    private boolean                                  isDo;
-    private boolean                                  isDont;
-    private boolean                                  isSb;
-    private boolean                                  isEsc;
-    private boolean                                  isCr;
+    private boolean isHandlingCommand;
+    private boolean isWill;
+    private boolean isWont;
+    private boolean isDo;
+    private boolean isDont;
+    private boolean isSb;
+    private boolean isEsc;
+    private boolean isCr;
     /**
      * telnet命令处理器
      */
-    private CommandHandler                           handler;
+    private CommandHandler handler;
 
     public TelnetProtocolHandler(SocketChannel sc, CommandHandler handler) {
         socketChannel = sc;
         terminalTypeMapping = new HashMap<>();
         this.handler = handler;
-        terminalTypeMapping.put("ANSI", new AbstractTerminalTypeMapping((byte) 8, (byte) 127) {
-        });
-        terminalTypeMapping.put("VT100", new AbstractTerminalTypeMapping((byte) 127, (byte) -1) {
-        });
-        terminalTypeMapping.put("VT200", new AbstractTerminalTypeMapping((byte) 127, (byte) -1) {
-        });
-        terminalTypeMapping.put("VT320", new AbstractTerminalTypeMapping((byte) 8, (byte) 127) {
-        });
-        terminalTypeMapping.put("SCO", new AbstractTerminalTypeMapping((byte) -1, (byte) 127) {
-        });
-        terminalTypeMapping.put("XTERM", new AbstractTerminalTypeMapping((byte) 127, (byte) -1) {
-        });
+        terminalTypeMapping.put("ANSI", new AbstractTerminalTypeMapping((byte)8, (byte)127) {});
+        terminalTypeMapping.put("VT100", new AbstractTerminalTypeMapping((byte)127, (byte)-1) {});
+        terminalTypeMapping.put("VT200", new AbstractTerminalTypeMapping((byte)127, (byte)-1) {});
+        terminalTypeMapping.put("VT320", new AbstractTerminalTypeMapping((byte)8, (byte)127) {});
+        terminalTypeMapping.put("SCO", new AbstractTerminalTypeMapping((byte)-1, (byte)127) {});
+        terminalTypeMapping.put("XTERM", new AbstractTerminalTypeMapping((byte)127, (byte)-1) {});
         reset();
     }
 
@@ -130,23 +108,23 @@ public class TelnetProtocolHandler {
             switch (b) {
                 case WILL:
                     isWill = true;
-                    telnetCommand += (char) WONT;
+                    telnetCommand += (char)WONT;
                     break;
                 case WONT:
                     isWont = true;
-                    telnetCommand += (char) DONT;
+                    telnetCommand += (char)DONT;
                     break;
                 case DO:
                     isDo = true;
-                    telnetCommand += (char) WONT;
+                    telnetCommand += (char)WONT;
                     break;
                 case DONT:
                     isDont = true;
-                    telnetCommand += (char) WONT;
+                    telnetCommand += (char)WONT;
                     break;
                 case SB:
                     isSb = true;
-                    telnetCommand += (char) SB;
+                    telnetCommand += (char)SB;
                     break;
                 default:
                     handleCommand(b);
@@ -154,7 +132,7 @@ public class TelnetProtocolHandler {
             }
         } else if (b == IAC) {
             isHandlingCommand = true;
-            telnetCommand += (char) IAC;
+            telnetCommand += (char)IAC;
         } else {
             handleData(b);
         }
@@ -162,9 +140,8 @@ public class TelnetProtocolHandler {
 
     private void handleData(byte b) throws IOException {
         if (isEsc) {
-            escCommand += (char) b;
-            AbstractTerminalTypeMapping.KEYS key = terminalTypeMapping.get(clientTerminalType)
-                .getMatchKeys(escCommand);
+            escCommand += (char)b;
+            AbstractTerminalTypeMapping.KEYS key = terminalTypeMapping.get(clientTerminalType).getMatchKeys(escCommand);
             handleEscCommand(key);
         } else if (b == ESC) {
             isEsc = true;
@@ -186,7 +163,7 @@ public class TelnetProtocolHandler {
                 socketChannel.write(wrapSingleByte(b));
             }
         } else if ((b == LF && !isCr) || b == CR) {
-            socketChannel.write(ByteBuffer.wrap(new byte[] { CR, LF }));
+            socketChannel.write(ByteBuffer.wrap(new byte[] {CR, LF}));
             handleCommand();
         }
         isCr = (b == CR);
@@ -212,7 +189,7 @@ public class TelnetProtocolHandler {
     private void render() throws IOException {
         socketChannel.write(ByteBuffer.wrap(arkCommandBuffer.getBuffer()));
         for (int i = 0; i < arkCommandBuffer.getGap(); ++i) {
-            socketChannel.write(ByteBuffer.wrap(new byte[] { BS }));
+            socketChannel.write(ByteBuffer.wrap(new byte[] {BS}));
         }
     }
 
@@ -249,28 +226,28 @@ public class TelnetProtocolHandler {
 
     /**
      * Handle telnet command
+     * 
      * @param b
      */
     private void handleCommand(byte b) throws IOException {
         if (b == SE) {
-            telnetCommand += (char) b;
+            telnetCommand += (char)b;
             handleNegotiation();
             reset();
         } else if (isWill || isDo) {
             if (isWill && b == TERMINAL_TYPE) {
-                socketChannel
-                    .write(ByteBuffer.wrap(new byte[] { IAC, SB, TERMINAL_TYPE, ECHO, IAC, SE }));
+                socketChannel.write(ByteBuffer.wrap(new byte[] {IAC, SB, TERMINAL_TYPE, ECHO, IAC, SE}));
             } else if (b != ECHO && b != GA && b != NAWS) {
-                telnetCommand += (char) b;
+                telnetCommand += (char)b;
                 socketChannel.write(ByteBuffer.wrap(telnetCommand.getBytes()));
             }
             reset();
         } else if (isWont || isDont) {
-            telnetCommand += (char) b;
+            telnetCommand += (char)b;
             socketChannel.write(ByteBuffer.wrap(telnetCommand.getBytes()));
             reset();
         } else if (isSb) {
-            telnetCommand += (char) b;
+            telnetCommand += (char)b;
         }
     }
 
@@ -278,8 +255,8 @@ public class TelnetProtocolHandler {
      * Handle negotiation of terminal type
      */
     private void handleNegotiation() throws IOException {
-        if (telnetCommand.contains(new String(new byte[] { TERMINAL_TYPE }))) {
-            //  IAC SB TERMINAL_TYPE IS XXX IAC SE
+        if (telnetCommand.contains(new String(new byte[] {TERMINAL_TYPE}))) {
+            // IAC SB TERMINAL_TYPE IS XXX IAC SE
             boolean isSuccess = false;
             clientTerminalType = telnetCommand.substring(4, telnetCommand.length() - 2);
             for (String terminalType : terminalTypeMapping.keySet()) {
@@ -331,6 +308,6 @@ public class TelnetProtocolHandler {
     }
 
     private ByteBuffer wrapSingleByte(byte b) {
-        return ByteBuffer.wrap(new byte[] { b });
+        return ByteBuffer.wrap(new byte[] {b});
     }
 }

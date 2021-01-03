@@ -25,7 +25,7 @@ public class NoSupportException extends UtilsException {
     }
 
     protected NoSupportException(String message, Throwable cause, boolean enableSuppression,
-                                 boolean writableStackTrace) {
+        boolean writableStackTrace) {
         super(cause, enableSuppression, writableStackTrace, message);
     }
 }

@@ -15,8 +15,8 @@ public class CodecTest {
     static byte[] datas;
     static String hex;
     static {
-        datas = new byte[] { 12, 56, 123, 1, 0, -45, 36, -123, -48, 94, 78, 53, 48, 12, 75, 48, 11,
-                             10, 34, 56, 91, 61, 43, 81, 61 };
+        datas = new byte[] {12, 56, 123, 1, 0, -45, 36, -123, -48, 94, 78, 53, 48, 12, 75, 48, 11, 10, 34, 56, 91, 61,
+            43, 81, 61};
         hex = "0c387b0100d32485d05e4e35300c4b300b0a22385b3d2b513d";
     }
 
@@ -28,15 +28,13 @@ public class CodecTest {
     @Test
     public void doHexDecodeTest() {
         Assert.assertTrue(Arrays.equals(datas, Hex.decodeHex(hex)));
-        Assert.assertTrue(
-            Arrays.equals(datas, Hex.decodeHex((char[]) ReflectUtil.getFieldValue(hex, "value"))));
+        Assert.assertTrue(Arrays.equals(datas, Hex.decodeHex((char[])ReflectUtil.getFieldValue(hex, "value"))));
     }
 
     @Test
     public void doBase64Test() {
         String text = "测试文本";
         Assert.assertEquals(IBase64.decrypt(IBase64.encrypt(text)), text);
-        Assert.assertTrue(
-            Arrays.equals(text.getBytes(), IBase64.decrypt(IBase64.encrypt(text.getBytes()))));
+        Assert.assertTrue(Arrays.equals(text.getBytes(), IBase64.decrypt(IBase64.encrypt(text.getBytes()))));
     }
 }

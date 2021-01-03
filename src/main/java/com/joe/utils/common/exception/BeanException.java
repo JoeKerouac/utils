@@ -23,8 +23,7 @@ public class BeanException extends RuntimeException {
         super(cause);
     }
 
-    protected BeanException(String message, Throwable cause, boolean enableSuppression,
-                            boolean writableStackTrace) {
+    protected BeanException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

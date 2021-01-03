@@ -11,9 +11,13 @@ public class MemoryUtils {
 
     /**
      * 构建JMemoryValue，并且做一次单位转换
-     * @param value 基本值
-     * @param srcUnit 单位
-     * @param destUnit 最终结果需要的单位
+     * 
+     * @param value
+     *            基本值
+     * @param srcUnit
+     *            单位
+     * @param destUnit
+     *            最终结果需要的单位
      * @return JMemoryValue
      */
     public static MemoryValue build(long value, MemoryUnitDefinition srcUnit, MemoryUnitDefinition destUnit) {

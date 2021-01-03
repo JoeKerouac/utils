@@ -28,9 +28,8 @@ public class UtilsException extends RuntimeException {
         super(cause);
     }
 
-    protected UtilsException(Throwable cause, boolean enableSuppression, boolean writableStackTrace,
-                             String message, Object... args) {
-        super(StringFormater.simpleFormat(message, args), cause, enableSuppression,
-            writableStackTrace);
+    protected UtilsException(Throwable cause, boolean enableSuppression, boolean writableStackTrace, String message,
+        Object... args) {
+        super(StringFormater.simpleFormat(message, args), cause, enableSuppression, writableStackTrace);
     }
 }

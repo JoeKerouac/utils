@@ -10,12 +10,12 @@ import org.junit.Test;
  */
 public class RedisClusterManagerTest {
     private String host = "192.168.2.222";
-    private int    port = 7001;
+    private int port = 7001;
 
     @Test
     public void test() throws Exception {
-        //        ClusterManager clusterManager = ClusterManager.getInstance(host, port);
-        //        Assert.notNull(clusterManager);
-        //        clusterManager.shutdown();
+        // ClusterManager clusterManager = ClusterManager.getInstance(host, port);
+        // Assert.notNull(clusterManager);
+        // clusterManager.shutdown();
     }
 }

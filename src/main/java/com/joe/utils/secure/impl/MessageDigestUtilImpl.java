@@ -19,15 +19,14 @@ import com.joe.utils.secure.exception.SecureException;
  */
 public class MessageDigestUtilImpl implements MessageDigestUtil {
     private static final Map<String, ObjectPoolImpl<MessageDigest>> CACHE = new ConcurrentHashMap<>();
-    private Algorithms                                              algorithms;
+    private Algorithms algorithms;
 
     private MessageDigestUtilImpl(Algorithms algorithms) {
         this.algorithms = algorithms;
 
         CACHE.computeIfAbsent(algorithms.name(), key -> {
-            ObjectPoolImpl<MessageDigest> pool = new ObjectPoolImpl<>(
-                () -> getMessageDigest(algorithms));
-            //快速验证
+            ObjectPoolImpl<MessageDigest> pool = new ObjectPoolImpl<>(() -> getMessageDigest(algorithms));
+            // 快速验证
             pool.get().close();
             return pool;
         });
@@ -36,7 +35,8 @@ public class MessageDigestUtilImpl implements MessageDigestUtil {
     /**
      * 获取摘要算法实例
      *
-     * @param algorithms 算法
+     * @param algorithms
+     *            算法
      * @return 摘要算法实例
      */
     public static MessageDigestUtil buildInstance(Algorithms algorithms) {
@@ -46,7 +46,8 @@ public class MessageDigestUtilImpl implements MessageDigestUtil {
     /**
      * 获取指定算法对应的MessageDigest
      *
-     * @param algorithms 算法
+     * @param algorithms
+     *            算法
      * @return MessageDigest
      */
     private MessageDigest getMessageDigest(Algorithms algorithms) {
@@ -60,7 +61,8 @@ public class MessageDigestUtilImpl implements MessageDigestUtil {
     /**
      * 获取数据摘要
      *
-     * @param data 数据
+     * @param data
+     *            数据
      * @return 对应的摘要（转为了16进制字符串）
      */
     public String digest(String data) {
@@ -70,7 +72,8 @@ public class MessageDigestUtilImpl implements MessageDigestUtil {
     /**
      * 获取数据摘要
      *
-     * @param data 数据
+     * @param data
+     *            数据
      * @return 对应的摘要
      */
     public byte[] digest(byte[] data) {

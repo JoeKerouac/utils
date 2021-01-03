@@ -27,6 +27,7 @@ public abstract class BaseTest {
 
     /**
      * 运行用例
+     * 
      * @param function
      */
     protected void runCase(CustomFunction function) {
@@ -59,7 +60,9 @@ public abstract class BaseTest {
 
     /**
      * 跳过用例执行
-     * @param skipAll true表示跳过所有用例执行
+     * 
+     * @param skipAll
+     *            true表示跳过所有用例执行
      */
     protected void skipAll(boolean skipAll) {
         this.skipAll = skipAll;

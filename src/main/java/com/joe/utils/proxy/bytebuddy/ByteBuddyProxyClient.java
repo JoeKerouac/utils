@@ -26,21 +26,19 @@ public class ByteBuddyProxyClient implements ProxyClient {
     private static final AnyMethodElementMatcher MATCHER = new AnyMethodElementMatcher();
 
     @Override
-    public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name,
-                        Interception interception, Class<?>[] paramTypes, Object[] params) {
+    public <T> T create(Class<T> parent, T proxy, ClassLoader loader, String name, Interception interception,
+        Class<?>[] paramTypes, Object[] params) {
         if (!CollectionUtil.sizeEquals(params, paramTypes)) {
             throw new IllegalArgumentException("构造器参数列表paramTypes长度和实际参数params长度不一致");
         }
 
-        return ClassUtils.getInstance(createClass(parent, proxy, loader, name, interception),
-            paramTypes, params);
+        return ClassUtils.getInstance(createClass(parent, proxy, loader, name, interception), paramTypes, params);
     }
 
     @Override
-    public <T> Class<? extends T> createClass(Class<T> parent, T proxy, ClassLoader loader,
-                                              String name, Interception interception) {
-        DynamicType.Builder<T> builder = new ByteBuddy().subclass(parent)
-            .implement(ProxyParent.class);
+    public <T> Class<? extends T> createClass(Class<T> parent, T proxy, ClassLoader loader, String name,
+        Interception interception) {
+        DynamicType.Builder<T> builder = new ByteBuddy().subclass(parent).implement(ProxyParent.class);
 
         if (!StringUtils.isEmpty(name)) {
             builder = builder.name(name);
@@ -50,17 +48,16 @@ public class ByteBuddyProxyClient implements ProxyClient {
             loader = ProxyClient.DEFAULT_LOADER;
         }
 
-        builder = builder.method(MATCHER)
-            .intercept(MethodDelegation.to(new GeneralInterceptor(interception, parent, proxy)));
+        builder =
+            builder.method(MATCHER).intercept(MethodDelegation.to(new GeneralInterceptor(interception, parent, proxy)));
         ProxyClassLoader realLoader;
         if (loader instanceof ProxyClassLoader) {
-            realLoader = (ProxyClassLoader) loader;
+            realLoader = (ProxyClassLoader)loader;
         } else {
             realLoader = new ProxyClassLoader(loader);
         }
         return builder.make()
-            .load(realLoader,
-                (classLoader, types) -> CollectionUtil.convert(types, classLoader::buildClass))
+            .load(realLoader, (classLoader, types) -> CollectionUtil.convert(types, classLoader::buildClass))
             .getLoaded();
     }
 

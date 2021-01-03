@@ -15,38 +15,35 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public enum MemoryUnitDefinition implements UnitDefinition {
-                                                             /**
-                                                              * 基本最小单位
-                                                              */
-                                                             BIT("BIT", 1, "Bit"),
+    /**
+     * 基本最小单位
+     */
+    BIT("BIT", 1, "Bit"),
 
-                                                             /**
-                                                              * Byte
-                                                              */
-                                                             BYTE("BYTE", 1024, "Byte"),
+    /**
+     * Byte
+     */
+    BYTE("BYTE", 1024, "Byte"),
 
-                                                             /**
-                                                              * KB
-                                                              */
-                                                             KB("KB", 1024 * 1024, "KB"),
+    /**
+     * KB
+     */
+    KB("KB", 1024 * 1024, "KB"),
 
-                                                             /**
-                                                              * MB
-                                                              */
-                                                             MB("MB", 1024 * 1024 * 1024, "MB"),
+    /**
+     * MB
+     */
+    MB("MB", 1024 * 1024 * 1024, "MB"),
 
-                                                             /**
-                                                              * GB
-                                                              */
-                                                             GB("GB", 1024L * 1024 * 1024 * 1024,
-                                                                "GB"),
+    /**
+     * GB
+     */
+    GB("GB", 1024L * 1024 * 1024 * 1024, "GB"),
 
-                                                             /**
-                                                              * TB
-                                                              */
-                                                             TB("TB",
-                                                                1024L * 1024 * 1024 * 1024 * 1024,
-                                                                "TB");
+    /**
+     * TB
+     */
+    TB("TB", 1024L * 1024 * 1024 * 1024 * 1024, "TB");
 
     /**
      * code
@@ -56,7 +53,7 @@ public enum MemoryUnitDefinition implements UnitDefinition {
     /**
      * 最小单位的倍数
      */
-    private final long   radix;
+    private final long radix;
 
     /**
      * 说明

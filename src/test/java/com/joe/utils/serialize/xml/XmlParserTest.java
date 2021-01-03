@@ -14,17 +14,17 @@ import lombok.Data;
  * @version 2018.05.08 10:25
  */
 public class XmlParserTest {
-    private static final XmlParser PARSER     = XmlParser.getInstance();
-    private static final String    NOTHASNULL = "<USER><users2><user><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></user"
-                                                + "></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao</ALIAS><userSet"
-                                                + "><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME></USER>";
-    private static final String    HASNULL    = "<USER><users2><user><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></user"
-                                                + "></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao</ALIAS><userSet"
-                                                + "><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME></USER>";
-    private static final String    MAP_XML    = "<root><test>test</test><user><users2><user><ALIAS>u1</ALIAS><age>0</age"
-                                                + "><NAME>u1</NAME></user></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao"
-                                                + "</ALIAS><userSet><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME"
-                                                + "></user></root>";
+    private static final XmlParser PARSER = XmlParser.getInstance();
+    private static final String NOTHASNULL = "<USER><users2><user><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></user"
+        + "></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao</ALIAS><userSet"
+        + "><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME></USER>";
+    private static final String HASNULL = "<USER><users2><user><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></user"
+        + "></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao</ALIAS><userSet"
+        + "><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME></USER>";
+    private static final String MAP_XML = "<root><test>test</test><user><users2><user><ALIAS>u1</ALIAS><age>0</age"
+        + "><NAME>u1</NAME></user></users2><users1><ALIAS>u1</ALIAS><age>0</age><NAME>u1</NAME></users1><ALIAS>qiao"
+        + "</ALIAS><userSet><ALIAS>u2</ALIAS><age>0</age><NAME>u2</NAME></userSet><age>18</age><NAME>joe</NAME"
+        + "></user></root>";
 
     @Test
     public void doMapToXml() {
@@ -80,12 +80,12 @@ public class XmlParserTest {
     @Data
     static class User {
         @XmlNode(name = "NAME")
-        private String     name;
+        private String name;
         @XmlNode(name = "ALIAS")
-        private String     otherName;
+        private String otherName;
         @XmlNode(ignore = true)
-        private String     other = "abc";
-        private int        age;
+        private String other = "abc";
+        private int age;
         /**
          * 集合类型必须加general字段
          */
@@ -97,6 +97,6 @@ public class XmlParserTest {
         @XmlNode(general = User.class, arrayRoot = "user")
         private List<User> users2;
         @XmlNode(general = User.class)
-        private Set<User>  userSet;
+        private Set<User> userSet;
     }
 }

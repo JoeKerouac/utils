@@ -61,8 +61,7 @@ public class CollectionUtilTest {
 
         List<List<String>> result = CollectionUtil.permutations(arg);
         List<String> resultConvert = result.stream()
-            .map(list -> list.stream().reduce((arg0, arg1) -> arg0 + arg1).get())
-            .collect(Collectors.toList());
+            .map(list -> list.stream().reduce((arg0, arg1) -> arg0 + arg1).get()).collect(Collectors.toList());
 
         Assert.assertTrue(CollectionUtil.sizeEquals(expectResult, resultConvert));
         expectResult.forEach(str -> Assert.assertTrue(resultConvert.contains(str)));

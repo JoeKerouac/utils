@@ -21,6 +21,6 @@ public class AsmDynamicClassLoader extends DynamicClassLoader {
     @Override
     @SuppressWarnings("unchecked")
     public <T> Class<T> buildClass(String name, byte[] b, int begin, int len) {
-        return (Class<T>) defineClass(name, b, begin, len);
+        return (Class<T>)defineClass(name, b, begin, len);
     }
 }

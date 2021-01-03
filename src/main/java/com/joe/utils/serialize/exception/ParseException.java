@@ -6,8 +6,7 @@ package com.joe.utils.serialize.exception;
  * @author joe
  */
 public class ParseException extends RuntimeException {
-    public ParseException() {
-    }
+    public ParseException() {}
 
     public ParseException(String message) {
         super(message);
@@ -21,8 +20,7 @@ public class ParseException extends RuntimeException {
         super(cause);
     }
 
-    public ParseException(String message, Throwable cause, boolean enableSuppression,
-                          boolean writableStackTrace) {
+    public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

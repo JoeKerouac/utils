@@ -13,8 +13,7 @@ import com.joe.utils.common.string.StringUtils;
 public class BooleanConverter extends AbstractXmlTypeConvert<Boolean> {
     @Override
     public Boolean read(Element element, String attrName) {
-        String data = StringUtils.isEmpty(attrName) ? element.getText()
-            : element.attributeValue(attrName);
+        String data = StringUtils.isEmpty(attrName) ? element.getText() : element.attributeValue(attrName);
         if (StringUtils.isEmpty(data)) {
             return false;
         } else {

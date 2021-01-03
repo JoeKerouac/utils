@@ -12,7 +12,8 @@ public class CipherUtilTest {
     /**
      * 检查加密是否能用
      *
-     * @param cipher 加密器
+     * @param cipher
+     *            加密器
      */
     public static void checkCipher(CipherUtil cipher) {
         Assert.assertEquals(data, cipher.decrypt(cipher.encrypt(data)));

@@ -12,25 +12,26 @@ import com.joe.utils.reflect.InvokeDistributeFactory;
  * @version $Id: joe, v 0.1 2019年02月21日 20:46 JoeKerouac Exp $
  */
 public class AsmInvokeDistributeFactoryTest {
-    private String                  name             = "joe";
-    private String                  owner            = ByteCodeUtils.convert(User.class);
-    private String                  sayMethodOwner   = ByteCodeUtils.convert(AbstractUser.class);
-    private String                  helloMethodOwner = ByteCodeUtils.convert(Hello.class);
-    private String                  hiMethodOwner    = ByteCodeUtils.convert(Hi.class);
-    private String                  setMethod        = "setName";
-    private String                  getMethod        = "getName";
-    private String                  sayMethod        = "say";
-    private String                  sayHiMethod      = "sayHi";
-    private String                  sayHelloMethod   = "sayHello";
-    private String                  talkMethod       = "talk";
-    private String                  setMethodDesc    = ByteCodeUtils.getDesc(void.class,
-        String.class);
-    private String                  desc             = ByteCodeUtils.getDesc(String.class);
-    private InvokeDistributeFactory factory          = new AsmInvokeDistributeFactory();
+    private String name = "joe";
+    private String owner = ByteCodeUtils.convert(User.class);
+    private String sayMethodOwner = ByteCodeUtils.convert(AbstractUser.class);
+    private String helloMethodOwner = ByteCodeUtils.convert(Hello.class);
+    private String hiMethodOwner = ByteCodeUtils.convert(Hi.class);
+    private String setMethod = "setName";
+    private String getMethod = "getName";
+    private String sayMethod = "say";
+    private String sayHiMethod = "sayHi";
+    private String sayHelloMethod = "sayHello";
+    private String talkMethod = "talk";
+    private String setMethodDesc = ByteCodeUtils.getDesc(void.class, String.class);
+    private String desc = ByteCodeUtils.getDesc(String.class);
+    private InvokeDistributeFactory factory = new AsmInvokeDistributeFactory();
 
     /**
      * 测试一般正确场景
-     * @throws NoSuchMethodException NoSuchMethodException
+     * 
+     * @throws NoSuchMethodException
+     *             NoSuchMethodException
      */
     @Test
     @SuppressWarnings("unchecked")
@@ -88,7 +89,9 @@ public class AsmInvokeDistributeFactoryTest {
 
     /**
      * 测试动态调用方法的行为与直接调用是否一致（主要测试当代理的类存在父类，并且父类也声明同一个方法的时候的行为是否一致）
-     * @throws NoSuchMethodException NoSuchMethodException
+     * 
+     * @throws NoSuchMethodException
+     *             NoSuchMethodException
      */
     @Test
     @SuppressWarnings("unchecked")
@@ -98,15 +101,12 @@ public class AsmInvokeDistributeFactoryTest {
 
         Assert.assertEquals(user.talk(), invokeDistribute.invoke(owner, talkMethod, desc));
         Assert.assertEquals(user.say(), invokeDistribute.invoke(sayMethodOwner, sayMethod, desc));
-        Assert.assertEquals(user.sayHello(),
-            invokeDistribute.invoke(helloMethodOwner, sayHelloMethod, desc));
-        Assert.assertEquals(user.sayHi(),
-            invokeDistribute.invoke(hiMethodOwner, sayHiMethod, desc));
+        Assert.assertEquals(user.sayHello(), invokeDistribute.invoke(helloMethodOwner, sayHelloMethod, desc));
+        Assert.assertEquals(user.sayHi(), invokeDistribute.invoke(hiMethodOwner, sayHiMethod, desc));
     }
 
     @Test
-    public void test() {
-    }
+    public void test() {}
 
     public static class User extends AbstractUser implements Hi {
         private String name;

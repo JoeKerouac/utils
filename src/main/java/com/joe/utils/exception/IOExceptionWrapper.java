@@ -27,7 +27,7 @@ public class IOExceptionWrapper extends UtilsException {
     }
 
     protected IOExceptionWrapper(String message, Throwable cause, boolean enableSuppression,
-                                 boolean writableStackTrace) {
+        boolean writableStackTrace) {
         super(cause, enableSuppression, writableStackTrace, message);
     }
 }

@@ -23,7 +23,9 @@ public interface ClusterManager {
 
     /**
      * 判断指定key是否存在于当前分布式管理器
-     * @param key key
+     * 
+     * @param key
+     *            key
      * @return 返回true表示存在
      */
     boolean exist(String key);
@@ -31,16 +33,18 @@ public interface ClusterManager {
     /**
      * 获取指定名字的lock，该Lock必须为分布式Lock
      *
-     * @param name lock的名字
+     * @param name
+     *            lock的名字
      * @return 指定名字的lock
      */
     Lock getLock(String name);
 
     /**
-     * 与{@link #getLock(String) getLock
-     * }类似，但是要求获取出来的必须是{@link java.util.concurrent.locks.ReadWriteLock ReadWriteLock}的子集
+     * 与{@link #getLock(String) getLock }类似，但是要求获取出来的必须是{@link java.util.concurrent.locks.ReadWriteLock
+     * ReadWriteLock}的子集
      *
-     * @param name lock的名字
+     * @param name
+     *            lock的名字
      * @return 指定名字的lock
      */
     ReadWriteLock getReadWriteLock(String name);
@@ -48,8 +52,10 @@ public interface ClusterManager {
     /**
      * 获取指定名字的BlockingDeque
      *
-     * @param name 名字
-     * @param <V>  BlockingDeque中的数据类型
+     * @param name
+     *            名字
+     * @param <V>
+     *            BlockingDeque中的数据类型
      * @return 指定名字对应的BlockingDeque
      */
     <V> BlockingDeque<V> getBlockingDeque(String name);
@@ -57,8 +63,10 @@ public interface ClusterManager {
     /**
      * 获取指定名字的BlockingQueue
      *
-     * @param name 名字
-     * @param <V>  BlockingQueue中的数据类型
+     * @param name
+     *            名字
+     * @param <V>
+     *            BlockingQueue中的数据类型
      * @return 指定名字对应的BlockingQueue
      */
     <V> BlockingQueue<V> getBlockingQueue(String name);
@@ -66,8 +74,10 @@ public interface ClusterManager {
     /**
      * 获取指定名字的list
      *
-     * @param name 名字
-     * @param <V>  list中的数据类型
+     * @param name
+     *            名字
+     * @param <V>
+     *            list中的数据类型
      * @return 指定名字对应的list
      */
     <V> List<V> getList(String name);
@@ -75,20 +85,25 @@ public interface ClusterManager {
     /**
      * 获取指定名字的Map，该Map必须能够自动在集群间同步
      *
-     * @param name Map的名字
-     * @param <K>  Map的key的类型
-     * @param <V>  Map的value的类型
+     * @param name
+     *            Map的名字
+     * @param <K>
+     *            Map的key的类型
+     * @param <V>
+     *            Map的value的类型
      * @return 指定名字对应的Map
      */
     <K, V> Map<K, V> getMap(String name);
 
     /**
-     * 与{@link #getMap(String) getMap}类似，但是要求获取出来的Map为{@link java.util.concurrent.ConcurrentMap ConcurrentMap}
-     * 的子集
+     * 与{@link #getMap(String) getMap}类似，但是要求获取出来的Map为{@link java.util.concurrent.ConcurrentMap ConcurrentMap} 的子集
      *
-     * @param name Map的名字
-     * @param <K>  Map的key的类型
-     * @param <V>  Map的value的类型
+     * @param name
+     *            Map的名字
+     * @param <K>
+     *            Map的key的类型
+     * @param <V>
+     *            Map的value的类型
      * @return 指定名字对应的Map
      */
     <K, V> ConcurrentMap<K, V> getConcurrentMap(String name);
@@ -96,8 +111,10 @@ public interface ClusterManager {
     /**
      * 获取一个分布式Set
      *
-     * @param name Set的名字
-     * @param <K>  Set中数据类型
+     * @param name
+     *            Set的名字
+     * @param <K>
+     *            Set中数据类型
      * @return Set
      */
     <K> Set<K> getSet(String name);
@@ -105,15 +122,19 @@ public interface ClusterManager {
     /**
      * 获取topic
      *
-     * @param name topic name
-     * @param <M>  topic中message的类型
+     * @param name
+     *            topic name
+     * @param <M>
+     *            topic中message的类型
      * @return 对应的topic
      */
     <M> Topic<M> getTopic(String name);
 
     /**
      * 释放该分布式管理器获取的资源(对于空集合、已经解锁的lock应该需要可以自动删除)
-     * @param obj 资源
+     * 
+     * @param obj
+     *            资源
      * @return true表示释放成功
      */
     boolean free(Object obj);
@@ -126,10 +147,13 @@ public interface ClusterManager {
     /**
      * 获取redis实现的分布式管理器
      *
-     * @param host redis的主机地址，例如192.168.1.100
-     * @param port redis的端口，例如8080
+     * @param host
+     *            redis的主机地址，例如192.168.1.100
+     * @param port
+     *            redis的端口，例如8080
      * @return redis实现的分布式锁管理器
-     * @throws MalformedURLException MalformedURLException
+     * @throws MalformedURLException
+     *             MalformedURLException
      */
     static RedisClusterManager getInstance(String host, int port) throws MalformedURLException {
         return RedisClusterManagerFactory.getInstance(host, port);
@@ -138,21 +162,25 @@ public interface ClusterManager {
     /**
      * 获取redis实现的分布式管理器
      *
-     * @param host     redis的主机地址，例如192.168.1.100
-     * @param port     redis的端口，例如8080
-     * @param password 密码
+     * @param host
+     *            redis的主机地址，例如192.168.1.100
+     * @param port
+     *            redis的端口，例如8080
+     * @param password
+     *            密码
      * @return redis实现的分布式锁管理器
-     * @throws MalformedURLException MalformedURLException
+     * @throws MalformedURLException
+     *             MalformedURLException
      */
-    static RedisClusterManager getInstance(String host, int port,
-                                           String password) throws MalformedURLException {
+    static RedisClusterManager getInstance(String host, int port, String password) throws MalformedURLException {
         return RedisClusterManagerFactory.getInstance(host, port, password);
     }
 
     /**
      * 获取redis实现的分布式管理器
      *
-     * @param redisBaseConfig redis配置
+     * @param redisBaseConfig
+     *            redis配置
      * @return 分布式管理器
      */
     static RedisClusterManager getInstance(RedisBaseConfig redisBaseConfig) {

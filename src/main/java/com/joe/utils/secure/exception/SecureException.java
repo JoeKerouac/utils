@@ -21,8 +21,7 @@ public class SecureException extends RuntimeException {
         super(cause);
     }
 
-    protected SecureException(String message, Throwable cause, boolean enableSuppression,
-                              boolean writableStackTrace) {
+    protected SecureException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -23,7 +23,7 @@ public class ValidatorUtil {
     /**
      * bean验证器
      */
-    private static final Validator           validator;
+    private static final Validator validator;
     /**
      * 构造器、方法参数、方法响应验证器
      */
@@ -38,7 +38,8 @@ public class ValidatorUtil {
     /**
      * 校验bean是否符合规则
      *
-     * @param bean 要校验的bean
+     * @param bean
+     *            要校验的bean
      */
     public static void validate(@NotNull Object bean) {
         Assert.notNull(bean, "bean不能为null");
@@ -49,22 +50,26 @@ public class ValidatorUtil {
     /**
      * 验证方法参数是否符合规则
      *
-     * @param instance 方法所在的类的实例
-     * @param method   方法实例
-     * @param params   参数
+     * @param instance
+     *            方法所在的类的实例
+     * @param method
+     *            方法实例
+     * @param params
+     *            参数
      */
     public static void validateParameters(Object instance, Method method, Object[] params) {
         Assert.notNull(instance, "instance不能为null");
         Assert.notNull(method, "method不能为null");
-        Set<ConstraintViolation<Object>> constraintViolations = executableValidator
-            .validateParameters(instance, method, params);
+        Set<ConstraintViolation<Object>> constraintViolations =
+            executableValidator.validateParameters(instance, method, params);
         check(constraintViolations);
     }
 
     /**
      * 检查是否有校验错误
      *
-     * @param constraintViolations 校验结果
+     * @param constraintViolations
+     *            校验结果
      */
     private static void check(Set<ConstraintViolation<Object>> constraintViolations) {
         Iterator<ConstraintViolation<Object>> iterator = constraintViolations.iterator();

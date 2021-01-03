@@ -14,7 +14,8 @@ public class AccessorUtil {
     /**
      * 判断字段是否是final的
      *
-     * @param field 字段
+     * @param field
+     *            字段
      * @return 返回true表示是final
      */
     public static boolean isFinal(Field field) {
@@ -25,7 +26,8 @@ public class AccessorUtil {
     /**
      * 判断方法、构造器是否是final
      *
-     * @param executable 方法、构造器对象
+     * @param executable
+     *            方法、构造器对象
      * @return 返回true表示是final
      */
     public static boolean isFinal(Executable executable) {
@@ -36,7 +38,8 @@ public class AccessorUtil {
     /**
      * 判断字段是否是public
      *
-     * @param field 字段
+     * @param field
+     *            字段
      * @return 返回true表示是public
      */
     public static boolean isPublic(Field field) {
@@ -47,7 +50,8 @@ public class AccessorUtil {
     /**
      * 判断方法、构造器是否是public
      *
-     * @param executable 方法、构造器对象
+     * @param executable
+     *            方法、构造器对象
      * @return 返回true表示是public
      */
     public static boolean isPublic(Executable executable) {
@@ -58,7 +62,8 @@ public class AccessorUtil {
     /**
      * 判断方法、构造器是否是protected
      *
-     * @param executable 方法、构造器对象
+     * @param executable
+     *            方法、构造器对象
      * @return 返回true表示是protected
      */
     public static boolean isProtected(Executable executable) {
@@ -68,7 +73,9 @@ public class AccessorUtil {
 
     /**
      * 判断方法是否是static
-     * @param method 方法
+     * 
+     * @param method
+     *            方法
      * @return true表示方法是静态的
      */
     public static boolean isStatic(Method method) {
@@ -77,7 +84,9 @@ public class AccessorUtil {
 
     /**
      * 判断方法是否是抽象的
-     * @param method 方法
+     * 
+     * @param method
+     *            方法
      * @return 返回true表示方法是抽象的
      */
     public static boolean isAbstract(Method method) {
@@ -86,7 +95,9 @@ public class AccessorUtil {
 
     /**
      * 判断字段是否是static
-     * @param field 字段
+     * 
+     * @param field
+     *            字段
      * @return true表示字段是静态的
      */
     public static boolean isStatic(Field field) {
@@ -96,7 +107,8 @@ public class AccessorUtil {
     /**
      * 判断修饰符是否是final
      *
-     * @param modifier 修饰符
+     * @param modifier
+     *            修饰符
      * @return 返回true表示是final类型
      */
     private static boolean isFinal(int modifier) {
@@ -106,7 +118,8 @@ public class AccessorUtil {
     /**
      * 判断修饰符是否是public
      *
-     * @param modifier 修饰符
+     * @param modifier
+     *            修饰符
      * @return 返回true表示是public
      */
     private static boolean isPublic(int modifier) {
@@ -116,7 +129,8 @@ public class AccessorUtil {
     /**
      * 判断修饰符是否是protected
      *
-     * @param modifier 修饰符
+     * @param modifier
+     *            修饰符
      * @return 返回true表示是protected
      */
     private static boolean isProtected(int modifier) {

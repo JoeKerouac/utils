@@ -15,8 +15,8 @@ import com.joe.utils.common.IOUtils;
  */
 public class ClassUtilsTest {
 
-    private static final JClassLoader LOADER = new JClassLoader(new String[] { ".*" },
-        name -> ClassUtils.getClassAsStream(ClassUtils.loadClass(name)));
+    private static final JClassLoader LOADER =
+        new JClassLoader(new String[] {".*"}, name -> ClassUtils.getClassAsStream(ClassUtils.loadClass(name)));
 
     @Test
     public void doTestGetClassAsStream() throws Exception {

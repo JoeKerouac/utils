@@ -10,8 +10,10 @@ public interface Invoker {
 
     /**
      * 调用
+     * 
      * @return 调用结果
-     * @throws Throwable 异常
+     * @throws Throwable
+     *             异常
      */
     Object call() throws Throwable;
 }
