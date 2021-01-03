@@ -34,7 +34,17 @@ public class IDCardTest {
         // 使用预设的身份证
         idCard = ID_CARD;
         // 年龄
-        int age = Calendar.getInstance().get(Calendar.YEAR) - 1990;
+        int age;
+
+        Calendar calendar = Calendar.getInstance();
+        int nowYear = calendar.get(Calendar.YEAR);
+        int nowMonthDay = calendar.get(Calendar.MONTH) * 100 + calendar.get(Calendar.DATE);
+
+        if (nowMonthDay > 216) {
+            age = nowYear - 1990 + 1;
+        } else {
+            age = nowYear - 1990;
+        }
 
         Assert.assertTrue(IDCard.check(idCard));
         Assert.assertEquals(IDCard.getProvince(idCard), PROVINCE);

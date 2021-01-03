@@ -197,7 +197,7 @@ public class IDCard {
     }
 
     /**
-     * 获取用户年龄
+     * 获取用户年龄，如果2020.01.01出生，那么到2021.01.01都返回1岁，到2021.01.02就返回2岁了
      *
      * @param idCard
      *            用户身份证号
@@ -212,9 +212,9 @@ public class IDCard {
         int nowYear = calendar.get(Calendar.YEAR);
         int nowMonthDay = calendar.get(Calendar.MONTH) * 100 + calendar.get(Calendar.DATE);
         if (nowMonthDay > monthDay) {
-            age = nowYear - year;
+            age = nowYear - year + 1;
         } else {
-            age = nowYear - year - 1;
+            age = nowYear - year;
 
         }
         if (age < 0) {
