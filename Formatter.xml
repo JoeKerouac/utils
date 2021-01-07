@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <profiles version="12">
     <profile kind="CodeFormatterProfile" name="JoeKerouac" version="13">
+        <!-- 配置说明:https://www.ibm.com/support/knowledgecenter/SS8PJ7_9.6.1/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/formatter/DefaultCodeFormatterConstants.html -->
+        <!-- 定义在org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants类中 -->
+
+        <!-- 配置说明:https://www.ibm.com/support/knowledgecenter/SS8PJ7_9.6.1/org.eclipse.jdt.doc.isv/reference/api/org/eclipse/jdt/core/formatter/DefaultCodeFormatterConstants.html -->
+        <!-- 定义在org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants类中 -->
         <!--可变参数的... Idea没有对应的配置项，强制insert-->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_ellipsis" value="insert"/>
         <!--枚举值之间 Idea没有对应的配置项，强制insert-->
