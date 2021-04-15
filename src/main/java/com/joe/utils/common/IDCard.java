@@ -35,7 +35,7 @@ public class IDCard {
     /**
      * 身份证正则
      */
-    private static final Pattern ID_CARD_PATTERN = Pattern.compile("[0-9]{17}[0-9|x|X]");
+    private static final Pattern ID_CARD_PATTERN = Pattern.compile("[0-9]{17}[0-9xX]");
 
     /**
      * 根据出生日期随机生成一个身份证号
