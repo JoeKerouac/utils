@@ -47,4 +47,9 @@ public class StringConst {
      * 右中括号
      */
     public static final char RIGHT_BRACKET = ']';
+
+    /**
+     * 连接符
+     */
+    public static final char HYPHEN = '-';
 }
